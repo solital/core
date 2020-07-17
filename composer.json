@@ -1,0 +1,21 @@
+{
+    "name": "solital/core",
+    "description": "Official core of Solital framework",
+    "license": "MIT",
+    "homepage": "https://solital.github.io/docs-v1/",
+    "require": {
+        "php": ">= 7.2",
+        "ext-json": "*",
+        "psr/container": "1.*",
+        "psr/http-factory": "^1.0",
+        "psr/simple-cache": "1.*"
+    },
+    "require-dev": {
+        "monolog/monolog": "^2.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Solital\\": "src/"
+        }
+    }
+}
