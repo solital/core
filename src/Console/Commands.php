@@ -2,7 +2,15 @@
 
 namespace Solital\Core\Console;
 
+use Solital\Core\Wolf\Wolf;
+use Solital\Core\Course\Course;
+use Solital\Core\Security\Hash;
+use Solital\Core\Security\Reset;
+use Solital\Components\Model\Model;
+use Solital\Core\Security\Guardian;
 use Solital\Database\Create\Create;
+use Solital\Core\Resource\HandleFiles;
+use Solital\Components\Controller\Auth\AuthController;
 
 class Commands
 {
@@ -102,7 +110,11 @@ class Commands
         }
 
         if (is_dir($dir)) {
-            file_put_contents($dir."$name.php", "<?php\n\nuse Solital\Course\Course;\nuse Solital\Wolf\Wolf;\n\nCourse::get('/', function(){\n\n});");
+            $res = (new HandleFiles())->fileExists($dir."$name.php");
+            if ($res == true) {
+                die("\n\n\033[91mError:\033[0m there is a file with the same name\n\n");
+            }
+            file_put_contents($dir."$name.php", "<?php\n\nuse Solital\Core\Course\Course;\nuse Solital\Wolf\Wolf;\n\nCourse::get('/', function(){\n\n});");
             
             return true;
         }
@@ -115,6 +127,10 @@ class Commands
         $dir = ROOT_VINCI."/app/Components/Controller/";
         
         if (is_dir($dir)) {
+            $res = (new HandleFiles())->fileExists(ROOT_VINCI."/app/Components/Controller/$name.php");
+            if ($res == true) {
+                die("\n\n\033[91mError:\033[0m there is a file with the same name\n\n");
+            }
             file_put_contents($dir."$name.php", "<?php\n\nnamespace Solital\Components\Controller;\n\nclass ".$name."\n{\n\n}");
             
             return true;
@@ -128,11 +144,17 @@ class Commands
         $dir = "./resources/view/";
 
         if (isset($folder)) {
-            \mkdir("./resources/view/".$folder);
+            if (!is_dir("./resources/view/".$folder."/")) {
+                \mkdir("./resources/view/".$folder);
+            }
             $dir = "./resources/view/".$folder."/";
         }
         
         if (is_dir($dir)) {
+            $res = (new HandleFiles())->fileExists($dir."$name.php");
+            if ($res == true) {
+                die("\n\n\033[91mError:\033[0m there is a file with the same name\n\n");
+            }
             file_put_contents($dir."$name.php", "<h1>$name</h1>");
             
             return true;
@@ -146,6 +168,10 @@ class Commands
         $dir = ROOT_VINCI."/app/Components/Model/";
         
         if (is_dir($dir)) {
+            $res = (new HandleFiles())->fileExists(ROOT_VINCI."/app/Components/Model/$name.php");
+            if ($res == true) {
+                die("\n\n\033[91mError:\033[0m there is a file with the same name\n\n");
+            }
             file_put_contents($dir."$name.php", "<?php\n\nnamespace Solital\Components\Model;\nuse Solital\Components\Model\Model;\n\nclass ".$name." extends Model\n{\n\n}");
             
             return true;
@@ -159,6 +185,10 @@ class Commands
         $dir = "./public/assets/_js/";
         
         if (is_dir($dir)) {
+            $res = (new HandleFiles())->fileExists("./public/assets/_js/$name.js");
+            if ($res == true) {
+                die("\n\n\033[91mError:\033[0m there is a file with the same name\n\n");
+            }
             file_put_contents($dir."$name.js", "");
             
             return true;
@@ -172,6 +202,10 @@ class Commands
         $dir = "./public/assets/_css/";
         
         if (is_dir($dir)) {
+            $res = (new HandleFiles())->fileExists("./public/assets/_css/$name.css");
+            if ($res == true) {
+                die("\n\n\033[91mError:\033[0m there is a file with the same name\n\n");
+            }
             file_put_contents($dir."$name.css", "");
             
             return true;
@@ -193,7 +227,7 @@ class Commands
         }
     }
 
-    public function authComponents()
+    public static function authComponents()
     {
         $controller = "<?php\n\n";
         $controller .= "namespace Solital\Components\Controller\Auth;\n";
@@ -213,7 +247,7 @@ class Commands
         $controller .= "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20->values('email', 'pass')\n";
         $controller .= "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20->register('tb_auth');\n\n";
         $controller .= "\x20\x20\x20\x20\x20\x20\x20\x20if (\x24res == false) {\n";
-        $controller .= "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20response()->redirect('/login');\n";
+        $controller .= "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20response()->redirect(url('login'));\n";
         $controller .= "\x20\x20\x20\x20\x20\x20\x20\x20}\n";
         $controller .= "\x20\x20\x20\x20}";
         $controller .= "\n\n";
@@ -263,10 +297,10 @@ class Commands
             file_put_contents($dir_view."dashboard.php", $view_dashboard);
         }
 
-        $new_routes = "/\n\n\x2A\x2A Login Routers \x2A/\n";
-        $new_routes .= "Course::get('/login', 'Auth\LoginController@login');\n";
+        $new_routes = "\n\n/\x2A\x2A Login Routers \x2A/\n";
+        $new_routes .= "Course::get('/login', 'Auth\LoginController@login')->name('login');\n";
         $new_routes .= "Course::post('/verify-login', 'Auth\LoginController@verify')->name('verifyLogin');\n";
-        $new_routes .= "Course::get('/dashboard', 'Auth\LoginController@dashboard');\n";
+        $new_routes .= "Course::get('/dashboard', 'Auth\LoginController@dashboard')->name('dashboard');\n";
         $new_routes .= "Course::get('/logoff', 'Auth\LoginController@exit')->name('exit');\n";
 
         $routes = fopen("./routers/routes.php", "a+");
@@ -282,7 +316,7 @@ class Commands
         return true;
     }
 
-    public function removeAuth()
+    public static function removeAuth()
     {
         $file_login = ROOT_VINCI."/app/Components/Controller/Auth/LoginController.php";
         $file_change = ROOT_VINCI."/app/Components/Controller/Auth/ChangeController.php";
@@ -301,7 +335,7 @@ class Commands
         return false;
     }
 
-    public function forgotComponents()
+    public static function forgotComponents()
     {
         $controller = "<?php\n\n";
         $controller .= "namespace Solital\Components\Controller\Auth;\n";
@@ -338,17 +372,17 @@ class Commands
         $controller .= "\x20\x20\x20\x20public function changePost(\x24hash)\n";
         $controller .= "\x20\x20\x20\x20{\n";
         $controller .= "\x20\x20\x20\x20\x20\x20\x20\x20\x24res = Hash::decrypt(\x24hash)::isValid();\n\n";
-        $controller .= "\x20\x20\x20\x20\x20\x20\x20\x20if (\x24res == true) {\n";
-        $controller .= "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x24pass = input()->post('pass')->getValue();\n";
-        $controller .= "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x24confPass = input()->post('confPass')->getValue();\n\n";
-        $controller .= "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20if (\x24pass != \x24confPass) {\n";
-        $controller .= "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20response()->redirect('/change/'.\x24hash);\n";
-        $controller .= "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20} else {\n";
-        $controller .= "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20echo 'enter the code that will change the password here';\n";
-        $controller .= "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20}\n";
-        $controller .= "\x20\x20\x20\x20\x20\x20\x20\x20} else {\n";
-        $controller .= "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20response()->redirect('/login');\n";
-        $controller .= "\x20\x20\x20\x20\x20\x20\x20\x20}\n";
+        $controller .= "\x20\x20\x20\x20\x20\x20\x20\x20\x20if (\x24res == true) {\n";
+        $controller .= "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x24pass = input()->post('pass')->getValue();\n";
+        $controller .= "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x24confPass = input()->post('confPass')->getValue();\n\n";
+        $controller .= "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20if (\x24pass != \x24confPass) {\n";
+        $controller .= "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20response()->redirect('/change/'.\x24hash);\n";
+        $controller .= "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20} else {\n";
+        $controller .= "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20echo 'enter the code that will change the password here';\n";
+        $controller .= "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20}\n";
+        $controller .= "\x20\x20\x20\x20\x20\x20\x20\x20\x20} else {\n";
+        $controller .= "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20response()->redirect('/login');\n";
+        $controller .= "\x20\x20\x20\x20\x20\x20\x20\x20\x20}\n";
         $controller .= "\x20\x20\x20\x20}";
         $controller .= "\n\n";
         $controller .= "}";
@@ -385,7 +419,7 @@ class Commands
             file_put_contents($dir_view."change.php", $view_change);
         }
 
-        $new_routes = "/\n\n\x2A\x2A Forgot Routers \x2A/\n";
+        $new_routes = "\n\n/\x2A\x2A Forgot Routers \x2A/\n";
         $new_routes .= "Course::get('/forgot', 'Auth\ForgotController@forgot')->name('forgot');\n";
         $new_routes .= "Course::post('/forgotPost', 'Auth\ForgotController@forgotPost')->name('forgotPost');\n";
         $new_routes .= "Course::get('/change/{hash}', 'Auth\ForgotController@change')->name('change');\n";
@@ -398,7 +432,7 @@ class Commands
         return true;
     }
 
-    public function removeForgot()
+    public static function removeForgot()
     {
         $file_forgot = ROOT_VINCI."/app/Components/Controller/Auth/ForgotController.php";
         $file_forgot_view = ROOT_VINCI."/resources/auth/forgot.php";

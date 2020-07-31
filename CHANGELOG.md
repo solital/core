@@ -1,5 +1,16 @@
 # Released Notes
 
+## v1.0.1 - (2020-07-31)
+
+### Fixed
+
+- Fixed Vinci Console
+- Fixed Vinci bug replacing existing file
+- Fixed duplicate route
+- Fixed title of exception templates
+- Fixed CSRF token for Session
+- Fixed key in the `Session` class
+
 ## v1.0.0 - (2020-07-17)
 
 ### Fixed

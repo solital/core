@@ -117,6 +117,11 @@ class Router
     protected $classLoader;
 
     /**
+     * @var array
+     */
+    private $url;
+
+    /**
      * Router constructor.
      */
     public function __construct()
@@ -262,6 +267,13 @@ class Router
                 /* Add the route to the map, so we can find the active one when all routes has been loaded */
                 $this->processedRoutes[] = $route;
             }
+
+            $this->url[] = $route->url;
+            $routeDuplicate = array_unique(array_diff_assoc($this->url, array_unique($this->url)));
+        }
+
+        foreach ($routeDuplicate as $duplicate) {
+            NotFoundHttpException::alertMessage(404, "Duplicate '$duplicate' route");
         }
 
         $this->exceptionHandlers = array_merge($exceptionHandlers, $this->exceptionHandlers);

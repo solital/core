@@ -298,7 +298,7 @@ class InputHandler
      */
     public function all(array $filter = []): array
     {
-        $output = filter_input_array(INPUT_GET, FILTER_SANITIZE_STRING);
+        $output = $_GET;
 
         if ($this->request->getMethod() === 'post') {
 

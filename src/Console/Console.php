@@ -6,8 +6,8 @@ use Solital\Database\Create\Create;
 
 class Console extends Commands
 {
-    const SOLITAL_VERSION = "1.0.0";
-    const VINCI_VERSION = "1.0.0";
+    const SOLITAL_VERSION = "1.0.1";
+    const VINCI_VERSION = "1.0.1";
 
     public static function verify($command, $file_create, $folder = null)
     {
@@ -17,9 +17,9 @@ class Console extends Commands
                 $return = Commands::controller($file);
             
                 if ($return == true) {
-                    print_r("Controller ".$file."Controller created\n\n");
+                    print_r("Controller ".$file." created\n\n");
                 } else {
-                    print_r("Error: Controller ".$file."Controller not created\n\n");
+                    print_r("Error: Controller ".$file." not created\n\n");
                 }
 
                 break;
@@ -160,10 +160,12 @@ class Console extends Commands
                 if (method_exists($create, $file_create)) {
                     if ($file_create == "configure") {
                         $create->configure(trim($res));
+                        echo "\nCommand successfully executed!\n\n";
                         exit;
                     }
 
                     $create->$file_create();
+                    echo "\nCommand successfully executed!\n\n";
                 } else {
                     echo "\n\033[91mError:\033[0m the reported method doesn't exist\n\n";
                 }

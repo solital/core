@@ -3,13 +3,13 @@
 namespace Solital\Core\Http\Security;
 
 use Solital\Core\Http\Security\Exceptions\SecurityException;
+use Solital\Core\Resource\Session;
 
 class CookieTokenProvider implements TokenProviderInterface
 {
     public const CSRF_KEY = 'CSRF-TOKEN';
-
+    private const CSRF_VALIDATE = 'CSRF-VALIDATE';
     protected $token;
-    protected $cookieTimeoutMinutes = 120;
 
     /**
      * CookieTokenProvider constructor.
@@ -20,50 +20,38 @@ class CookieTokenProvider implements TokenProviderInterface
         $this->token = $this->getToken();
 
         if ($this->token === null) {
-            $this->token = $this->generateToken();
-        }
-    }
-
-    /**
-     * Generate random identifier for CSRF token
-     *
-     * @return string
-     * @throws SecurityException
-     */
-    public function generateToken(): string
-    {
-        try {
-            return bin2hex(random_bytes(32));
-        } catch (\Exception $e) {
-            throw new SecurityException($e->getMessage(), (int)$e->getCode(), $e->getPrevious());
+            $this->token = $this->setToken();
         }
     }
 
     /**
      * Validate valid CSRF token
      *
-     * @param string $token
      * @return bool
      */
-    public function validate(string $token): bool
+    public function validate(): bool
     {
-        if ($this->getToken() !== null) {
-            return hash_equals($token, $this->getToken());
+        if ($this->getToken() == null || Session::has(static::CSRF_KEY) == false || empty($_REQUEST['csrf_token']) || $_REQUEST['csrf_token'] != Session::show(static::CSRF_KEY)) {
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     /**
-     * Set csrf token cookie
-     * Overwrite this method to save the token to another storage like session etc.
-     *
-     * @param string $token
+     * Set csrf token
+     * @param int $seconds
+     * @return string
      */
-    public function setToken(string $token): void
+    public function setToken(int $seconds = 20): string
     {
-        $this->token = $token;
-        setcookie(static::CSRF_KEY, $token, (time() + 60) * $this->cookieTimeoutMinutes, '/', ini_get('session.cookie_domain'), ini_get('session.cookie_secure'), ini_get('session.cookie_httponly'));
+        if (Session::show(static::CSRF_VALIDATE) < time() || empty(Session::show(static::CSRF_VALIDATE))) {
+            Session::new(static::CSRF_VALIDATE, time() + $seconds);
+            $token = base64_encode(random_bytes(20));
+            Session::new(static::CSRF_KEY, $token);
+        }
+
+        return Session::show(static::CSRF_KEY);
     }
 
     /**
@@ -73,19 +61,8 @@ class CookieTokenProvider implements TokenProviderInterface
      */
     public function getToken(?string $defaultValue = null): ?string
     {
-        $this->token = ($this->hasToken() === true) ? $_COOKIE[static::CSRF_KEY] : null;
-
+        $this->token = ($this->hasToken() === true) ? $_SESSION[static::CSRF_KEY] : null;
         return $this->token ?? $defaultValue;
-    }
-
-    /**
-     * Refresh existing token
-     */
-    public function refresh(): void
-    {
-        if ($this->token !== null) {
-            $this->setToken($this->token);
-        }
     }
 
     /**
@@ -94,25 +71,7 @@ class CookieTokenProvider implements TokenProviderInterface
      */
     public function hasToken(): bool
     {
-        return isset($_COOKIE[static::CSRF_KEY]);
-    }
-
-    /**
-     * Get timeout for cookie in minutes
-     * @return int
-     */
-    public function getCookieTimeoutMinutes(): int
-    {
-        return $this->cookieTimeoutMinutes;
-    }
-
-    /**
-     * Set cookie timeout in minutes
-     * @param int $minutes
-     */
-    public function setCookieTimeoutMinutes(int $minutes): void
-    {
-        $this->cookieTimeoutMinutes = $minutes;
+        return isset($_SESSION[static::CSRF_KEY]);
     }
 
 }

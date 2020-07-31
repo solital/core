@@ -64,27 +64,19 @@ class BaseCsrfVerifier implements MiddlewareInterface
      */
     public function handle(Request $request): void
     {
-
         if ($this->skip($request) === false && \in_array($request->getMethod(), ['post', 'put', 'delete'], true) === true) {
 
-            $token = $request->getInputHandler()->value(
-                static::POST_KEY,
-                $request->getHeader(static::HEADER_KEY),
-                'post'
-            );
-
-            if ($this->tokenProvider->validate((string)$token) === false) {
-                #throw new TokenMismatchException('Invalid CSRF-token.');
+            if ($this->tokenProvider->validate() === false) {
                 TokenMismatchException::alertMessage(404, "Invalid CSRF-token");
             }
 
         }
-
-        // Refresh existing token
-        $this->tokenProvider->refresh();
-
     }
 
+    /**
+     * Get token provider
+     * @return TokenProviderInterface
+     */
     public function getTokenProvider(): TokenProviderInterface
     {
         return $this->tokenProvider;
@@ -93,6 +85,7 @@ class BaseCsrfVerifier implements MiddlewareInterface
     /**
      * Set token provider
      * @param TokenProviderInterface $provider
+     * @return TokenProviderInterface
      */
     public function setTokenProvider(TokenProviderInterface $provider): void
     {

@@ -73,11 +73,17 @@ class HandleFiles
 
     /**
      * @param string $file
+     * @param bool   $delete
      * @return null|bool
      */
-    public function fileExists($file): bool
+    public function fileExists(string $file, bool $delete = false): bool
     {
         if (file_exists($this->folder.$file)) {
+            if ($delete == true) {
+                unlink($this->folder.$file);
+                return true;
+            }
+
             return true;
         } else {
             return false;

@@ -15,7 +15,7 @@ class RouteController extends LoadableRoute implements ControllerRouteInterface
 
     public function __construct($url, $controller)
     {
-        #$this->setUrl($url);
+        $this->setUri($url);
         $this->setName(trim(str_replace('/', '.', $url), '/'));
         $this->controller = $controller;
     }

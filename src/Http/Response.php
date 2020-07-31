@@ -247,6 +247,9 @@ class Response implements ResponseInterface
      */
     public function withStatus($code, $reasonPhrase = '')
     {
+        if ($reasonPhrase == "") {
+            $reasonPhrase = $this->statusMessageList[$code];
+        }
         $code = $this->sanitizeStatus($code);
 
         if (! is_string($reasonPhrase)) {

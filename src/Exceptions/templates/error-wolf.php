@@ -1,3 +1,4 @@
+<title>Wolf error</title>
 <body style='background: #F8F8FF;'>
     <div style='background: #FFF; padding: 15px; font-family: sans-serif;'>
         <p>
