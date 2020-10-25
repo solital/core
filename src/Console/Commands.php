@@ -227,8 +227,22 @@ class Commands
         }
     }
 
+    private static function checkConnection()
+    {
+        if (!defined('DB_CONFIG')) {
+            return false;
+        }
+
+        return true;
+    }
+
     public static function authComponents()
     {
+        if (self::checkConnection() == false) {
+            echo "\n\033[91mError:\033[0m The database doesn't' exist or wasn't reported in the \033[34mdb.php\033[0m file\n\n";
+            return false;
+        }
+
         $controller = "<?php\n\n";
         $controller .= "namespace Solital\Components\Controller\Auth;\n";
         $controller .= "use Solital\Components\Controller\Auth\AuthController;\n";
@@ -319,13 +333,11 @@ class Commands
     public static function removeAuth()
     {
         $file_login = ROOT_VINCI."/app/Components/Controller/Auth/LoginController.php";
-        $file_change = ROOT_VINCI."/app/Components/Controller/Auth/ChangeController.php";
         $file_login_view = ROOT_VINCI."/resources/auth/login.php";
         $file_dashboard_view = ROOT_VINCI."/resources/auth/dashboard.php";
-
-        if (is_file($file_login) && is_file($file_change) && is_file($file_login_view) && is_file($file_dashboard_view)) {
+        
+        if (isset($file_login) && isset($file_login_view) && isset($file_dashboard_view)) {
             unlink($file_login);
-            unlink($file_change);
             unlink($file_login_view);
             unlink($file_dashboard_view);
 

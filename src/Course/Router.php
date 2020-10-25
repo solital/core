@@ -272,8 +272,10 @@ class Router
             $routeDuplicate = array_unique(array_diff_assoc($this->url, array_unique($this->url)));
         }
 
-        foreach ($routeDuplicate as $duplicate) {
-            NotFoundHttpException::alertMessage(404, "Duplicate '$duplicate' route");
+        if (isset($routeDuplicate)) {
+            foreach ($routeDuplicate as $duplicate) {
+                NotFoundHttpException::alertMessage(404, "Duplicate '$duplicate' route");
+            }
         }
 
         $this->exceptionHandlers = array_merge($exceptionHandlers, $this->exceptionHandlers);
@@ -430,7 +432,7 @@ class Router
         }
 
         if ($methodNotAllowed === true) {
-            $message = NotFoundHttpException::alertMessage(403, "Route '".$this->request->getUri()->getPath()."' or method '".$this->request->getMethod()."' not allowed", $this->request->getUri()->getPath());
+            $message = NotFoundHttpException::alertMessage(403, "Route '".$this->request->getUri()->getPath()."' or method '".strtoupper($this->request->getMethod())."' not allowed", $this->request->getUri()->getPath());
             #$message = sprintf('Route "%s" or method "%s" not allowed.', $this->request->getUri()->getPath(), $this->request->getMethod());
             $this->handleException(new NotFoundHttpException($message, 403));
         }

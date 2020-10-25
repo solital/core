@@ -19,9 +19,9 @@ class Cookie
      * @param string $index
      * @return bool
      */
-    public static function delete($index): bool
+    public static function delete($index, $path = null): bool
     {
-        setcookie($index, NULL, -1);
+        setcookie($index, NULL, -1, $path);
         return true;
     }
     

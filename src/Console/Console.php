@@ -202,7 +202,7 @@ class Console extends Commands
 
             case 'about':
                 $about = "Solital framework \033[96m ".Console::SOLITAL_VERSION."\033[0m\n\n";
-                $about .= "Thank you for using Solital, you can see the full documentation at https://solital.com/documentation/starting\n\n";
+                $about .= "Thank you for using Solital, you can see the full documentation at https://solital.github.io/docs-v1/\n\n";
                 $about .= "Components Version\n";
                 $about .= "+-------------------------+\n";
                 $about .= "+ Katrina ORM   |\033[93m ".\Solital\Database\ORM::KATRINA_VERSION."\033[0m   +\n";

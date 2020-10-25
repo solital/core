@@ -2,23 +2,26 @@
 
 namespace Solital\Core\Course;
 
-use Solital\Core\Exceptions\InvalidArgumentException;
-use Solital\Core\Http\Exceptions\MalformedUrlException;
-use Solital\Core\Http\Middleware\BaseCsrfVerifier;
-use Solital\Core\Http\Request;
-use Solital\Core\Http\Response;
 use Solital\Core\Http\Uri;
-use Solital\Core\Course\Exceptions\HttpException;
-use Solital\Core\Course\Handlers\CallbackExceptionHandler;
-use Solital\Core\Course\Handlers\EventHandlerInterface;
-use Solital\Core\Course\Route\GroupRouteInterface;
-use Solital\Core\Course\Route\PartialGroupRouteInterface;
+use Solital\Core\Http\Request;
+use Solital\Core\Course\Router;
+use Solital\Core\Http\Response;
+use Solital\Core\Course\Route\RouteUrl;
+use Solital\Core\Course\Route\RouteGroup;
+use Solital\Core\Course\Route\RouteResource;
 use Solital\Core\Course\Route\RouteInterface;
 use Solital\Core\Course\Route\RouteController;
-use Solital\Core\Course\Route\RouteGroup;
 use Solital\Core\Course\Route\RoutePartialGroup;
-use Solital\Core\Course\Route\RouteResource;
-use Solital\Core\Course\Route\RouteUrl;
+use Solital\Core\Course\Exceptions\HttpException;
+use Solital\Core\Course\Route\GroupRouteInterface;
+use Solital\Core\Exceptions\NotFoundHttpException;
+use Solital\Core\Http\Middleware\BaseCsrfVerifier;
+use Solital\Core\Course\RouterBootManagerInterface;
+use Solital\Core\Exceptions\InvalidArgumentException;
+use Solital\Core\Course\Handlers\EventHandlerInterface;
+use Solital\Core\Http\Exceptions\MalformedUrlException;
+use Solital\Core\Course\Route\PartialGroupRouteInterface;
+use Solital\Core\Course\Handlers\CallbackExceptionHandler;
 
 class Course
 {
@@ -248,6 +251,7 @@ class Course
      */
     public static function group(array $settings, \Closure $callback): GroupRouteInterface
     {
+        http_response_code(200);
         if (\is_callable($callback) === false) {
             throw new InvalidArgumentException('Invalid callback provided. Only functions or methods supported');
         }
@@ -273,6 +277,7 @@ class Course
      */
     public static function partialGroup(string $url, \Closure $callback, array $settings = []): PartialGroupRouteInterface
     {
+        http_response_code(200);
         if (\is_callable($callback) === false) {
             throw new InvalidArgumentException('Invalid callback provided. Only functions or methods supported');
         }
@@ -328,6 +333,7 @@ class Course
      */
     public static function match(array $requestMethods, string $url, $callback, array $settings = null)
     {
+        http_response_code(200);
         $route = new RouteUrl($url, $callback);
         $route->setRequestMethods($requestMethods);
         $route = static::addDefaultNamespace($route);
@@ -349,6 +355,7 @@ class Course
      */
     public static function all(string $url, $callback, array $settings = null)
     {
+        http_response_code(200);
         $route = new RouteUrl($url, $callback);
         $route = static::addDefaultNamespace($route);
 
@@ -369,6 +376,7 @@ class Course
      */
     public static function controller(string $url, $controller, array $settings = null)
     {
+        http_response_code(200);
         $route = new RouteController($url, $controller);
         $route = static::addDefaultNamespace($route);
 
@@ -389,6 +397,7 @@ class Course
      */
     public static function resource(string $url, $controller, array $settings = null)
     {
+        http_response_code(200);
         $route = new RouteResource($url, $controller);
         $route = static::addDefaultNamespace($route);
 
@@ -503,6 +512,10 @@ class Course
         if (static::$defaultNamespace !== null) {
 
             $callback = $route->getCallback();
+
+            if (empty($callback)) {
+                NotFoundHttpException::alertMessage(404, "Callback not found");
+            }
 
             /* Only add default namespace on relative callbacks */
             if ($callback === null || (\is_string($callback) === true && $callback[0] !== '\\')) {

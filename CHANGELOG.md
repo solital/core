@@ -1,5 +1,16 @@
 # Released Notes
 
+## v1.0.2 - (2020-10-25)
+
+### Fixed
+
+- Fixed Connection in Vince Console
+- Fixed Katrina version in Vince Console
+- Fixed callback not found
+- Fixed HTTP code 404
+- Fixed duplicate route
+- Fixed Cookie delete path
+
 ## v1.0.1 - (2020-07-31)
 
 ### Fixed
