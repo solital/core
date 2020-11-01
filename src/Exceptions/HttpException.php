@@ -4,6 +4,9 @@ namespace Solital\Core\Exceptions;
 
 class HttpException extends \Exception
 {
+    /**
+     * @var array
+     */
     protected static $statusMessageList = [
         //Informational 1xx
         100 => 'Continue',

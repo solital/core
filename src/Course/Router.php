@@ -432,9 +432,7 @@ class Router
         }
 
         if ($methodNotAllowed === true) {
-            $message = NotFoundHttpException::alertMessage(403, "Route '".$this->request->getUri()->getPath()."' or method '".strtoupper($this->request->getMethod())."' not allowed", $this->request->getUri()->getPath());
-            #$message = sprintf('Route "%s" or method "%s" not allowed.', $this->request->getUri()->getPath(), $this->request->getMethod());
-            $this->handleException(new NotFoundHttpException($message, 403));
+            return NotFoundHttpException::alertMessage(403, "Route '".$this->request->getUri()->getPath()."' or method '".strtoupper($this->request->getMethod())."' not allowed", $this->request->getUri()->getPath());
         }
 
         if (\count($this->request->getLoadedRoutes()) === 0) {
@@ -442,16 +440,10 @@ class Router
             $rewriteUrl = $this->request->getRewriteUrl();
 
             if ($rewriteUrl !== null) {
-                $message = NotFoundHttpException::alertMessage(404, "Route '".$rewriteUrl."' not found (rewrite from: '", $this->request->getUri()->getPath()."')");
-                #$message = sprintf('Route not found: "%s" (rewrite from: "%s")', $rewriteUrl, $this->request->getUri()->getPath());
+                return NotFoundHttpException::alertMessage(404, "Route '".$rewriteUrl."' not found (rewrite from: '", $this->request->getUri()->getPath()."')");
             } else {
-                $message = NotFoundHttpException::alertMessage(404, "Route '".$this->request->getUri()->getPath()."' not found", $this->request->getUri()->getPath());
-                #$message = sprintf('Route not found: "%s"', $this->request->getUri()->getPath());
+                return NotFoundHttpException::alertMessage(404, "Route '".$this->request->getUri()->getPath()."' not found", $this->request->getUri()->getPath());
             }
-
-            $this->debug($message);
-
-            return $this->handleException(new NotFoundHttpException($message, 404));
         }
 
         return null;

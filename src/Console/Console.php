@@ -6,8 +6,8 @@ use Solital\Database\Create\Create;
 
 class Console extends Commands
 {
-    const SOLITAL_VERSION = "1.0.1";
-    const VINCI_VERSION = "1.0.1";
+    const SOLITAL_VERSION = "1.0.3";
+    const VINCI_VERSION = "1.0.2";
 
     public static function verify($command, $file_create, $folder = null)
     {

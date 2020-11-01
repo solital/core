@@ -23,7 +23,7 @@ use Solital\Core\Http\Exceptions\MalformedUrlException;
 use Solital\Core\Course\Route\PartialGroupRouteInterface;
 use Solital\Core\Course\Handlers\CallbackExceptionHandler;
 
-class Course
+class Course extends NotFoundHttpException
 {
     /**
      * Default namespace added to all routes
@@ -407,27 +407,20 @@ class Course
 
         return static::router()->addRoute($route);
     }
-
+    
     /**
-     * Add exception callback handler.
-     *
-     * @param \Closure $callback
-     * @return CallbackExceptionHandler $callbackHandler
+     * @param bool $bool
+     * @param string $url
+     * @return __CLASS__
      */
-    public static function error(\Closure $callback): CallbackExceptionHandler
+    public static function error(bool $bool, string $url)
     {
-        $routes = static::router()->getRoutes();
+        if ($bool == true) {
+            self::$error = true;
+            self::$url = $url;
+        }
 
-        $callbackHandler = new CallbackExceptionHandler($callback);
-
-        $group = new RouteGroup();
-        $group->addExceptionHandler($callbackHandler);
-
-        array_unshift($routes, $group);
-
-        static::router()->setRoutes($routes);
-
-        return $callbackHandler;
+        return __CLASS__;
     }
 
     /**
