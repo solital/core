@@ -97,8 +97,6 @@ class HandleFiles
      */
     public function create(string $dir, int $permission = 0777): bool
     {
-        $dir = ROOT."/".$dir."/";
-        
         if (!is_dir($dir)) {
             \mkdir($dir, $permission, true);
             \chmod($dir, $permission);
@@ -115,7 +113,7 @@ class HandleFiles
      */
     public function remove(string $dir, bool $safe = true): bool
     {
-        $dir = dir(ROOT."/".$dir."/");
+        $dir = dir($dir);
         
         while (($files = $dir->read()) !== false) {
             if(($files != '.') && ($files != '..')) {
