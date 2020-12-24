@@ -44,6 +44,12 @@ class Course extends NotFoundHttpException
     protected static $router;
 
     /**
+     * Default basepath added to all urls
+     * @var string|null
+     */
+    protected static $basePath;
+
+    /**
      * Start routing
      *
      * @throws \Solital\Course\Exceptions\NotFoundHttpException
@@ -114,6 +120,15 @@ class Course extends NotFoundHttpException
     public static function setDefaultNamespace(string $defaultNamespace): void
     {
         static::$defaultNamespace = $defaultNamespace;
+    }
+
+    /**
+     * Set default basepath which will be prepended to all urls.
+     *
+     * @param string $basePath
+     */
+    public static function setDefaultBasepath(string $basePath): void {
+        static::$basePath = $basePath;
     }
 
     /**
@@ -334,7 +349,7 @@ class Course extends NotFoundHttpException
     public static function match(array $requestMethods, string $url, $callback, array $settings = null)
     {
         http_response_code(200);
-        $route = new RouteUrl($url, $callback);
+        $route = new RouteUrl(static::$basePath . $url, $callback);
         $route->setRequestMethods($requestMethods);
         $route = static::addDefaultNamespace($route);
 
@@ -356,7 +371,7 @@ class Course extends NotFoundHttpException
     public static function all(string $url, $callback, array $settings = null)
     {
         http_response_code(200);
-        $route = new RouteUrl($url, $callback);
+        $route = new RouteUrl(static::$basePath . $url, $callback);
         $route = static::addDefaultNamespace($route);
 
         if ($settings !== null) {
