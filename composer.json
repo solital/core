@@ -7,7 +7,10 @@
         "php": "^7.2|^8.0",
         "ext-json": "*",
         "psr/container": "1.*",
+        "fig/event-dispatcher-util": "^1.1",
+        "psr/event-dispatcher": "^1.0",
         "psr/http-factory": "^1.0",
+        "psr/log": "1.1.*",
         "psr/simple-cache": "1.*"
     },
     "autoload": {

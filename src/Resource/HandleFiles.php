@@ -4,7 +4,6 @@ namespace Solital\Core\Resource;
 
 use FilesystemIterator;
 use RecursiveIteratorIterator;
-use RecursiveDirectoryIterator;
 use Solital\Core\Exceptions\NotFoundException;
 
 class HandleFiles
@@ -25,7 +24,7 @@ class HandleFiles
      */
     public function folder(string $folder): HandleFiles
     {
-        $this->folder = $folder."/";
+        $this->folder = $folder.DIRECTORY_SEPARATOR;
         return $this;
     }
 

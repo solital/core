@@ -1,5 +1,17 @@
 # Released Notes
 
+## v1.2.0 - (2021-03-01)
+
+### Added
+
+- Added PSR-3 and PSR-14
+
+### Fixed
+
+- Fix bug in `HandleFiles` class
+
+--------------------------------------------------------------------
+
 ## v1.1.1 - (2021-01-24)
 
 ### Fixed
