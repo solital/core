@@ -1,11 +1,12 @@
 <?php
 
 namespace Solital\Core\Cache;
+
 use Psr\SimpleCache\CacheInterface;
 
 class Cache implements CacheInterface
 {
-    
+
     /**
      * @var string
      */
@@ -16,8 +17,7 @@ class Cache implements CacheInterface
      */
     public function __construct()
     {
-        $this->value = dirname(__DIR__)."/Cache/tmp/";
-        
+        $this->value = dirname(__DIR__) . DIRECTORY_SEPARATOR . "Cache" . DIRECTORY_SEPARATOR . "tmp" . DIRECTORY_SEPARATOR;
     }
 
     /**
@@ -28,10 +28,9 @@ class Cache implements CacheInterface
     {
         if (!is_string($key)) {
             throw new \InvalidArgumentException("The parameter informed must be equal to string");
-            
         }
 
-        $file_in_cache = $this->value.$key.".cache.php";
+        $file_in_cache = $this->value . $key . ".cache.php";
 
         if (file_exists($file_in_cache)) {
             $file_cache = file_get_contents($file_in_cache);
@@ -42,7 +41,7 @@ class Cache implements CacheInterface
             } else {
                 print_r($decoded);
                 exit;
-            }   
+            }
         }
     }
 
@@ -56,22 +55,21 @@ class Cache implements CacheInterface
         if ($ttl == null) {
             $ttl = 20;
         }
-        
+
         if (!is_string($key)) {
             throw new \InvalidArgumentException("The parameter $key informed must be equal to string");
-            
         }
 
-        if (!$ttl instanceof DateInterval && !is_int($ttl)) {
+        if (!$ttl instanceof \DateInterval && !is_int($ttl)) {
             throw new \InvalidArgumentException("$ttl is not a valid value. Enter a value equal to int or DateInterval");
         }
 
-        $file_for_cache = $this->value.$key.".cache.php";
+        $file_for_cache = $this->value . $key . ".cache.php";
 
         $expire = null;
 
-        if ($ttl instanceof DateInterval) {
-            $expire = (new DateTime('now'))->add($ttl)->getTimeStamp();
+        if ($ttl instanceof \DateInterval) {
+            $expire = (new \DateTime('now'))->add($ttl)->getTimeStamp();
         } else if (is_int($ttl)) {
             $expire = time() + $ttl;
         }
@@ -98,10 +96,9 @@ class Cache implements CacheInterface
     {
         if (!is_string($key)) {
             throw new \InvalidArgumentException("The parameter informed must be equal to string");
-            
         }
 
-        $file_for_cache = $this->value.$key.".cache.php";
+        $file_for_cache = $this->value . $key . ".cache.php";
 
         if (file_exists($file_for_cache)) {
             unlink($file_for_cache);
@@ -114,18 +111,20 @@ class Cache implements CacheInterface
 
     /**
      * Wipes clean the entire cache's keys.
+     * 
+     * @return bool
      */
     public function clear(): bool
     {
-        if(is_dir($this->value)) {
+        if (is_dir($this->value)) {
             $directory = dir($this->value);
 
-            while($file = $directory->read()) {
-                if(($file != '.') && ($file != '..')) {
-                    unlink($this->value.$file);
+            while ($file = $directory->read()) {
+                if (($file != '.') && ($file != '..')) {
+                    unlink($this->value . $file);
                 }
             }
-        
+
             $directory->close();
 
             return true;
@@ -134,15 +133,16 @@ class Cache implements CacheInterface
 
     /**
      * @param string $key The cache item key.
+     * 
+     * @return bool
      */
     public function has($key): bool
     {
         if (!is_string($key)) {
             throw new \InvalidArgumentException("The parameter informed must be equal to string");
-            
         }
 
-        $file_in_cache = $this->value.$key.".cache.php";
+        $file_in_cache = $this->value . $key . ".cache.php";
 
         if (file_exists($file_in_cache)) {
             return true;
@@ -152,17 +152,19 @@ class Cache implements CacheInterface
     }
 
     /**
-     * @param iterable $keys A list of keys that can obtained in a single operation.
+     * @param mixed $keys A list of keys that can obtained in a single operation.
+     * @param null $default
+     * 
+     * @return iterable|null
      */
     public function getMultiple($keys, $default = null): ?iterable
     {
         if (!is_array($keys)) {
             throw new \InvalidArgumentException("The parameter informed must be equal to array");
-            
         }
 
         foreach ($keys as $key => $value) {
-            $file_in_cache = $this->value.$value.".cache.php";
+            $file_in_cache = $this->value . $value . ".cache.php";
 
             if (file_exists($file_in_cache)) {
                 $file_cache = file_get_contents($file_in_cache);
@@ -184,8 +186,10 @@ class Cache implements CacheInterface
     }
 
     /**
-     * @param array            $value The value that will be created the cache with the keys
-     * @param int|DateInterval $ttl The TTL value of this item
+     * @param array $values The value that will be created the cache with the keys
+     * @param mixed $ttl     The TTL value of this item
+     * 
+     * @return bool
      */
     public function setMultiple($values, $ttl = null): bool
     {
@@ -195,20 +199,19 @@ class Cache implements CacheInterface
 
         if (!is_array($values)) {
             throw new \InvalidArgumentException("The parameter informed must be equal to array");
-            
         }
 
-        if (!$ttl instanceof DateInterval && !is_int($ttl)) {
+        if (!$ttl instanceof \DateInterval && !is_int($ttl)) {
             throw new \InvalidArgumentException("$ttl is not a valid value. Enter a value equal to int or DateInterval");
         }
 
-        foreach ($values as $key=>$value) {
-            $file_for_cache = $this->value.$key.".cache.php";
-            
+        foreach ($values as $key => $value) {
+            $file_for_cache = $this->value . $key . ".cache.php";
+
             $expire = null;
 
-            if ($ttl instanceof DateInterval) {
-                $expire = (new DateTime('now'))->add($ttl)->getTimeStamp();
+            if ($ttl instanceof \DateInterval) {
+                $expire = (new \DateTime('now'))->add($ttl)->getTimeStamp();
             } else if (is_int($ttl)) {
                 $expire = time() + $ttl;
             }
@@ -219,7 +222,7 @@ class Cache implements CacheInterface
                 return false;
             }
 
-            $page = json_encode($value);    
+            $page = json_encode($value);
             $handle = fopen($file_for_cache, 'w');
             fwrite($handle, $page);
             fclose($handle);
@@ -230,12 +233,13 @@ class Cache implements CacheInterface
 
     /**
      * @param iterable $keys A list of string-based keys to be deleted.
+     * 
+     * @return Cache
      */
     public function deleteMultiple($keys)
     {
         if (!is_array($keys) && !is_string($keys)) {
             throw new \InvalidArgumentException("The parameter informed must be equal to array");
-            
         }
 
         if (is_array($keys)) {
@@ -251,10 +255,12 @@ class Cache implements CacheInterface
 
     /**
      * @param array|string $keys checks multiple keys
+     * 
+     * @return Cache
      */
     private function verifyMultipleKeys($keys)
     {
-        $file_in_cache = $this->value.$keys.".cache.php";
+        $file_in_cache = $this->value . $keys . ".cache.php";
 
         if (file_exists($file_in_cache)) {
             unlink($file_in_cache);

@@ -2,222 +2,284 @@
 
 namespace Solital\Core\Console;
 
-use Solital\Core\Wolf\Wolf;
-use Solital\Core\Course\Course;
-use Solital\Core\Security\Hash;
-use Solital\Core\Security\Reset;
-use Solital\Components\Model\Model;
-use Solital\Core\Security\Guardian;
 use Solital\Database\Create\Create;
 use Solital\Core\Resource\HandleFiles;
-use Solital\Components\Controller\Auth\AuthController;
 
 class Commands
 {
-    protected static function removeController(string $name)
+    /**
+     * @param string $name
+     * 
+     * @return bool
+     */
+    protected static function removeController(string $name): bool
     {
-        $file = ROOT_VINCI."/app/Components/Controller/".$name.".php";
+        $file = ROOT_VINCI . DIRECTORY_SEPARATOR . "app" . DIRECTORY_SEPARATOR . "Components" . DIRECTORY_SEPARATOR . "Controller" . DIRECTORY_SEPARATOR . $name . ".php";
 
         if (is_file($file)) {
             unlink($file);
-        
+
             return true;
         }
-        
+
         return false;
     }
 
-    protected static function removeModel(string $name)
+    /**
+     * @param string $name
+     * 
+     * @return bool
+     */
+    protected static function removeModel(string $name): bool
     {
-        $file = ROOT_VINCI."/app/Components/Model/".$name.".php";
+        $file = ROOT_VINCI . DIRECTORY_SEPARATOR . "app" . DIRECTORY_SEPARATOR . "Components" . DIRECTORY_SEPARATOR . "Model" . DIRECTORY_SEPARATOR . $name . ".php";
 
         if (is_file($file)) {
             unlink($file);
-        
+
             return true;
         }
-        
-        return false;   
+
+        return false;
     }
 
-    protected static function removeView(string $name, string $folder = null)
+    /**
+     * @param string $name
+     * @param string|null $folder
+     * 
+     * @return bool
+     */
+    protected static function removeView(string $name, string $folder = null): bool
     {
-        $file = "./resources/view/".$name.".php";
+        $file = "." . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . "view" . DIRECTORY_SEPARATOR . $name . ".php";
 
         if (isset($folder)) {
-            $file = "./resources/view/".$folder."/".$name.".php";
+            $file = "." . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . "view" . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . $name . ".php";
         }
 
         if (is_file($file)) {
             unlink($file);
-        
+
             return true;
         }
-        
-        return false;   
+
+        return false;
     }
 
-    protected static function removeRouter(string $name, string $folder = null)
+    /**
+     * @param string $name
+     * @param string|null $folder
+     * 
+     * @return bool
+     */
+    protected static function removeRouter(string $name, string $folder = null): bool
     {
-        $file = "./routers/".$name.".php";
-        
-        if (isset($folder)) {
-            $file = "./routers".$folder."/".$name.".php";
-        }
-
-        if (is_file($file)) {
-            unlink($file);
-        
-            return true;
-        }
-        
-        return false;   
-    }
-
-    protected static function removeJs(string $name)
-    {
-        $file = "./public/assets/_js/".$name.".js";
-
-        if (is_file($file)) {
-            unlink($file);
-        
-            return true;
-        }
-        
-        return false;   
-    }
-
-    protected static function removeCss(string $name)
-    {
-        $file = "./public/assets/_css/".$name.".css";
-
-        if (is_file($file)) {
-            unlink($file);
-        
-            return true;
-        }
-        
-        return false;   
-    }
-
-    protected static function router(string $name, string $folder = null) 
-    {
-        $dir = "./routers/";
+        $file = "." . DIRECTORY_SEPARATOR . "routers" . DIRECTORY_SEPARATOR . $name . ".php";
 
         if (isset($folder)) {
-            \mkdir("./routers".$folder);
-            $dir = "./routers".$folder."/";
+            $file = "." . DIRECTORY_SEPARATOR . "routers" . $folder . DIRECTORY_SEPARATOR . $name . ".php";
         }
 
-        if (is_dir($dir)) {
-            $res = (new HandleFiles())->fileExists($dir."$name.php");
-            if ($res == true) {
-                die("\n\n\033[91mError:\033[0m there is a file with the same name\n\n");
-            }
-            file_put_contents($dir."$name.php", "<?php\n\nuse Solital\Core\Course\Course;\nuse Solital\Wolf\Wolf;\n\nCourse::get('/', function(){\n\n});");
-            
+        if (is_file($file)) {
+            unlink($file);
+
             return true;
         }
-        
+
         return false;
     }
-    
-    protected static function controller(string $name) 
+
+    /**
+     * @param string $name
+     * 
+     * @return bool
+     */
+    protected static function removeJs(string $name): bool
     {
-        $dir = ROOT_VINCI."/app/Components/Controller/";
-        
-        if (is_dir($dir)) {
-            $res = (new HandleFiles())->fileExists(ROOT_VINCI."/app/Components/Controller/$name.php");
-            if ($res == true) {
-                die("\n\n\033[91mError:\033[0m there is a file with the same name\n\n");
-            }
-            file_put_contents($dir."$name.php", "<?php\n\nnamespace Solital\Components\Controller;\n\nclass ".$name."\n{\n\n}");
-            
+        $file = "." . DIRECTORY_SEPARATOR . "public" . DIRECTORY_SEPARATOR . "assets" . DIRECTORY_SEPARATOR . "_js" . DIRECTORY_SEPARATOR . $name . ".js";
+
+        if (is_file($file)) {
+            unlink($file);
+
             return true;
         }
-        
+
         return false;
     }
-    
-    protected static function view(string $name, string $folder = null) 
+
+    /**
+     * @param string $name
+     * 
+     * @return bool
+     */
+    protected static function removeCss(string $name): bool
     {
-        $dir = "./resources/view/";
+        $file =  "." . DIRECTORY_SEPARATOR . "public" . DIRECTORY_SEPARATOR . "assets" . DIRECTORY_SEPARATOR . "_css" . DIRECTORY_SEPARATOR . $name . ".css";
+
+        if (is_file($file)) {
+            unlink($file);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $name
+     * @param string|null $folder
+     * 
+     * @return bool
+     */
+    protected static function router(string $name, string $folder = null): bool
+    {
+        $dir = "." . DIRECTORY_SEPARATOR . "routers" . DIRECTORY_SEPARATOR;
 
         if (isset($folder)) {
-            if (!is_dir("./resources/view/".$folder."/")) {
-                \mkdir("./resources/view/".$folder);
-            }
-            $dir = "./resources/view/".$folder."/";
+            \mkdir("." . DIRECTORY_SEPARATOR . "routers" . $folder);
+            $dir = "." . DIRECTORY_SEPARATOR . "routers" . $folder . DIRECTORY_SEPARATOR;
         }
-        
+
         if (is_dir($dir)) {
-            $res = (new HandleFiles())->fileExists($dir."$name.php");
+            $res = (new HandleFiles())->fileExists($dir . "$name.php");
             if ($res == true) {
                 die("\n\n\033[91mError:\033[0m there is a file with the same name\n\n");
             }
-            file_put_contents($dir."$name.php", "<h1>$name</h1>");
-            
+            file_put_contents($dir . "$name.php", "<?php\n\nuse Solital\Core\Course\Course;\nuse Solital\Wolf\Wolf;\n\nCourse::get('/', function(){\n\n});");
+
             return true;
         }
-        
-        return false;
-    }
-    
-    protected static function model(string $name) 
-    {
-        $dir = ROOT_VINCI."/app/Components/Model/";
-        
-        if (is_dir($dir)) {
-            $res = (new HandleFiles())->fileExists(ROOT_VINCI."/app/Components/Model/$name.php");
-            if ($res == true) {
-                die("\n\n\033[91mError:\033[0m there is a file with the same name\n\n");
-            }
-            file_put_contents($dir."$name.php", "<?php\n\nnamespace Solital\Components\Model;\nuse Solital\Components\Model\Model;\n\nclass ".$name." extends Model\n{\n\n}");
-            
-            return true;
-        }
-        
-        return false;
-    }
-    
-    protected static function jsFile(string $name) 
-    {
-        $dir = "./public/assets/_js/";
-        
-        if (is_dir($dir)) {
-            $res = (new HandleFiles())->fileExists("./public/assets/_js/$name.js");
-            if ($res == true) {
-                die("\n\n\033[91mError:\033[0m there is a file with the same name\n\n");
-            }
-            file_put_contents($dir."$name.js", "");
-            
-            return true;
-        }
-        
+
         return false;
     }
 
-    protected static function cssFile(string $name) 
+    /**
+     * @param string $name
+     * 
+     * @return bool
+     */
+    protected static function controller(string $name): bool
     {
-        $dir = "./public/assets/_css/";
-        
+        $dir = ROOT_VINCI . DIRECTORY_SEPARATOR . "app" . DIRECTORY_SEPARATOR . "Components" . DIRECTORY_SEPARATOR . "Controller" . DIRECTORY_SEPARATOR;
+
         if (is_dir($dir)) {
-            $res = (new HandleFiles())->fileExists("./public/assets/_css/$name.css");
+            $res = (new HandleFiles())->fileExists(ROOT_VINCI . $dir . $name . ".php");
             if ($res == true) {
                 die("\n\n\033[91mError:\033[0m there is a file with the same name\n\n");
             }
-            file_put_contents($dir."$name.css", "");
-            
+            file_put_contents($dir . "$name.php", "<?php\n\nnamespace Solital\Components\Controller;\n\nclass " . $name . "\n{\n\n}");
+
             return true;
         }
-        
+
         return false;
     }
 
-    protected static function dump(string $local) 
+    /**
+     * @param string $name
+     * @param string|null $folder
+     * 
+     * @return bool
+     */
+    protected static function view(string $name, string $folder = null): bool
     {
-        $command = exec("mysqldump -u ".DB_CONFIG['USER']." -p".DB_CONFIG['PASS']." ".DB_CONFIG['DBNAME']." > ".$local."/".DB_CONFIG['DBNAME'].".sql");
-        
+        $dir = "." . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . "view" . DIRECTORY_SEPARATOR;
+
+        if (isset($folder)) {
+            if (!is_dir($dir . $folder . DIRECTORY_SEPARATOR)) {
+                \mkdir($dir . $folder);
+            }
+            $dir = $dir . $folder . DIRECTORY_SEPARATOR;
+        }
+
+        if (is_dir($dir)) {
+            $res = (new HandleFiles())->fileExists($dir . "$name.php");
+            if ($res == true) {
+                die("\n\n\033[91mError:\033[0m there is a file with the same name\n\n");
+            }
+            file_put_contents($dir . "$name.php", "<h1>$name</h1>");
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $name
+     * 
+     * @return bool
+     */
+    protected static function model(string $name): bool
+    {
+        $dir = ROOT_VINCI . DIRECTORY_SEPARATOR . "app" . DIRECTORY_SEPARATOR . "Components" . DIRECTORY_SEPARATOR . "Model" . DIRECTORY_SEPARATOR;
+
+        if (is_dir($dir)) {
+            $res = (new HandleFiles())->fileExists(ROOT_VINCI . $dir . $name . ".php");
+            if ($res == true) {
+                die("\n\n\033[91mError:\033[0m there is a file with the same name\n\n");
+            }
+            file_put_contents($dir . "$name.php", "<?php\n\nnamespace Solital\Components\Model;\nuse Solital\Components\Model\Model;\n\nclass " . $name . " extends Model\n{\n\n}");
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $name
+     * 
+     * @return bool
+     */
+    protected static function jsFile(string $name): bool
+    {
+        $dir = "." . DIRECTORY_SEPARATOR . "public" . DIRECTORY_SEPARATOR . "assets" . DIRECTORY_SEPARATOR . "_js" . DIRECTORY_SEPARATOR;
+
+        if (is_dir($dir)) {
+            $res = (new HandleFiles())->fileExists($dir . $name . ".js");
+            if ($res == true) {
+                die("\n\n\033[91mError:\033[0m there is a file with the same name\n\n");
+            }
+            file_put_contents($dir . "$name.js", "");
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $name
+     * 
+     * @return bool
+     */
+    protected static function cssFile(string $name): bool
+    {
+        $dir = "." . DIRECTORY_SEPARATOR . "public" . DIRECTORY_SEPARATOR . "assets" . DIRECTORY_SEPARATOR . "_css" . DIRECTORY_SEPARATOR;
+
+        if (is_dir($dir)) {
+            $res = (new HandleFiles())->fileExists($dir . $name . ".css");
+            if ($res == true) {
+                die("\n\n\033[91mError:\033[0m there is a file with the same name\n\n");
+            }
+            file_put_contents($dir . "$name.css", "");
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $local
+     * 
+     * @return bool
+     */
+    protected static function dump(string $local): bool
+    {
+        $command = exec("mysqldump -u " . DB_CONFIG['USER'] . " -p" . DB_CONFIG['PASS'] . " " . DB_CONFIG['DBNAME'] . " > " . $local . "/" . DB_CONFIG['DBNAME'] . ".sql");
+
         if ($command) {
             echo 'dump';
             return true;
@@ -227,7 +289,10 @@ class Commands
         }
     }
 
-    private static function checkConnection()
+    /**
+     * @return bool
+     */
+    private static function checkConnection(): bool
     {
         if (!defined('DB_CONFIG')) {
             return false;
@@ -236,7 +301,10 @@ class Commands
         return true;
     }
 
-    public static function authComponents()
+    /**
+     * @return bool
+     */
+    public static function authComponents(): bool
     {
         if (self::checkConnection() == false) {
             echo "\n\033[91mError:\033[0m The database doesn't' exist or wasn't reported in the \033[34mdb.php\033[0m file\n\n";
@@ -284,7 +352,7 @@ class Commands
         $view_login .= "\x20\x20\x20\x20<button type='submit'>Login</button>\n\n";
         $view_login .= "\x20\x20\x20\x20<a href='<?= url('forgot'); ?>'>Forgot password</a>\n";
         $view_login .= "</form>";
-        
+
         $view_dashboard = "<h1>Dashboard</h1>\n\n";
         $view_dashboard .= "<a href='<?= url('exit'); ?>'>Loggof</a>";
 
@@ -294,21 +362,21 @@ class Commands
         $view_pass .= "\x20\x20\x20\x20<button type='submit'>Alterar</button>\n";
         $view_pass .= "</form>";
 
-        $dir_controller = ROOT_VINCI."/app/Components/Controller/Auth/";
-        
+        $dir_controller = ROOT_VINCI . DIRECTORY_SEPARATOR . "app" . DIRECTORY_SEPARATOR . "Components" . DIRECTORY_SEPARATOR . "Controller" . DIRECTORY_SEPARATOR . "Auth" . DIRECTORY_SEPARATOR;
+
         if (is_dir($dir_controller)) {
-            file_put_contents($dir_controller."LoginController.php", $controller);
+            file_put_contents($dir_controller . "LoginController.php", $controller);
         }
 
-        $dir_view = "./resources/auth/";
+        $dir_view = "." . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . "auth" . DIRECTORY_SEPARATOR;
 
         if (!is_dir($dir_view)) {
             mkdir($dir_view);
         }
-        
+
         if (is_dir($dir_view)) {
-            file_put_contents($dir_view."login.php", $view_login);
-            file_put_contents($dir_view."dashboard.php", $view_dashboard);
+            file_put_contents($dir_view . "login.php", $view_login);
+            file_put_contents($dir_view . "dashboard.php", $view_dashboard);
         }
 
         $new_routes = "\n\n/\x2A\x2A Login Routers \x2A/\n";
@@ -317,7 +385,7 @@ class Commands
         $new_routes .= "Course::get('/dashboard', 'Auth\LoginController@dashboard')->name('dashboard');\n";
         $new_routes .= "Course::get('/logoff', 'Auth\LoginController@exit')->name('exit');\n";
 
-        $routes = fopen("./routers/routes.php", "a+");
+        $routes = fopen("." . DIRECTORY_SEPARATOR . "routers" . DIRECTORY_SEPARATOR . "routes.php", "a+");
         fwrite($routes, $new_routes);
         fclose($routes);
 
@@ -326,16 +394,19 @@ class Commands
 
         \exec("composer dump-autoload -o", $output);
         \exec("php composer.phar dump-autoload -o", $output);
-        
+
         return true;
     }
 
-    public static function removeAuth()
+    /**
+     * @return bool
+     */
+    public static function removeAuth(): bool
     {
-        $file_login = ROOT_VINCI."/app/Components/Controller/Auth/LoginController.php";
-        $file_login_view = ROOT_VINCI."/resources/auth/login.php";
-        $file_dashboard_view = ROOT_VINCI."/resources/auth/dashboard.php";
-        
+        $file_login = ROOT_VINCI . DIRECTORY_SEPARATOR . "app" . DIRECTORY_SEPARATOR . "Components" . DIRECTORY_SEPARATOR . "Controller" . DIRECTORY_SEPARATOR . "Auth" . DIRECTORY_SEPARATOR . "LoginController.php";
+        $file_login_view = ROOT_VINCI . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . "auth" . DIRECTORY_SEPARATOR . "login.php";
+        $file_dashboard_view = ROOT_VINCI . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . "auth" . DIRECTORY_SEPARATOR . "dashboard.php";
+
         if (isset($file_login) && isset($file_login_view) && isset($file_dashboard_view)) {
             unlink($file_login);
             unlink($file_login_view);
@@ -347,7 +418,10 @@ class Commands
         return false;
     }
 
-    public static function forgotComponents()
+    /**
+     * @return bool
+     */
+    public static function forgotComponents(): bool
     {
         $controller = "<?php\n\n";
         $controller .= "namespace Solital\Components\Controller\Auth;\n";
@@ -414,21 +488,21 @@ class Commands
         $view_change .= "\x20\x20\x20\x20<button type='submit'>Change</button>\n";
         $view_change .= "</form>";
 
-        $dir_controller = ROOT_VINCI."/app/Components/Controller/Auth/";
-        
+        $dir_controller = ROOT_VINCI . DIRECTORY_SEPARATOR . "app" . DIRECTORY_SEPARATOR . "Components" . DIRECTORY_SEPARATOR . "Controller" . DIRECTORY_SEPARATOR . "Auth" . DIRECTORY_SEPARATOR;
+
         if (is_dir($dir_controller)) {
-            file_put_contents($dir_controller."ForgotController.php", $controller);
+            file_put_contents($dir_controller . "ForgotController.php", $controller);
         }
 
-        $dir_view = "./resources/auth/";
+        $dir_view = "." . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . "auth" . DIRECTORY_SEPARATOR;
 
         if (!is_dir($dir_view)) {
             mkdir($dir_view);
         }
-        
+
         if (is_dir($dir_view)) {
-            file_put_contents($dir_view."forgot.php", $view_forgot);
-            file_put_contents($dir_view."change.php", $view_change);
+            file_put_contents($dir_view . "forgot.php", $view_forgot);
+            file_put_contents($dir_view . "change.php", $view_change);
         }
 
         $new_routes = "\n\n/\x2A\x2A Forgot Routers \x2A/\n";
@@ -437,18 +511,21 @@ class Commands
         $new_routes .= "Course::get('/change/{hash}', 'Auth\ForgotController@change')->name('change');\n";
         $new_routes .= "Course::post('/changePost/{hash}', 'Auth\ForgotController@changePost')->name('changePost');\n";
 
-        $routes = fopen("./routers/routes.php", "a+");
+        $routes = fopen("." . DIRECTORY_SEPARATOR . "routers" . DIRECTORY_SEPARATOR . "routes.php", "a+");
         fwrite($routes, $new_routes);
         fclose($routes);
 
         return true;
     }
 
-    public static function removeForgot()
+    /**
+     * @return bool
+     */
+    public static function removeForgot(): bool
     {
-        $file_forgot = ROOT_VINCI."/app/Components/Controller/Auth/ForgotController.php";
-        $file_forgot_view = ROOT_VINCI."/resources/auth/forgot.php";
-        $file_change_view = ROOT_VINCI."/resources/auth/change.php";
+        $file_forgot = ROOT_VINCI . DIRECTORY_SEPARATOR . "app" . DIRECTORY_SEPARATOR . "Components" . DIRECTORY_SEPARATOR . "Controller" . DIRECTORY_SEPARATOR . "Auth" . DIRECTORY_SEPARATOR . "ForgotController.php";
+        $file_forgot_view = ROOT_VINCI . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . "auth" . DIRECTORY_SEPARATOR . "forgot.php";
+        $file_change_view = ROOT_VINCI . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . "auth" . DIRECTORY_SEPARATOR . "change.php";
 
         if (is_file($file_forgot) && is_file($file_forgot_view) && is_file($file_change_view)) {
             unlink($file_forgot);

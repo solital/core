@@ -12,7 +12,7 @@ abstract class WolfCache
     /**
      * @var string
      */
-    protected static $cache_dir = ROOT."/vendor/solital/core/src/Cache/tmp/";
+    protected static $cache_dir = ROOT . DIRECTORY_SEPARATOR . "vendor" . DIRECTORY_SEPARATOR . "solital" . DIRECTORY_SEPARATOR . "core" . DIRECTORY_SEPARATOR . "src" . DIRECTORY_SEPARATOR . "Cache" . DIRECTORY_SEPARATOR . "tmp" . DIRECTORY_SEPARATOR;
 
     /**
      * @var date

@@ -1,5 +1,14 @@
 # Released Notes
 
+## v1.2.1 - (2021-03-15)
+
+### Fixed
+
+- Fixed directory bar by constant `DIRECTORY_SEPARATOR`
+- Fixed Wolf Template
+
+--------------------------------------------------------------------
+
 ## v1.2.0 - (2021-03-01)
 
 ### Added

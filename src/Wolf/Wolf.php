@@ -1,30 +1,46 @@
 <?php
 
 namespace Solital\Core\Wolf;
+
 use Solital\Core\Wolf\WolfCache;
 use Solital\Core\Exceptions\NotFoundException;
 
 class Wolf extends WolfCache
 {
     /**
-     * @param string $view
-     * @param array $data
-     * @param string $ext
+     * @var string
      */
-    public static function loadView(string $view, array $data = null, string $ext = "php") 
-    {
-        $view = str_replace(".", "/", $view);
-        $file = ROOT.'/resources/view/'.$view.'.'.$ext;
+    private static $main_url;
 
-        self::$file_cache = self::$cache_dir.$view."-".date('Ymd')."-".self::$time.".cache.php";
+    /**
+     * @return string
+     */
+    private static function getInstance(): string
+    {
+        return self::$main_url = '//' . $_SERVER['HTTP_HOST'] . "/";
+    }
+
+    /**
+     * @param string $view
+     * @param array|null $data
+     * @param string $ext
+     * 
+     * @return Wolf
+     */
+    public static function loadView(string $view, array $data = null, string $ext = "php")
+    {
+        $view = str_replace(".", DIRECTORY_SEPARATOR, $view);
+        $file = ROOT . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'view' . DIRECTORY_SEPARATOR . $view . '.' . $ext;
+
+        self::$file_cache = self::$cache_dir . $view . "-" . date('Ymd') . "-" . self::$time . ".cache.php";
 
         if (strpos($view, "/")) {
-            $file = ROOT.'/resources/'.$view.'.'.$ext;
-            
+            $file = ROOT . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . $view . '.' . $ext;
+
             $viewForCache = str_replace("/", ".", $view);
-            self::$file_cache = self::$cache_dir.$viewForCache."-".date('Ymd')."-".self::$time.".cache.php";
+            self::$file_cache = self::$cache_dir . $viewForCache . "-" . date('Ymd') . "-" . self::$time . ".cache.php";
         }
-        
+
         if (isset($data)) {
             extract($data, EXTR_SKIP);
         }
@@ -33,14 +49,14 @@ class Wolf extends WolfCache
             include_once self::$file_cache;
             die;
         }
-        
+
         if (file_exists($file)) {
             if (self::$time != null) {
                 ob_start();
             }
 
             include $file;
-            
+
             if (self::$time != null) {
                 $res = ob_get_contents();
                 ob_flush();
@@ -54,38 +70,50 @@ class Wolf extends WolfCache
     }
 
     /**
-     * @param string @asset
+     * @param string $asset
+     * 
+     * @return string
      */
-    public static function loadFile(string $asset)
+    public static function loadFile(string $asset): string
     {
-        $css = '//'.$_SERVER['HTTP_HOST'].'/'.$asset;
+        $file = self::getInstance() . $asset;
+
+        return $file;
+    }
+
+    /**
+     * @param string $asset
+     * 
+     * @return string
+     */
+    public static function loadCss(string $asset): string
+    {
+        $css = self::getInstance() . 'assets/_css/' . $asset;
+
         return $css;
     }
-    
+
     /**
-     * @param string @asset
+     * @param string $asset
+     * 
+     * @return string
      */
-    public static function loadCss(string $asset) 
+    public static function loadJs(string $asset): string
     {
-        $css = '//'.$_SERVER['HTTP_HOST'].'/assets/_css/'.$asset;
-        return $css;
-    }
-    
-    /**
-     * @param string @asset
-     */
-    public static function loadJs(string $asset) 
-    {
-        $js = '//'.$_SERVER['HTTP_HOST'].'/assets/_js/'.$asset;
+        $js = self::getInstance() . 'assets/_js/' . $asset;
+
         return $js;
     }
-    
+
     /**
-     * @param string @asset
+     * @param string $asset
+     * 
+     * @return string
      */
-    public static function loadImg(string $asset) 
+    public static function loadImg(string $asset): string
     {
-        $img = '//'.$_SERVER['HTTP_HOST'].'/assets/_img/'.$asset;
+        $img = self::getInstance() . 'assets/_img/' . $asset;
+
         return $img;
     }
 }
