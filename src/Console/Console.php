@@ -7,7 +7,7 @@ use Solital\Database\Create\Create;
 
 class Console extends Commands
 {
-    const SOLITAL_VERSION = "1.2.1";
+    const SOLITAL_VERSION = "1.3.0";
     const VINCI_VERSION = "1.0.3";
 
     /**
