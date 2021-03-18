@@ -1,5 +1,17 @@
 # Released Notes
 
+## v1.3.0 - (2021-03-18)
+
+### Added
+
+- Added exception if there is no parameter in the anonymous function 
+- Added HttpCache
+- Added most support for JSON
+- Added validation date and values
+- Added Katrina 1.2.0
+
+--------------------------------------------------------------------
+
 ## v1.2.1 - (2021-03-15)
 
 ### Fixed
