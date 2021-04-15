@@ -7,7 +7,6 @@ use Solital\Core\Course\Router;
 
 interface EventArgumentInterface
 {
-
     /**
      * Get event name
      *
@@ -42,5 +41,4 @@ interface EventArgumentInterface
      * @return array
      */
     public function getArguments(): array;
-
 }

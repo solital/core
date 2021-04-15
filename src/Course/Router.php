@@ -2,81 +2,83 @@
 
 namespace Solital\Core\Course;
 
+use Solital\Core\Console\Command\SystemCommandsCourse;
 use Solital\Core\Http\Uri;
 use Solital\Core\Http\Request;
-use Solital\Core\Http\Middleware\BaseCsrfVerifier;
-use Solital\Core\Http\Exceptions\MalformedUrlException;
-use Solital\Core\Exceptions\HttpException;
-use Solital\Core\Exceptions\InvalidArgumentException;
-use Solital\Core\Exceptions\NotFoundHttpException;
 use Solital\Core\Course\Route\RouteInterface;
 use Solital\Core\Course\Handlers\EventHandler;
 use Solital\Core\Course\ClassLoader\ClassLoader;
-use Solital\Core\Course\Route\PartialGroupRouteInterface;
-use Solital\Core\Course\Handlers\ExceptionHandlerInterface;
 use Solital\Core\Course\Route\GroupRouteInterface;
+use Solital\Core\Exceptions\MalformedUrlException;
+use Solital\Core\Exceptions\NotFoundHttpException;
+use Solital\Core\Http\Middleware\BaseCsrfVerifier;
 use Solital\Core\Course\Route\LoadableRouteInterface;
+use Solital\Core\Exceptions\InvalidArgumentException;
+use Solital\Core\Exceptions\ExceptionHandlerInterface;
 use Solital\Core\Course\Handlers\EventHandlerInterface;
 use Solital\Core\Course\Route\ControllerRouteInterface;
 use Solital\Core\Course\ClassLoader\ClassLoaderInterface;
+use Solital\Core\Course\Route\PartialGroupRouteInterface;
 
 class Router
 {
 
     /**
      * Current request
+     * 
      * @var Request
      */
     protected $request;
 
     /**
-     * Current request
-     * @var Uri
-     */
-    private $uri;
-
-    /**
      * Defines if a route is currently being processed.
+     * 
      * @var bool
      */
     protected $isProcessingRoute;
 
     /**
      * All added routes
+     * 
      * @var array
      */
-    protected $routes = [];
+    protected array $routes = [];
 
     /**
      * List of processed routes
+     * 
      * @var array
      */
-    protected $processedRoutes = [];
+    protected array $processedRoutes = [];
 
     /**
      * Stack of routes used to keep track of sub-routes added
      * when a route is being processed.
+     * 
      * @var array
      */
-    protected $routeStack = [];
+    protected array $routeStack = [];
 
     /**
      * List of added bootmanagers
+     * 
      * @var array
      */
-    protected $bootManagers = [];
+    protected array $bootManagers = [];
 
     /**
      * Csrf verifier class
+     * 
      * @var BaseCsrfVerifier
      */
     protected $csrfVerifier;
 
     /**
      * Get exception handlers
+     * 
      * @var array
      */
-    protected $exceptionHandlers = [];
+    protected array $exceptionHandlers = [];
 
     /**
      * List of loaded exception that has been loaded.
@@ -84,34 +86,39 @@ class Router
      *
      * @var array
      */
-    protected $loadedExceptionHandlers = [];
+    protected array $loadedExceptionHandlers = [];
 
     /**
      * Enable or disabled debugging
+     * 
      * @var bool
      */
-    protected $debugEnabled = false;
+    protected bool $debugEnabled = false;
 
     /**
      * The start time used when debugging is enabled
+     * 
      * @var float
      */
     protected $debugStartTime;
 
     /**
      * List containing all debug messages
+     * 
      * @var array
      */
-    protected $debugList = [];
+    protected array $debugList = [];
 
     /**
      * Contains any registered event-handler.
+     * 
      * @var array
      */
-    protected $eventHandlers = [];
+    protected array $eventHandlers = [];
 
     /**
      * Class loader instance
+     * 
      * @var ClassLoader
      */
     protected $classLoader;
@@ -122,12 +129,16 @@ class Router
     private $url;
 
     /**
+     * @var bool
+     */
+    private bool $send_console;
+
+    /**
      * Router constructor.
      */
     public function __construct()
     {
         $this->reset();
-        $this->uri = new Uri();
     }
 
     /**
@@ -137,7 +148,7 @@ class Router
     {
         $this->debugStartTime = microtime(true);
         $this->isProcessingRoute = false;
-        
+
         try {
             $this->request = new Request($_SERVER["REQUEST_METHOD"], $_SERVER["REQUEST_URI"], 'php://memory');
         } catch (MalformedUrlException $e) {
@@ -158,6 +169,7 @@ class Router
 
     /**
      * Add route
+     * 
      * @param RouteInterface $route
      * @return RouteInterface
      */
@@ -188,8 +200,8 @@ class Router
      */
     protected function renderAndProcess(RouteInterface $route): void
     {
-
         $this->isProcessingRoute = true;
+
         $route->renderRoute($this->request, $this);
         $this->isProcessingRoute = false;
 
@@ -229,7 +241,6 @@ class Router
 
         /* @var $route RouteInterface */
         foreach ($routes as $route) {
-
             $this->debug('Processing route "%s"', \get_class($route));
 
             if ($group !== null) {
@@ -240,8 +251,16 @@ class Router
             /* @var $route GroupRouteInterface */
             if ($route instanceof GroupRouteInterface) {
 
-                if ($route->matchRoute($url, $this->request) === true) {
+                if ($this->send_console == true) {
+                    $values[] = [
+                        'url' => ($route->getPrefix() . "/(GroupRoute)"),
+                        'name' => '',
+                        'method' => 'GET',
+                        'controller' => 'Closure'
+                    ];
+                }
 
+                if ($route->matchRoute($url, $this->request) === true) {
                     /* Add exception handlers */
                     if (\count($route->getExceptionHandlers()) !== 0) {
                         /** @noinspection AdditionOperationOnArraysInspection */
@@ -252,7 +271,6 @@ class Router
                     if ($route instanceof PartialGroupRouteInterface === true) {
                         $this->renderAndProcess($route);
                     }
-
                 }
 
                 if ($route instanceof PartialGroupRouteInterface === false) {
@@ -270,6 +288,19 @@ class Router
 
             $this->url[] = $route->url;
             $routeDuplicate = array_unique(array_diff_assoc($this->url, array_unique($this->url)));
+
+            if ($this->send_console == true) {
+                $values[] = [
+                    'url' => ($route->url ?? ''),
+                    'name' => $route->getName(),
+                    'method' => strtoupper(implode("|", $route->getRequestMethods())),
+                    'controller' => $route->getControllerName()
+                ];
+            }
+        }
+
+        if ($this->send_console == true) {
+            $this->sendToConsole($values);
         }
 
         if (isset($routeDuplicate)) {
@@ -296,7 +327,7 @@ class Router
 
         /* Initialize boot-managers */
 
-        /* @var $manager RouteInterfacerBootManager */
+        /* @var $manager RouterBootManagerInterface */
         foreach ($this->bootManagers as $manager) {
 
             $className = \get_class($manager);
@@ -331,8 +362,10 @@ class Router
      * @throws HttpException
      * @throws \Exception
      */
-    public function start()
+    public function start(bool $send_console = false)
     {
+        $this->send_console = $send_console;
+
         $this->debug('Router starting');
 
         $this->fireEvents(EventHandler::EVENT_INIT);
@@ -426,13 +459,12 @@ class Router
                     }
                 }
             }
-
         } catch (\Exception $e) {
             $this->handleException($e);
         }
 
         if ($methodNotAllowed === true) {
-            return NotFoundHttpException::alertMessage(403, "Route '".$this->request->getUri()->getPath()."' or method '".strtoupper($this->request->getMethod())."' not allowed", $this->request->getUri()->getPath());
+            return NotFoundHttpException::alertMessage(403, "Route '" . $this->request->getUri()->getPath() . "' or method '" . strtoupper($this->request->getMethod()) . "' not allowed", "This route was not defined with method " . strtoupper($this->request->getMethod()) . ", but with another method.");
         }
 
         if (\count($this->request->getLoadedRoutes()) === 0) {
@@ -440,9 +472,9 @@ class Router
             $rewriteUrl = $this->request->getRewriteUrl();
 
             if ($rewriteUrl !== null) {
-                return NotFoundHttpException::alertMessage(404, "Route '".$rewriteUrl."' not found (rewrite from: '", $this->request->getUri()->getPath()."')");
+                return NotFoundHttpException::alertMessage(404, "Route '" . $rewriteUrl . "' not found (rewrite from: '" . $this->request->getUri()->getPath() . "')");
             } else {
-                return NotFoundHttpException::alertMessage(404, "Route '".$this->request->getUri()->getPath()."' not found", $this->request->getUri()->getPath());
+                return NotFoundHttpException::alertMessage(404, "Route '" . $this->request->getUri()->getPath() . "' not found", "Check if the given route exists in the 'routers.php' file or another route file.");
             }
         }
 
@@ -520,7 +552,7 @@ class Router
             $this->debug('Processing exception-handler "%s"', \get_class($handler));
 
             if (($handler instanceof ExceptionHandlerInterface) === false) {
-                throw new HttpException('Exception handler must implement the ExceptionHandlerInterface interface.', 500);
+                NotFoundHttpException::alertMessage(500, "Exception handler must implement the ExceptionHandlerInterface interface.");
             }
 
             try {
@@ -545,9 +577,8 @@ class Router
 
                     return $this->routeRequest();
                 }
-
             } catch (\Exception $e) {
-                echo "<strong>Exceptionnnnnnn</strong>".$e->getMessage();
+                echo "<strong>Exceptionnnnnnn</strong>" . $e->getMessage();
             }
 
             $this->debug('Finished processing');
@@ -570,7 +601,7 @@ class Router
         $this->fireEvents(EventHandler::EVENT_FIND_ROUTE, [
             'name' => $name,
         ]);
-        
+
         /* @var $route LoadableRouteInterface */
         foreach ($this->processedRoutes as $route) {
 
@@ -583,7 +614,7 @@ class Router
 
             /* Direct match to controller */
             if ($route instanceof ControllerRouteInterface && strtoupper($route->getController()) === strtoupper($name)) {
-                $this->debug('Found route "%s" by controller "%s"', $route->getUri(), $name);
+                #$this->debug('Found route "%s" by controller "%s"', $route->getUri(), $name);
 
                 return $route;
             }
@@ -667,8 +698,8 @@ class Router
         /* Return current route if no options has been specified */
         if ($name === null && $parameters === null) {
             return $this->request
-                        ->getUrlCopy()
-                        ->setParams($getParams);
+                ->getUrlCopy()
+                ->setParams($getParams);
         }
 
         $loadedRoute = $this->request->getLoadedRoute();
@@ -676,9 +707,9 @@ class Router
         /* If nothing is defined and a route is loaded we use that */
         if ($name === null && $loadedRoute !== null) {
             return $this->request
-                        ->getUrlCopy()
-                        ->setPath($loadedRoute->findUrl($loadedRoute->getMethod(), $parameters, $name))
-                        ->setParams($getParams);
+                ->getUrlCopy()
+                ->setPath($loadedRoute->findUrl($loadedRoute->getMethod(), $parameters, $name))
+                ->setParams($getParams);
         }
 
         /* We try to find a match on the given name */
@@ -686,9 +717,9 @@ class Router
 
         if ($route !== null) {
             return $this->request
-                        ->getUrlCopy()
-                        ->setPath($route->findUrl($route->getMethod(), $parameters, $name))
-                        ->setParams($getParams);
+                ->getUrlCopy()
+                ->setPath($route->findUrl($route->getMethod(), $parameters, $name))
+                ->setParams($getParams);
         }
 
         /* Using @ is most definitely a controller@method or alias@method */
@@ -703,30 +734,29 @@ class Router
                 /* Check if the route contains the name/alias */
                 if ($route->hasName($controller) === true) {
                     return $this->request
-                                ->getUrlCopy()
-                                ->setPath($route->findUrl($method, $parameters, $name))
-                                ->setParams($getParams);
+                        ->getUrlCopy()
+                        ->setPath($route->findUrl($method, $parameters, $name))
+                        ->setParams($getParams);
                 }
 
                 /* Check if the route controller is equal to the name */
                 if ($route instanceof ControllerRouteInterface && strtolower($route->getController()) === strtolower($controller)) {
                     return $this->request
-                                ->getUrlCopy()
-                                ->setPath($route->findUrl($method, $parameters, $name))
-                                ->setParams($getParams);
+                        ->getUrlCopy()
+                        ->setPath($route->findUrl($method, $parameters, $name))
+                        ->setParams($getParams);
                 }
-
             }
         }
 
         /* No result so we assume that someone is using a hardcoded url and join everything together. */
         $url = trim(implode('/', array_merge((array)$name, (array)$parameters)), '/');
         $url = (($url === '') ? '/' : '/' . $url . '/');
-        
+
         return $this->request
-                    ->getUrlCopy()
-                    ->setPath($url)
-                    ->setParams($getParams);
+            ->getUrlCopy()
+            ->setPath($url)
+            ->setParams($getParams);
     }
 
     /**
@@ -754,10 +784,10 @@ class Router
     /**
      * Add BootManager
      *
-     * @param RouteInterfacerBootManager $bootManager
+     * @param RouterBootManagerInterface $bootManager
      * @return static
      */
-    public function addBootManager(RouteInterfacerBootManager $bootManager): self
+    public function addBootManager(RouterBootManagerInterface $bootManager): self
     {
         $this->bootManagers[] = $bootManager;
 
@@ -883,6 +913,16 @@ class Router
     }
 
     /**
+     * @param mixed $values
+     * 
+     * @return void
+     */
+    public function sendToConsole($values): void
+    {
+        SystemCommandsCourse::setRoutes($values)->getRoutes();
+    }
+
+    /**
      * Add new debug message
      * @param string $message
      * @param array $args
@@ -923,5 +963,4 @@ class Router
     {
         return $this->debugList;
     }
-
 }

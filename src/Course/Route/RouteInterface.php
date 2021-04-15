@@ -4,6 +4,7 @@ namespace Solital\Core\Course\Route;
 
 use Solital\Core\Http\Request;
 use Solital\Core\Course\Router;
+use Solital\Core\Course\Route\GroupRouteInterface;
 
 interface RouteInterface
 {
@@ -206,4 +207,15 @@ interface RouteInterface
      */
     public function setMiddlewares(array $middlewares): self;
 
+       /**
+     * Get the value of controller_name
+     */ 
+    public function getControllerName();
+
+    /**
+     * Set the value of controller_name
+     *
+     * @return  self
+     */ 
+    public function setControllerName($controller_name);
 }

@@ -2,6 +2,8 @@
 
 namespace Solital\Core\Course\Route;
 
+use Solital\Core\Course\Route\RouteInterface;
+
 interface ControllerRouteInterface extends RouteInterface
 {
     /**
@@ -18,5 +20,4 @@ interface ControllerRouteInterface extends RouteInterface
      * @return static
      */
     public function setController(string $controller): self;
-
 }

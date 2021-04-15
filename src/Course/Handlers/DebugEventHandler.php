@@ -5,9 +5,8 @@ namespace Solital\Core\Course\Handlers;
 use Solital\Core\Course\Event\EventArgument;
 use Solital\Core\Course\Router;
 
-class DebugEventHandler implements IEventHandler
+class DebugEventHandler implements EventHandler
 {
-
     /**
      * Debug callback
      * @var \Closure
@@ -58,5 +57,4 @@ class DebugEventHandler implements IEventHandler
     {
         $this->callback = $event;
     }
-
 }

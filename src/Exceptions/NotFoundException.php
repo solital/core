@@ -2,44 +2,21 @@
 
 namespace Solital\Core\Exceptions;
 
-class NotFoundException 
-{    
+use Solital\Core\Exceptions\HttpException;
+
+class NotFoundException extends HttpException
+{
     /**
-     * WolfNotFound
-     *
-     * @param string $view
-     * @param string $ext
-     * @return void
-     */
-    public static function WolfNotFound(string $view, string $ext) 
-    {
-        include_once dirname(__DIR__).'/Exceptions/templates/error-wolf.php';
-        die;
-    }
-    
-    /**
-     * GuardianNotFound
-     *
-     * @param string $type
+     * @param int $code
      * @param string $msg
+     * @param string $description
+     * @param string $component
+     * 
      * @return void
      */
-    public static function GuardianNotFound(string $type, string $msg) 
+    public static function notFound(int $code, string $msg, string $description = "", string $component = 'Solital'): void
     {
-        include_once dirname(__DIR__).'/Exceptions/templates/error-guardian.php';
+        include_once dirname(__DIR__) . '/Exceptions/templates/view-error.php';
         die;
     }
-    
-    /**
-     * FileSystemNotFound
-     *
-     * @param string $view
-     * @return void
-     */
-    public static function FileSystemNotFound(string $view)
-    {
-        include_once dirname(__DIR__).'/Exceptions/templates/error-file.php';
-        die;
-    }
-    
 }

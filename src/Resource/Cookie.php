@@ -14,7 +14,7 @@ class Cookie
         setcookie($index, $value, $time, $path);
         return true;
     }
-    
+
     /**
      * @param string $index
      * @return bool
@@ -24,12 +24,12 @@ class Cookie
         setcookie($index, NULL, -1, $path);
         return true;
     }
-    
+
     /**
      * @param string $index
      * @return bool
      */
-    public static function show(string $index) 
+    public static function show(string $index)
     {
         if (\filter_input(INPUT_COOKIE, $index, FILTER_SANITIZE_STRING)) {
             return \filter_input(INPUT_COOKIE, $index);
@@ -47,5 +47,5 @@ class Cookie
         } else {
             return false;
         }
-    }    
+    }
 }

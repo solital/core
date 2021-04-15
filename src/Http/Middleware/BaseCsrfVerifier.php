@@ -2,8 +2,8 @@
 
 namespace Solital\Core\Http\Middleware;
 
-use Solital\Core\Http\Middleware\Exceptions\TokenMismatchException;
 use Solital\Core\Http\Request;
+use Solital\Core\Exceptions\TokenMismatchException;
 use Solital\Core\Http\Security\CookieTokenProvider;
 use Solital\Core\Http\Security\TokenProviderInterface;
 
@@ -12,7 +12,14 @@ class BaseCsrfVerifier implements MiddlewareInterface
     public const POST_KEY = 'csrf_token';
     public const HEADER_KEY = 'X-CSRF-TOKEN';
 
+    /**
+     * @var mixed
+     */
     protected $except;
+
+    /**
+     * @var mixed
+     */
     protected $tokenProvider;
 
     /**
@@ -69,7 +76,6 @@ class BaseCsrfVerifier implements MiddlewareInterface
             if ($this->tokenProvider->validate() === false) {
                 TokenMismatchException::alertMessage(404, "Invalid CSRF-token");
             }
-
         }
     }
 
@@ -91,5 +97,4 @@ class BaseCsrfVerifier implements MiddlewareInterface
     {
         $this->tokenProvider = $provider;
     }
-
 }

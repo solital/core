@@ -45,7 +45,7 @@ class ClassLoader implements ClassLoaderInterface
      * @param \Closure $closure
      * @param array $parameters
      * 
-     * @return mixed
+     * @return void
      */
     public function loadClosure(\Closure $closure, array $parameters)
     {
@@ -71,11 +71,6 @@ class ClassLoader implements ClassLoaderInterface
         foreach ($parameters as $key => $params) {
             array_push($this->router_params, $key);
         }
-
-        /* pre($this->router_params);
-        pre($this->closure_params);
-        pre(array_diff_assoc($this->closure_params, $this->router_params));
-         */
 
         $diff1 = array_diff($this->router_params, $this->closure_params);
         $diff2 = array_diff_assoc($this->closure_params, $this->router_params);

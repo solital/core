@@ -3,24 +3,28 @@
 namespace Solital\Core\Http;
 
 use Psr\Http\Message\UriInterface;
-use Solital\Core\Http\Exceptions\MalformedUrlException;
-use Solital\Core\Http\Exceptions\InvalidArgumentException;
+use Solital\Core\Exceptions\MalformedUrlException;
+use Solital\Core\Exceptions\InvalidArgumentException;
+use Solital\Core\Exceptions\InvalidArgumentHttpException;
 
 class Uri implements \JsonSerializable, UriInterface
 {
+    /**
+     * @var null|string
+     */
     private $originalUrl;
 
     /**
      * The URI user info.
      *
-     * @var string
+     * @var null|string
      */
     private $userInfo;
 
     /**
      * The URI scheme without "://" suffix.
      *
-     * @var string
+     * @var null|string
      */
     private $scheme;
 
@@ -31,7 +35,8 @@ class Uri implements \JsonSerializable, UriInterface
      */
     private $host;
 
-    /**The URI port.
+    /**
+     * The URI port.
      *
      * @var int|null
      */
@@ -40,21 +45,21 @@ class Uri implements \JsonSerializable, UriInterface
     /**
      * The URI username.
      *
-     * @var string
+     * @var null|string
      */
     private $username;
 
     /**
      * The URI password.
      *
-     * @var string
+     * @var null|string
      */
     private $password;
 
     /**
      * The URI path.
      *
-     * @var string
+     * @var null|string
      */
     private $path;
 
@@ -63,18 +68,18 @@ class Uri implements \JsonSerializable, UriInterface
      *
      * @var string
      */
-    private $params = [];
+    private array $params = [];
 
     /** The URI fragment.
      *
-     * @var string
+     * @var null|string
      */
     private $fragment;
 
     /**
      * The URI query.
      *
-     * @var string
+     * @var null|string
      */
     private $query;
 
@@ -318,7 +323,7 @@ class Uri implements \JsonSerializable, UriInterface
      *
      * @return array
      */
-    public function getParams(): array
+    public function getParams()
     {
         return $this->params;
     }
@@ -571,7 +576,7 @@ class Uri implements \JsonSerializable, UriInterface
     private function sanitizeScheme($scheme): string
     {
         if (!is_string($scheme)) {
-            InvalidArgumentException::alertMessage(
+            InvalidArgumentHttpException::invalidExceptionMessage(
                 400,
                 'The URI scheme must be a string, received' .
                     (is_object($scheme) ? get_class($scheme) : gettype($scheme))
@@ -582,7 +587,7 @@ class Uri implements \JsonSerializable, UriInterface
         $scheme = rtrim($scheme, '://');
 
         if (!in_array($scheme, ['', 'http', 'https'], true)) {
-            InvalidArgumentException::alertMessage(400, 'The URI scheme must be \'\', http or https');
+            InvalidArgumentHttpException::invalidExceptionMessage(400, 'The URI scheme must be \'\', http or https');
         }
 
         return $scheme;
@@ -615,12 +620,12 @@ class Uri implements \JsonSerializable, UriInterface
     /**
      * @param string $host The hostname to use with the new instance.
      * @return static A new instance with the specified host.
-     * @throws \InvalidArgumentException for invalid hostnames.
+     * @throws \InvalidArgumentHttpException for invalid hostnames.
      */
     public function withHost($host): Uri
     {
         if (!is_string($host)) {
-            InvalidArgumentException::alertMessage(
+            InvalidArgumentHttpException::invalidExceptionMessage(
                 400,
                 'The URI host must be a string, received ' .
                     (is_object($host) ? get_class($host) : gettype($host))
@@ -633,7 +638,7 @@ class Uri implements \JsonSerializable, UriInterface
     /**
      * @param null|int $port The port to use with the new instance; a null value removes the port information.
      * @return static A new instance with the specified port.
-     * @throws \InvalidArgumentException for invalid ports.
+     * @throws \InvalidArgumentHttpException for invalid ports.
      */
     public function withPort($port): Uri
     {
@@ -657,12 +662,12 @@ class Uri implements \JsonSerializable, UriInterface
     /**
      * @param mixed $port
      * @return int
-     * @throws \InvalidArgumentException for invalid ports.
+     * @throws \InvalidArgumentHttpException for invalid ports.
      */
     private function sanitizePort($port): int
     {
         if (is_bool($port) || is_array($port) || is_object($port) || (string) (int) $port !== (string) $port) {
-            InvalidArgumentException::alertMessage(
+            InvalidArgumentHttpException::invalidExceptionMessage(
                 400,
                 'The URI port must be null or an integer, received ' .
                     (is_object($port) ? get_class($port) : gettype($port))
@@ -672,7 +677,7 @@ class Uri implements \JsonSerializable, UriInterface
         $port = (int) $port;
 
         if ($port < 1 || $port > 65535) {
-            throw new InvalidArgumentException('The URI port must be a valid TCP/UDP port');
+            InvalidArgumentHttpException::invalidExceptionMessage(400, 'The URI port must be a valid TCP/UDP port');
         }
 
         return $port;
@@ -693,7 +698,7 @@ class Uri implements \JsonSerializable, UriInterface
     /**
      * @param string $path The path to use with the new instance.
      * @return static A new instance with the specified path.
-     * @throws \InvalidArgumentException for invalid paths.
+     * @throws \InvalidArgumentHttpException for invalid paths.
      */
     public function withPath($path): Uri
     {
@@ -705,12 +710,12 @@ class Uri implements \JsonSerializable, UriInterface
     /**
      * @param mixed $path
      * @return string
-     * @throws \InvalidArgumentException for invalid paths.
+     * @throws \InvalidArgumentHttpException for invalid paths.
      */
     private function sanitizePath($path): string
     {
         if (!is_string($path)) {
-            InvalidArgumentException::alertMessage(
+            InvalidArgumentHttpException::invalidExceptionMessage(
                 400,
                 'The URI path must be a string, received ' .
                     (is_object($path) ? get_class($path) : gettype($path))
@@ -718,11 +723,11 @@ class Uri implements \JsonSerializable, UriInterface
         }
 
         if (strpos($path, '?') !== false) {
-            InvalidArgumentException::alertMessage(400, 'The URI path must not contain a query string');
+            InvalidArgumentHttpException::invalidExceptionMessage(400, 'The URI path must not contain a query string');
         }
 
         if (strpos($path, '#') !== false) {
-            InvalidArgumentException::alertMessage(400, 'The URI path must not contain a URI fragment');
+            InvalidArgumentHttpException::invalidExceptionMessage(400, 'The URI path must not contain a URI fragment');
         }
 
         return preg_replace_callback(
@@ -757,12 +762,12 @@ class Uri implements \JsonSerializable, UriInterface
     /**
      * @param $query
      * @return string
-     * @throws \InvalidArgumentException for invalid query strings.
+     * @throws \InvalidArgumentHttpException for invalid query strings.
      */
     private function sanitizeQuery($query): string
     {
         if (!is_string($query)) {
-            InvalidArgumentException::alertMessage(
+            InvalidArgumentHttpException::invalidExceptionMessage(
                 400,
                 'The URI query must be a string, received ' .
                     (is_object($query) ? get_class($query) : gettype($query))
@@ -770,7 +775,7 @@ class Uri implements \JsonSerializable, UriInterface
         }
 
         if (strpos($query, '#') !== false) {
-            InvalidArgumentException::alertMessage(400, 'The URI query must not contain a URI fragment');
+            InvalidArgumentHttpException::invalidExceptionMessage(400, 'The URI query must not contain a URI fragment');
         }
 
         $query = ltrim($query, '?');
@@ -811,12 +816,12 @@ class Uri implements \JsonSerializable, UriInterface
     /**
      * @param mixed $fragment
      * @return string
-     * @throws \InvalidArgumentException for invalid fragment strings.
+     * @throws \InvalidArgumentHttpException for invalid fragment strings.
      */
     private function sanitizeFragment($fragment): string
     {
         if (!is_string($fragment)) {
-            InvalidArgumentException::alertMessage(
+            InvalidArgumentHttpException::invalidExceptionMessage(
                 400,
                 'The URI query must be a string, received ' .
                     (is_object($fragment) ? get_class($fragment) : gettype($fragment))

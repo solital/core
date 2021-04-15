@@ -1,0 +1,27 @@
+#!/usr/bin/env php
+<?php
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+use Solital\Core\Console\Command\CustomCommand;
+use Solital\Core\Console\Console;
+
+define('SITE_ROOT_VINCI', __DIR__);
+
+$command = $argv[1];
+$folder = '';
+
+if (isset($argv[2])) {
+    $folder = $argv[2];
+}
+
+$res = (new CustomCommand())->exec($command);
+
+if ($res == null) {
+    if (stripos($command, ":") !== false) {
+        $file = explode(':', $command);
+        (new Console())->execComponent($file[0], $file[1], $folder);
+    } else {
+        (new Console())->execCommand($command);
+    }
+}

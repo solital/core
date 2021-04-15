@@ -2,183 +2,89 @@
 
 namespace Solital\Core\Console;
 
-use Solital\Core\Console\Commands;
-use Solital\Database\Create\Create;
+use Solital\Core\Console\Style\Colors;
+use Solital\Core\Console\Command\Commands;
+use Solital\Core\Console\Command\FileCommands;
+use Solital\Core\Console\Command\SystemCommands;
 
-class Console extends Commands
+class Console
 {
-    const SOLITAL_VERSION = "1.3.0";
-    const VINCI_VERSION = "1.0.3";
+    /**
+     * @var instance
+     */
+    private $cmd;
 
     /**
-     * @param mixed $command
-     * @param mixed $file_create
-     * @param null $folder
+     * @var instance
+     */
+    private $cmd_system;
+
+    /**
+     * @var instance
+     */
+    private $files;
+
+    /**
+     * @var instance
+     */
+    protected $color;
+
+    /**
+     * @param bool $debug
+     */
+    public function __construct(bool $debug = false)
+    {
+        $this->cmd = new Commands($debug);
+        $this->cmd_system = new SystemCommands($debug);
+        $this->files = new FileCommands($debug);
+        $this->color = new Colors();
+    }
+
+    /**
+     * @param string $command
+     * @param string $file_create
+     * @param string $folder
      * 
      * @return void
      */
-    public static function verify($command, $file_create, $folder = null): void
+    public function execComponent(string $command, string $file_create, string $folder): Console
     {
-        switch ($command) {
-            case 'controller':
-                $file = ucfirst($file_create);
-                $return = Commands::controller($file);
+        $cmd = $this->cmd_system->register()->componentsRegistered();
 
-                if ($return == true) {
-                    print_r("Controller " . $file . " created\n\n");
-                } else {
-                    print_r("Error: Controller " . $file . " not created\n\n");
+        if (in_array($command, $cmd['cmd'])) {
+            if (strpos($command, 'remove') === false) {
+                $this->cmd->$command($file_create)->createComponent();
+
+                die;
+            } else {
+                $method = $this->execute();
+
+                if (empty($method[$command])) {
+                    $msg = $this->color->stringColor("Vinci: Command not found", "yellow", "red", true);
+                    print_r($msg);
+
+                    die;
                 }
 
-                break;
+                $method = $method[$command];
 
-            case 'model':
-                $file = ucfirst($file_create);
-                $return = Commands::model($file);
+                $execute_method1 = explode(':', $command);
+                $function = $execute_method1[0];
+                $method2 = explode('remove-', $function);
+                $execute_method2 = $method2[1];
 
-                if ($return == true) {
-                    print_r("Model $file created\n\n");
-                } else {
-                    print_r("Error: Model $file not created\n\n");
-                }
+                $this->files->confirmDialog("Do you really want to remove this component?[Y/N]");
 
-                break;
+                $this->cmd->$execute_method2($file_create)->removeComponent();
 
-            case 'view':
-                $return = Commands::view($file_create, $folder);
-
-                if ($return == true) {
-                    print_r("View $file_create created\n\n");
-                } else {
-                    print_r("Error: View $file_create not created\n\n");
-                }
-
-                break;
-
-            case 'router':
-                $return = Commands::router($file_create, $folder);
-
-                if ($return == true) {
-                    print_r("Router $file_create created\n\n");
-                } else {
-                    print_r("Error: Router $file_create not created\n\n");
-                }
-
-                break;
-
-            case 'js':
-                $return = Commands::jsFile($file_create);
-
-                if ($return == true) {
-                    print_r("JavaScript $file_create file created\n\n");
-                } else {
-                    print_r("Error: JavaScript $file_create file not created\n\n");
-                }
-
-                break;
-
-            case 'css':
-                $return = Commands::cssFile($file_create);
-
-                if ($return == true) {
-                    print_r("Cascading Style Sheet $file_create file created\n\n");
-                } else {
-                    print_r("Error: Cascading Style Sheet $file_create file not created\n\n");
-                }
-
-                break;
-
-            case 'remove-controller':
-                $file = ucfirst($file_create);
-                $return = Commands::removeController($file);
-
-                if ($return == true) {
-                    print_r("Controller " . $file . "Controller removed\n\n");
-                } else {
-                    print_r("Error: Controller $file not removed or doesn't exist\n\n");
-                }
-
-                break;
-
-            case 'remove-model':
-                $file = ucfirst($file_create);
-                $return = Commands::removeModel($file);
-
-                if ($return == true) {
-                    print_r("Model $file removed\n\n");
-                } else {
-                    print_r("Error: Model $file not removed or doesn't exist\n\n");
-                }
-
-                break;
-
-            case 'remove-view':
-                $return = Commands::removeView($file_create, $folder);
-
-                if ($return == true) {
-                    print_r("View $file_create removed\n\n");
-                } else {
-                    print_r("Error: View $file_create not removed or doesn't exist\n\n");
-                }
-
-                break;
-
-            case 'remove-router':
-                $return = Commands::removeRouter($file_create, $folder);
-
-                if ($return == true) {
-                    print_r("Router $file_create removed\n\n");
-                } else {
-                    print_r("Error: Router $file_create not removed or doesn't exist\n\n");
-                }
-
-                break;
-
-            case 'remove-js':
-                $return = Commands::removeJs($file_create);
-
-                if ($return == true) {
-                    print_r("JavaScript $file_create file removed\n\n");
-                } else {
-                    print_r("Error: JavaScript $file_create file not removed or doesn't exist\n\n");
-                }
-
-                break;
-
-            case 'remove-css':
-                $return = Commands::removeCss($file_create);
-
-                if ($return == true) {
-                    print_r("Cascading Style Sheet $file_create file removed\n\n");
-                } else {
-                    print_r("Error: Cascading Style Sheet $file_create file not removed or doesn't exist\n\n");
-                }
-
-                break;
-
-            case 'katrina':
-                if ($file_create == "configure") {
-                    echo "Enter the drive, host, database name, username and password for your database separated by commas\n\n> ";
-                    $stdin = fopen("php://stdin", "rb");
-                    $res = fgets($stdin);
-                    $res = \str_replace(" ", "", $res);
-                }
-
-                $create = new Create();
-                if (method_exists($create, $file_create)) {
-                    if ($file_create == "configure") {
-                        $create->configure(trim($res));
-                        echo "\nCommand successfully executed!\n\n";
-                        exit;
-                    }
-
-                    $create->$file_create();
-                    echo "\nCommand successfully executed!\n\n";
-                } else {
-                    echo "\n\033[91mError:\033[0m the reported method doesn't exist\n\n";
-                }
-                break;
+                die;
+            }
+        } else {
+            $msg = $this->color->stringColor("Vinci: Command not found", "yellow", "red", true);
+            print_r($msg);
         }
+
+        return $this;
     }
 
     /**
@@ -186,144 +92,56 @@ class Console extends Commands
      * 
      * @return void
      */
-    public static function vinciCommand($command): void
+    public function execCommand($command): Console
     {
-        switch ($command) {
-            case 'cache-clear':
-                $dir = \dirname(__DIR__) . DIRECTORY_SEPARATOR . "Solital" . DIRECTORY_SEPARATOR . "Cache" . DIRECTORY_SEPARATOR . "tmp" . DIRECTORY_SEPARATOR;
+        $cmd = $this->cmd_system->register()->commandsRegistered();
 
-                if (is_dir($dir)) {
-                    $directory = dir($dir);
+        if (in_array($command, $cmd['cmd'])) {
+            $method = $this->execute();
+            $execute_method = $method[$command];
 
-                    while ($file = $directory->read()) {
-                        if (($file != '.') && ($file != '..')) {
-                            unlink($dir . $file);
-                        }
-                    }
-
-                    \print_r("Cache was cleared successfully\n\n");
-
-                    $directory->close();
-                } else {
-                    \print_r("Error clearing the cache\n\n");
-                }
-                break;
-
-            case 'katrina-dump':
-                Commands::dump("." . DIRECTORY_SEPARATOR);
-                break;
-
-            case 'about':
-                $about = "Solital framework \033[96m " . Console::SOLITAL_VERSION . "\033[0m\n\n";
-                $about .= "Thank you for using Solital, you can see the full documentation at https://solital.github.io/docs-v1/\n\n";
-                $about .= "Components Version\n";
-                $about .= "+-------------------------+\n";
-                $about .= "+ Katrina ORM   |\033[93m " . \Solital\Database\ORM::KATRINA_VERSION . "\033[0m   +\n";
-                $about .= "+-------------------------+\n";
-                $about .= "+ Vinci Console |\033[93m " . Console::VINCI_VERSION . "\033[0m   +\n";
-                $about .= "+-------------------------+\n";
-                $about .= "+ PHP Version   |\033[93m " . PHP_MAJOR_VERSION . "." . PHP_MINOR_VERSION . "." . PHP_RELEASE_VERSION . "\033[0m  +\n";
-                $about .= "+-------------------------+\n\n";
-                $about .= "To access the list of Vinci commands, run the command \033[92mphp vinci show\033[0m\n\n";
-
-                \print_r($about);
-                break;
-
-            case 'show':
-                $show = "Below is a list of all vinci commands\n\n";
-                $show .= "\033[33mUsage:\033[0m\n\n";
-                $show .= "To create a component:\n";
-                $show .= "  \033[92mphp vinci [component]:[file]\033[0m\n\n";
-                $show .= "To run a command:\n";
-                $show .= "  \033[92mphp vinci [command]\033[0m\n\n";
-
-                $show .= "\033[33mComponents:\033[0m\n\n";
-                $show .= "  \033[92mcontroller\033[0m          Create a new Controller\n";
-                $show .= "  \033[92mmodel\033[0m               Create a new Model\n";
-                $show .= "  \033[92mview\033[0m                Create a new View\n";
-                $show .= "  \033[92mrouter\033[0m              Create a new Router\n";
-                $show .= "  \033[92mjs\033[0m                  Create a new JavaScript file\n";
-                $show .= "  \033[92mcss\033[0m                 Create a new Cascading Style Sheet file\n";
-                $show .= "  \033[92mremove-controller\033[0m   Remove a Controller\n";
-                $show .= "  \033[92mremove-model\033[0m        Remove a Model\n";
-                $show .= "  \033[92mremove-view\033[0m         Remove a View\n";
-                $show .= "  \033[92mremove-router\033[0m       Remove a Router\n";
-                $show .= "  \033[92mremove-js\033[0m           Remove a JavaScript file\n";
-                $show .= "  \033[92mremove-css\033[0m          Remove a Cascading Style Sheet file\n\n";
-
-                $show .= "\033[33mCommands:\033[0m\n\n";
-                $show .= "  \033[92mabout\033[0m           Shows version of solital and components\n";
-                $show .= "  \033[92mshow\033[0m            Lists all Vinci commands\n";
-                $show .= "  \033[92mcache-clear\033[0m     Clears the solital cache\n";
-                $show .= "  \033[92mauth\033[0m            Create classes for login\n";
-                $show .= "  \033[92mremove-auth\033[0m     Removes the components created with the \033[92mauth\033[0m command\n";
-
-                \print_r($show);
-                break;
-
-            case 'auth':
-                $return = Commands::authComponents();
-
-                if ($return == true) {
-                    print_r("Created components. Run the command \033[92mcomposer dump-autoload -o\033[0m to load the classes\n\n");
-                } else {
-                    print_r("Error: it wasn't possible to create the components\n\n");
-                }
-                break;
-
-            case 'remove-auth':
-
-                echo "Are you sure you want to delete the authentication components? (this process cannot be undone)? [Y/N]";
-                $stdin = fopen("php://stdin", "rb");
-                $res = fgets($stdin);
-                $res = strtoupper($res);
-
-                if (\trim($res) == "Y") {
-                    $return = Commands::removeAuth();
-
-                    if ($return == true) {
-                        print_r("Components removed\n\n");
-                    } else {
-                        print_r("Error: it wasn't possible to remove the components\n\n");
-                    }
-                } else if (\trim($res) == "N") {
-                    echo "Aborted\n\n";
-                    exit;
-                }
-
-                break;
-
-            case 'forgot':
-                $return = Commands::forgotComponents();
-
-                if ($return == true) {
-                    print_r("Created components. Run the command \033[92mcomposer dump-autoload -o\033[0m to load the classes\n\n");
-                } else {
-                    print_r("Error: it wasn't possible to create the components\n\n");
-                }
-                break;
-
-            case 'remove-forgot':
-
-                echo "Are you sure you want to delete the forgot password components? (this process cannot be undone)? [Y/N]";
-                $stdin = fopen("php://stdin", "rb");
-                $res = fgets($stdin);
-                $res = strtoupper($res);
-
-                if (\trim($res) == "Y") {
-                    $return = Commands::removeForgot();
-
-                    if ($return == true) {
-                        print_r("Components removed\n\n");
-                    } else {
-                        print_r("Error: it wasn't possible to remove the components\n\n");
-                    }
-                } else if (\trim($res) == "N") {
-                    echo "Aborted\n\n";
-                    exit;
-                }
-
-                break;
+            if (method_exists($this->cmd_system, $execute_method)) {
+                $this->cmd_system->$execute_method();
+            } else {
+                $this->files->$execute_method();
+            }
+        } else {
+            $msg = $this->color->stringColor("Vinci: Command not found", "yellow", "red", true);
+            print_r($msg);
         }
+
+        return $this;
+    }
+
+    /**
+     * @param string $cmd
+     * 
+     * @return array
+     */
+    private function execute(): array
+    {
+        return [
+            'controller' => 'controller:file_name',
+            'model' => 'model:file_name',
+            'view' => 'view:file_name',
+            'router' => 'file:file_name',
+            'js' => 'js:file_name',
+            'css' => 'css:file_name',
+            'remove-controller' => 'controller:file_name',
+            'remove-model' => 'model:file_name',
+            'remove-view' => 'view:file_name',
+            'remove-router' => 'file:file_name',
+            'remove-js' => 'js:file_name',
+            'remove-css' => 'css:file_name',
+            'version' => 'version',
+            'show' => 'show',
+            'routes' => 'routes',
+            'cache-clear' => 'clearCache',
+            'session-clear' => 'clearSession',
+            'login' => 'login',
+            'remove-login' => 'removeLogin',
+            'forgot' => 'forgot',
+            'remove-forgot' => 'removeForgot',
+        ];
     }
 }

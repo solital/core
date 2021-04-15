@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Solital\Core\Http;
 
-use Solital\Core\Http\Exceptions\InvalidArgumentException;
-use Solital\Core\Http\Exceptions\RuntimeException;
 use Psr\Http\Message\StreamInterface;
+use Solital\Core\Exceptions\RuntimeException;
+use Solital\Core\Exceptions\InvalidArgumentHttpException;
 
 class Stream implements StreamInterface
 {
@@ -22,7 +22,7 @@ class Stream implements StreamInterface
      * @param string|resource $stream
      * @param string          $mode
      *
-     * @throws \InvalidArgumentException
+     * @throws \InvalidArgumentHttpException
      */
     public function __construct($stream = 'php://memory', string $mode = 'r')
     {
@@ -31,7 +31,7 @@ class Stream implements StreamInterface
         }
 
         if (! is_resource($stream) || get_resource_type($stream) !== 'stream') {
-            InvalidArgumentException::alertMessage(400, 
+            InvalidArgumentHttpException::invalidExceptionMessage(400, 
                 'The stream must be a string stream identifier or stream resource, received ' .
                 (is_object($stream) ? get_class($stream) : gettype($stream))
             );
@@ -101,7 +101,7 @@ class Stream implements StreamInterface
     public function tell() : int
     {
         if (! $this->stream || is_int($position = ftell($this->stream)) === false) {
-            RuntimeException::alertMessage('Unable to determine stream position');
+            RuntimeException::exceptionMessage('Unable to determine stream position');
         }
 
         return $position;
@@ -129,7 +129,7 @@ class Stream implements StreamInterface
     public function seek($offset, $whence = SEEK_SET)
     {
         if (! $this->isSeekable() || fseek($this->stream, $offset, $whence) === -1) {
-            RuntimeException::alertMessage('Unable tho seek stream position');
+            RuntimeException::exceptionMessage('Unable tho seek stream position');
         }
     }
 
@@ -187,7 +187,7 @@ class Stream implements StreamInterface
     public function read($length) : string
     {
         if (! $this->isReadable() || ($read = fread($this->stream, $length)) === false) {
-            RuntimeException::alertMessage('Unable to read stream');
+            RuntimeException::exceptionMessage('Unable to read stream');
         }
 
         return $read;
@@ -200,7 +200,7 @@ class Stream implements StreamInterface
     public function getContents() : string
     {
         if (! $this->isReadable() || ($contents = stream_get_contents($this->stream)) === false) {
-            RuntimeException::alertMessage('Unable to read stream contents');
+            RuntimeException::exceptionMessage('Unable to read stream contents');
         }
 
         return $contents;

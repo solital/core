@@ -120,7 +120,7 @@ class EventHandler implements EventHandlerInterface
      * List of all registered events
      * @var array
      */
-    private $registeredEvents = [];
+    private array $registeredEvents = [];
 
     /**
      * Register new event
@@ -181,5 +181,4 @@ class EventHandler implements EventHandlerInterface
             $event(new EventArgument($name, $router, $eventArgs));
         }
     }
-
 }

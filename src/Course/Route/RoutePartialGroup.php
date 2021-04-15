@@ -3,6 +3,8 @@
 namespace Solital\Core\Course\Route;
 
 use Solital\Core\Http\Request;
+use Solital\Core\Course\Route\RouteGroup;
+use Solital\Core\Course\Route\PartialGroupRouteInterface;
 
 class RoutePartialGroup extends RouteGroup implements PartialGroupRouteInterface
 {
@@ -43,5 +45,4 @@ class RoutePartialGroup extends RouteGroup implements PartialGroupRouteInterface
 
         return $this->matchDomain($request);
     }
-
 }

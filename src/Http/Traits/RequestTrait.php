@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace Solital\Core\Http\Traits;
 
 use Solital\Core\Http\Uri;
-use Solital\Core\Http\Exceptions\InvalidArgumentException;
 use Psr\Http\Message\UriInterface;
+use Solital\Core\Exceptions\InvalidArgumentHttpException;
 
 trait RequestTrait
 {
-
     use MessageTrait;
 
     /**
@@ -25,7 +24,7 @@ trait RequestTrait
      *
      * @var string
      */
-    protected $method = '';
+    protected string $method = '';
 
     /**
      * Available valid HTTP methods.
@@ -56,7 +55,7 @@ trait RequestTrait
      * @param string|resource|\Psr\Http\Message\StreamInterface $body
      * @param array                                             $headers
      *
-     * @throws \InvalidArgumentException for any invalid value.
+     * @throws \InvalidArgumentHttpException for any invalid value.
      */
     private function initialize(string $method = null, $uri = null, $body = 'php://memory', array $headers = [])
     {
@@ -69,7 +68,7 @@ trait RequestTrait
     /**
      * @return string
      */
-    public function getRequestTarget() : string
+    public function getRequestTarget(): string
     {
         if ($this->requestTarget) {
             return $this->requestTarget;
@@ -93,12 +92,12 @@ trait RequestTrait
      *
      * @return static
      *
-     * @throws \InvalidArgumentException for invalid request targets.
+     * @throws \InvalidArgumentHttpException for invalid request targets.
      */
     public function withRequestTarget($requestTarget)
     {
         if (preg_match('#\s#', $requestTarget)) {
-            InvalidArgumentException::alertMessage(400, 'Invalid request target provided. Must be a string without whitespace');
+            InvalidArgumentHttpException::invalidExceptionMessage(400, 'Invalid request target provided. Must be a string without whitespace');
         }
 
         $clone = clone $this;
@@ -110,7 +109,7 @@ trait RequestTrait
     /**
      * @return string Returns the request method.
      */
-    public function getMethod() : string
+    public function getMethod(): string
     {
         return $this->method;
     }
@@ -120,7 +119,7 @@ trait RequestTrait
      *
      * @return static
      *
-     * @throws \InvalidArgumentException for invalid HTTP methods.
+     * @throws \InvalidArgumentHttpException for invalid HTTP methods.
      */
     public function withMethod($method)
     {
@@ -137,29 +136,30 @@ trait RequestTrait
      *
      * @return string
      *
-     * @throws \InvalidArgumentException for invalid HTTP methods.
+     * @throws \InvalidArgumentHttpException for invalid HTTP methods.
      */
-    private function sanitizeMethod($method) : string
+    private function sanitizeMethod($method): string
     {
         if ($method === null) {
             return '';
         }
 
-        if (! is_string($method)) {
-            InvalidArgumentException::alertMessage(400, 
+        if (!is_string($method)) {
+            InvalidArgumentHttpException::invalidExceptionMessage(
+                400,
                 'Invalid HTTP method. Must be a string, received ' .
-                (is_object($method) ? get_class($method) : gettype($method))
+                    (is_object($method) ? get_class($method) : gettype($method))
             );
         }
 
         $method = strtoupper($method);
 
-        if (! in_array($method, self::$validMethods, true)) {
-            InvalidArgumentException::alertMessage(400, 
+        if (!in_array($method, self::$validMethods, true)) {
+            InvalidArgumentHttpException::invalidExceptionMessage(
+                400,
                 'Invalid HTTP method. Must be ' .
-                implode(', ', self::$validMethods)
+                    implode(', ', self::$validMethods)
             );
-
         }
 
         return $method;
@@ -170,7 +170,7 @@ trait RequestTrait
      *
      * @param string|null|\Psr\Http\Message\UriInterface $uri
      *
-     * @throws \InvalidArgumentException When the provided URI is invalid.
+     * @throws \InvalidArgumentHttpException When the provided URI is invalid.
      */
     private function setUriInstance($uri)
     {
@@ -181,9 +181,10 @@ trait RequestTrait
         } elseif ($uri === null) {
             $this->uri = new Uri;
         } else {
-            InvalidArgumentException::alertMessage(400, 
+            InvalidArgumentHttpException::invalidExceptionMessage(
+                400,
                 'Invalid URI provided. Must be null, a string, ' .
-                'or a Psr\Http\Message\UriInterface instance'
+                    'or a Psr\Http\Message\UriInterface instance'
             );
         }
     }
@@ -191,7 +192,7 @@ trait RequestTrait
     /**
      * @return UriInterface Returns a UriInterface instance representing the URI of the request.
      */
-    public function getUri() : UriInterface
+    public function getUri(): UriInterface
     {
         return $this->uri;
     }
@@ -215,7 +216,7 @@ trait RequestTrait
 
         // @todo: I'm not very happy with this solution right now :(
         if ($preserveHost) {
-            if ($host !== '' && (! $this->hasHeader('Host') || $this->getHeaderLine('Host') === '')) {
+            if ($host !== '' && (!$this->hasHeader('Host') || $this->getHeaderLine('Host') === '')) {
                 $clone->headerNames['host'] = 'Host';
                 $clone->headers['Host'] = [$host];
             }

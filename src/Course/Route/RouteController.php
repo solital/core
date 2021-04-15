@@ -3,16 +3,36 @@
 namespace Solital\Core\Course\Route;
 
 use Solital\Core\Http\Request;
+use Solital\Core\Course\Route\LoadableRoute;
 use Solital\Core\Course\Route\RouteInterface;
 use Solital\Core\Course\Route\ControllerRouteInterface;
 
 class RouteController extends LoadableRoute implements ControllerRouteInterface
 {
-    protected $defaultMethod = 'index';
-    protected $controller;
-    protected $method;
-    protected $names = [];
+    /**
+     * @var string
+     */
+    protected string $defaultMethod = 'index';
 
+    /**
+     * @var mixed
+     */
+    protected $controller;
+
+    /**
+     * @var string
+     */
+    protected string $method;
+
+    /**
+     * @var array
+     */
+    protected array $names = [];
+
+    /**
+     * @param mixed $url
+     * @param mixed $controller
+     */
     public function __construct($url, $controller)
     {
         $this->setUri($url);
@@ -181,5 +201,4 @@ class RouteController extends LoadableRoute implements ControllerRouteInterface
 
         return parent::setSettings($values, $merge);
     }
-
 }

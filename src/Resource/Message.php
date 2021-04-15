@@ -1,43 +1,39 @@
 <?php
 
 namespace Solital\Core\Resource;
+
 use Solital\Core\Resource\Session;
 
-class Message 
+class Message
 {
     /**
      * @param string $index
      * @param string $msg
+     * 
+     * @return null
      */
-    public static function new(string $index , string $msg): Message
+    public function new(string $index, string $msg)
     {
         Session::new($index, $msg);
-        return new static;
+
+        return null;
     }
-    
+
     /**
      * @param string $index
+     * 
+     * @return null|string
      */
-    public static function get(string $index): ?string
+    public function get(string $index): ?string
     {
         if (isset($_SESSION[$index])) {
-            return (string)$_SESSION[$index];
+            try {
+                return (string)$_SESSION[$index];
+            } finally {
+                Session::delete($index);
+            }
         }
 
         return null;
     }
-    
-    /**
-     * @param string $index
-     * @return bool
-     */
-    public static function clear(string $index): bool
-    {
-        if (isset($_SESSION[$index])) {
-            unset($_SESSION[$index]);
-            return true;
-        } else {
-            return false;
-        }
-    }    
 }

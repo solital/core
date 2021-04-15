@@ -12,14 +12,13 @@ use Solital\Core\Course\Route\RouteResource;
 use Solital\Core\Course\Route\RouteInterface;
 use Solital\Core\Course\Route\RouteController;
 use Solital\Core\Course\Route\RoutePartialGroup;
-use Solital\Core\Course\Exceptions\HttpException;
 use Solital\Core\Course\Route\GroupRouteInterface;
+use Solital\Core\Exceptions\MalformedUrlException;
 use Solital\Core\Exceptions\NotFoundHttpException;
 use Solital\Core\Http\Middleware\BaseCsrfVerifier;
 use Solital\Core\Course\RouterBootManagerInterface;
 use Solital\Core\Exceptions\InvalidArgumentException;
 use Solital\Core\Course\Handlers\EventHandlerInterface;
-use Solital\Core\Http\Exceptions\MalformedUrlException;
 use Solital\Core\Course\Route\PartialGroupRouteInterface;
 use Solital\Core\Course\Handlers\CallbackExceptionHandler;
 
@@ -57,11 +56,25 @@ class Course extends NotFoundHttpException
      * @throws HttpException
      * @throws \Exception
      */
-    public static function start(): void
+    public static function start(bool $send_console = false): void
     {
-        echo static::router()->start();
+        if (!defined('DB_CONFIG')) {
+            define('DB_CONFIG', [
+                'DRIVE' => $_ENV['DB_DRIVE'],
+                'HOST' => $_ENV['DB_HOST'],
+                'DBNAME' => $_ENV['DB_NAME'],
+                'USER' => $_ENV['DB_USER'],
+                'PASS' => $_ENV['DB_PASS'],
+                'SQLITE_DIR' => $_ENV['SQLITE_DIR']
+            ]);
+        }
+
+        echo static::router()->start($send_console);
     }
-    
+
+    /**
+     * @return array
+     */
     public static function startDebug(): array
     {
         $routerOutput = null;
@@ -72,7 +85,6 @@ class Course extends NotFoundHttpException
             $routerOutput = ob_get_contents();
             ob_end_clean();
         } catch (\Exception $e) {
-
         }
 
         // Try to parse library version
@@ -127,7 +139,8 @@ class Course extends NotFoundHttpException
      *
      * @param string $basePath
      */
-    public static function setDefaultBasepath(string $basePath): void {
+    public static function setDefaultBasepath(string $basePath): void
+    {
         static::$basePath = $basePath;
     }
 
@@ -351,6 +364,7 @@ class Course extends NotFoundHttpException
         http_response_code(200);
         $route = new RouteUrl(static::$basePath . $url, $callback);
         $route->setRequestMethods($requestMethods);
+        $route->setControllerName($callback);
         $route = static::addDefaultNamespace($route);
 
         if ($settings !== null) {
@@ -422,7 +436,7 @@ class Course extends NotFoundHttpException
 
         return static::router()->addRoute($route);
     }
-    
+
     /**
      * @param bool $bool
      * @param string $url
@@ -537,7 +551,6 @@ class Course extends NotFoundHttpException
                 }
 
                 $route->setDefaultNamespace($namespace);
-
             }
         }
 
@@ -552,5 +565,4 @@ class Course extends NotFoundHttpException
     {
         return static::$defaultNamespace;
     }
-
 }

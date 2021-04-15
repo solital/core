@@ -1,7 +1,8 @@
 <?php
 
 namespace Solital\Core\Security;
-use Solital\Database\Forgot\Forgot;
+
+use Solital\Core\Database\ORM;
 use Solital\Core\Resource\Session;
 use Solital\Core\Exceptions\NotFoundException;
 
@@ -10,22 +11,25 @@ class Guardian
     /**
      * @var string
      */
-    private $table;
+    private string $table;
 
     /**
      * Verify login
      */
-    protected static function verifyLogin()
+    public static function verifyLogin()
     {
         return new static;
     }
 
     /**
      * @param string $table
+     * 
+     * @return Guardian
      */
     public function table(string $table): Guardian
     {
         $this->table = $table;
+
         return $this;
     }
 
@@ -35,10 +39,10 @@ class Guardian
      * @param string $email
      * @param string $password
      */
-    protected function fields(string $email_column, string $pass_column, string $email, string $password)
+    public function fields(string $email_column, string $pass_column, string $email, string $password)
     {
         $sql = "SELECT * FROM $this->table WHERE $email_column = '$email';";
-        $res = (new Forgot())->queryDatabase($sql);
+        $res = ORM::query($sql);
 
         if (password_verify($password, $res[$pass_column])) {
             return $res;
@@ -51,13 +55,14 @@ class Guardian
      * @param string $table
      * @param string $email_column
      * @param string $email
+     * 
      * @return bool
      */
     public static function verifyEmail(string $table, string $email_column, string $email): bool
     {
         $sql = "SELECT * FROM $table WHERE $email_column = '$email';";
-        $res = (new Forgot())->queryDatabase($sql);
-        
+        $res = ORM::query($sql);
+
         if ($res) {
             return true;
         } else {
@@ -66,69 +71,34 @@ class Guardian
     }
 
     /**
-     * @param string $index Optional
+     * @param string $redirect
+     * @param string $session
+     * @param string $index
+     * 
+     * @return void
      */
-    public static function checkLogin(string $index = INDEX_LOGIN): void
+    public static function validate(string $redirect, string $session, string $index = ''): void
     {
-        self::verifyConstants();
-        if (empty($_SESSION[$index])) {
-            response()->redirect(URL_LOGIN);
-            exit;
+        if ($index == '') {
+            $index = $_ENV['INDEX_LOGIN'];
         }
-    }
-    
-    /**
-     * @param string $index Optional
-     */
-    public static function checkLogged(string $index = INDEX_LOGIN): void
-    {
-        self::verifyConstants();
-        if (isset($_SESSION[$index])) {
-            response()->redirect(URL_DASHBOARD);
-            exit;
-        }
-    }
-    
-    /**
-     * @param string $index Optional
-     */
-    protected static function validate(string $session, string $index = INDEX_LOGIN): void
-    {
+
         self::verifyConstants();
         Session::new($index, $session);
-        response()->redirect(URL_DASHBOARD);
+        response()->redirect($redirect);
         exit;
     }
-    
-    /**
-     * @param string $index Optional
-     * @return null
-     */
-    public static function logoff(string $index = INDEX_LOGIN): void
-    {
-        self::verifyConstants();
-        Session::delete($index);
-        response()->redirect(URL_LOGIN);
-        exit;
-    }
-    
+
     /**
      * Checks for constants
-     * @return null
+     * 
+     * @return void
      */
     private static function verifyConstants(): void
     {
-        if (INDEX_LOGIN == "" || empty(INDEX_LOGIN)) {
-            NotFoundException::GuardianNotFound("INDEX_LOGIN not defined", "You have not determined any indexes in the INDEX_LOGIN constant. Check your 'config.php' file");
-        }
-        
-        if (URL_DASHBOARD == "" || empty(URL_DASHBOARD)) {
-            NotFoundException::GuardianNotFound("URL_DASHBOARD not defined", "You have not determined any indexes in the URL_DASHBOARD constant. Check your 'config.php' file");
-        }
-        
-        if (URL_LOGIN == "" || empty(URL_LOGIN)) {
-            NotFoundException::GuardianNotFound("URL_LOGIN not defined", "You have not determined any indexes in the URL_LOGIN constant. Check your 'config.php' file");
+        if ($_ENV['INDEX_LOGIN'] == "" || empty($_ENV['INDEX_LOGIN'])) {
+            NotFoundException::notFound(404, "INDEX_LOGIN not defined", "You have not determined any 
+            indexes in the INDEX_LOGIN constant. Check your 'config.php' file", "Guardian");
         }
     }
-
 }

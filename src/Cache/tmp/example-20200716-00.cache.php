@@ -1,1 +1,0 @@
-<!-- This file is just an example of a cache made with the Wolf template -->

@@ -2,7 +2,7 @@
 
 namespace Solital\Core\Resource;
 
-class Session 
+class Session
 {
     /**
      * @param string $index
@@ -18,7 +18,7 @@ class Session
         $_SESSION[$index] = (is_array($value) ? (object)$value : $value);
         return new static;
     }
-    
+
     /**
      * @param string $index
      * @return bool
@@ -39,7 +39,7 @@ class Session
 
         return false;
     }
-    
+
     /**
      * @param string $index
      */
@@ -75,14 +75,5 @@ class Session
         } else {
             return false;
         }
-    }
-    
-    /**
-     * @return bool
-     */
-    public static function destroy(): bool
-    {
-        session_destroy();
-        return true;
     }
 }

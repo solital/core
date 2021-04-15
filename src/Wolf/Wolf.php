@@ -3,14 +3,22 @@
 namespace Solital\Core\Wolf;
 
 use Solital\Core\Wolf\WolfCache;
+use Solital\Core\Wolf\WolfMinifyTrait;
 use Solital\Core\Exceptions\NotFoundException;
 
 class Wolf extends WolfCache
 {
+    use WolfMinifyTrait;
+
     /**
      * @var string
      */
-    private static $main_url;
+    private static string $main_url;
+
+    /**
+     * @var string
+     */
+    private static string $dir_view;
 
     /**
      * @return string
@@ -18,6 +26,16 @@ class Wolf extends WolfCache
     private static function getInstance(): string
     {
         return self::$main_url = '//' . $_SERVER['HTTP_HOST'] . "/";
+    }
+
+    /**
+     * @return string
+     */
+    private static function getDirView(): string
+    {
+        self::$dir_view = SITE_ROOT . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR;
+
+        return self::$dir_view;
     }
 
     /**
@@ -30,21 +48,25 @@ class Wolf extends WolfCache
     public static function loadView(string $view, array $data = null, string $ext = "php")
     {
         $view = str_replace(".", DIRECTORY_SEPARATOR, $view);
-        $file = ROOT . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'view' . DIRECTORY_SEPARATOR . $view . '.' . $ext;
 
-        self::$file_cache = self::$cache_dir . $view . "-" . date('Ymd') . "-" . self::$time . ".cache.php";
+        $file = self::getDirView() . "view" . DIRECTORY_SEPARATOR . $view . '.' . $ext;
+
+        /** Create or browse the cached file  */
+        self::$file_cache = self::getFolderCache() . $view . "-" . date('Ymd') . "-" . self::$time . ".cache.php";
 
         if (strpos($view, "/")) {
-            $file = ROOT . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . $view . '.' . $ext;
+            $file = self::getDirView() . $view . '.' . $ext;
 
             $viewForCache = str_replace("/", ".", $view);
-            self::$file_cache = self::$cache_dir . $viewForCache . "-" . date('Ymd') . "-" . self::$time . ".cache.php";
+            self::$file_cache = self::getFolderCache() . $viewForCache . "-" . date('Ymd') . "-" . self::$time . ".cache.php";
         }
 
+        /** Convert array indexes to variables  */
         if (isset($data)) {
             extract($data, EXTR_SKIP);
         }
 
+        /** Checks whether the cached file exists  */
         if (file_exists(self::$file_cache)) {
             include_once self::$file_cache;
             die;
@@ -63,7 +85,9 @@ class Wolf extends WolfCache
                 file_put_contents(self::$file_cache, $res);
             }
         } else {
-            NotFoundException::WolfNotFound($view, $ext);
+            NotFoundException::notFound(403, "Template '$view.$ext' not found", "Check if the informed 
+            template is in the 'resources/view' folder or if the file extension corresponds to 
+            the informed in the 'loadView()' method. ", "Wolf");
         }
 
         return __CLASS__;
@@ -88,9 +112,9 @@ class Wolf extends WolfCache
      */
     public static function loadCss(string $asset): string
     {
-        $css = self::getInstance() . 'assets/_css/' . $asset;
+        $file = self::getInstance() . 'assets/_css/' . $asset;
 
-        return $css;
+        return $file;
     }
 
     /**
@@ -100,9 +124,9 @@ class Wolf extends WolfCache
      */
     public static function loadJs(string $asset): string
     {
-        $js = self::getInstance() . 'assets/_js/' . $asset;
+        $file = self::getInstance() . 'assets/_js/' . $asset;
 
-        return $js;
+        return $file;
     }
 
     /**
@@ -112,8 +136,8 @@ class Wolf extends WolfCache
      */
     public static function loadImg(string $asset): string
     {
-        $img = self::getInstance() . 'assets/_img/' . $asset;
+        $file = self::getInstance() . 'assets/_img/' . $asset;
 
-        return $img;
+        return $file;
     }
 }

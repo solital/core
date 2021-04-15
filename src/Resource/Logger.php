@@ -5,32 +5,36 @@ namespace Solital\Core\Resource;
 use Psr\Log\LogLevel;
 use Psr\Log\LoggerInterface;
 
-class Logger implements \Psr\Log\LoggerInterface
+class Logger implements LoggerInterface
 {
     /**
      * File name and path of log file.
+     * 
      * @var string
      */
-    private $log_file;
+    private string $log_file;
 
     /**
      * Log channel--namespace for log lines.
      * Used to identify and correlate groups of similar log lines.
+     * 
      * @var string
      */
-    private $channel;
+    private string $channel;
 
     /**
      * Lowest log level to log.
-     * @var int
+     * 
+     * @var mixed
      */
     private $log_level;
 
     /**
      * Whether to log to standard out.
+     * 
      * @var bool
      */
-    private $stdout;
+    private string $stdout;
 
     /**
      * Log fields separated by tabs to form a TSV (CSV with tabs).
@@ -60,13 +64,12 @@ class Logger implements \Psr\Log\LoggerInterface
     /**
      * Logger constructor
      *
-     * @param string $log_file  File name and path of log file.
      * @param string $channel   Logger channel associated with this logger.
      * @param string $log_level (optional) Lowest log level to log.
      */
-    public function __construct(string $log_file, string $channel, string $log_level = LogLevel::DEBUG)
+    public function __construct(string $channel, string $log_level = LogLevel::DEBUG)
     {
-        $this->log_file  = $log_file;
+        $this->log_file  = SITE_ROOT . DIRECTORY_SEPARATOR . "app" . DIRECTORY_SEPARATOR . "Storage" . DIRECTORY_SEPARATOR . "log" . DIRECTORY_SEPARATOR . "solital-log.txt";
         $this->channel   = $channel;
         $this->stdout    = false;
         $this->setLogLevel($log_level);
@@ -76,8 +79,10 @@ class Logger implements \Psr\Log\LoggerInterface
      * Set the lowest log level to log.
      *
      * @param string $log_level
+     * 
+     * @return void
      */
-    public function setLogLevel(string $log_level)
+    public function setLogLevel(string $log_level): void
     {
         if (!array_key_exists($log_level, self::LEVELS)) {
             throw new \DomainException("Log level $log_level is not a valid log level. Must be one of (" . implode(', ', array_keys(self::LEVELS)) . ')');
@@ -90,8 +95,10 @@ class Logger implements \Psr\Log\LoggerInterface
      * Set the log channel which identifies the log line.
      *
      * @param string $channel
+     * 
+     * @return void
      */
-    public function setChannel(string $channel)
+    public function setChannel(string $channel): void
     {
         $this->channel = $channel;
     }
@@ -101,8 +108,10 @@ class Logger implements \Psr\Log\LoggerInterface
      * If set to true, log lines will also be printed to standard out.
      *
      * @param bool $stdout
+     * 
+     * @return void
      */
-    public function setOutput(bool $stdout)
+    public function setOutput(bool $stdout): void
     {
         $this->stdout = $stdout;
     }
@@ -115,8 +124,10 @@ class Logger implements \Psr\Log\LoggerInterface
      * @param array $data Associative array of contextual support data that goes with the log event.
      *
      * @throws \RuntimeException
+     * 
+     * @return void
      */
-    public function debug($message = '', array $data = null)
+    public function debug($message = '', array $data = null): void
     {
         if ($this->logAtThisLevel(LogLevel::DEBUG)) {
             $this->log(LogLevel::DEBUG, $message, $data);

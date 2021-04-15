@@ -2,18 +2,21 @@
 
 namespace Solital\Core\Http\Security;
 
-use Solital\Core\Http\Security\Exceptions\SecurityException;
 use Solital\Core\Resource\Session;
+use Solital\Core\Http\Security\TokenProviderInterface;
 
 class CookieTokenProvider implements TokenProviderInterface
 {
     public const CSRF_KEY = 'CSRF-TOKEN';
     private const CSRF_VALIDATE = 'CSRF-VALIDATE';
+
+    /**
+     * @var mixed
+     */
     protected $token;
 
     /**
      * CookieTokenProvider constructor.
-     * @throws SecurityException
      */
     public function __construct()
     {
@@ -73,5 +76,4 @@ class CookieTokenProvider implements TokenProviderInterface
     {
         return isset($_SESSION[static::CSRF_KEY]);
     }
-
 }

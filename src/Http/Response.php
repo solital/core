@@ -4,16 +4,16 @@ namespace Solital\Core\Http;
 
 use Psr\Http\Message\ResponseInterface;
 use Solital\Core\Http\Traits\MessageTrait;
-use Solital\Core\Http\Exceptions\InvalidArgumentException;
+use Solital\Core\Exceptions\InvalidArgumentHttpException;
 
 class Response implements ResponseInterface
 {
-
     use MessageTrait;
+
     /**
      * Reason phrase
      *
-     * @var string
+     * @var mixed
      */
     private $statusCode;
 
@@ -29,12 +29,12 @@ class Response implements ResponseInterface
      *
      * @var string
      */
-    protected $reasonPhrase = '';
+    protected string $reasonPhrase = '';
 
     /**
      * Reason phrase
      *
-     * @var string
+     * @var Request
      */
     protected $request;
 
@@ -43,7 +43,7 @@ class Response implements ResponseInterface
      *
      * @var array
      */
-    protected $statusMessageList = [
+    protected array $statusMessageList = [
         //Informational 1xx
         100 => 'Continue',
         101 => 'Switching Protocols',
@@ -115,11 +115,17 @@ class Response implements ResponseInterface
         599 => 'Network Connect Timeout Error',
     ];
 
+    /**
+     * @param Request $request
+     * @param null $body
+     * @param int $code
+     * @param array $headers
+     */
     public function __construct(Request $request, $body = null, $code = 200, array $headers = [])
     {
         #$headers = \getallheaders();
         $this->request = $request;
-        
+
         foreach ($_SERVER as $key => $value) {
             $this->headers[strtolower($key)] = $value;
             $this->headers[strtolower(str_replace('_', '-', $key))] = $value;
@@ -159,48 +165,12 @@ class Response implements ResponseInterface
         exit(0);
     }
 
+    /**
+     * @return void
+     */
     public function refresh(): void
     {
         $this->redirect($this->request->getUrl()->getOriginalUrl());
-    }
-
-    public function cache(string $eTag, int $lastModifiedTime = 2592000): self
-    {
-
-        $this->headers([
-            'Cache-Control: public',
-            sprintf('Last-Modified: %s GMT', gmdate('D, d M Y H:i:s', $lastModifiedTime)),
-            sprintf('Etag: %s', $eTag),
-        ]);
-
-        $httpModified = $this->request->getHeader('http-if-modified-since');
-        $httpIfNoneMatch = $this->request->getHeader('http-if-none-match');
-
-        if (($httpIfNoneMatch !== null && $httpIfNoneMatch === $eTag) || ($httpModified !== null && strtotime($httpModified) === $lastModifiedTime)) {
-
-            $this->header('HTTP/1.1 304 Not Modified');
-            exit(0);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Json encode
-     * @param array|\JsonSerializable $value
-     * @param int $options JSON options Bitmask consisting of JSON_HEX_QUOT, JSON_HEX_TAG, JSON_HEX_AMP, JSON_HEX_APOS, JSON_NUMERIC_CHECK, JSON_PRETTY_PRINT, JSON_UNESCAPED_SLASHES, JSON_FORCE_OBJECT, JSON_PRESERVE_ZERO_FRACTION, JSON_UNESCAPED_UNICODE, JSON_PARTIAL_OUTPUT_ON_ERROR.
-     * @param int $dept JSON debt.
-     * @throws InvalidArgumentException
-     */
-    public function json($value, ?int $options = null, int $dept = 512): void
-    {
-        if (($value instanceof \JsonSerializable) === false && \is_array($value) === false) {
-            InvalidArgumentException::alertMessage(417, 'Invalid type. Must be of type array or object implementing the \JsonSerializable interface.');
-        }
-
-        $this->header('Content-Type: application/json; charset=utf-8');
-        echo json_encode($value, $options, $dept);
-        exit(0);
     }
 
     /**
@@ -228,11 +198,11 @@ class Response implements ResponseInterface
 
         return $this;
     }
-    
+
     /**
      * @return int Status code.
      */
-    public function getStatusCode() : int
+    public function getStatusCode(): int
     {
         return $this->statusCode;
     }
@@ -243,7 +213,7 @@ class Response implements ResponseInterface
      *                             provided status code; if none is provided, implementations MAY
      *                             use the defaults as suggested in the HTTP specification.
      * @return static
-     * @throws \InvalidArgumentException For invalid status code arguments.
+     * @throws \InvalidArgumentHttpException For invalid status code arguments.
      */
     public function withStatus($code, $reasonPhrase = '')
     {
@@ -252,10 +222,11 @@ class Response implements ResponseInterface
         }
         $code = $this->sanitizeStatus($code);
 
-        if (! is_string($reasonPhrase)) {
-            InvalidArgumentException::alertMessage(400, 
+        if (!is_string($reasonPhrase)) {
+            InvalidArgumentHttpException::invalidExceptionMessage(
+                400,
                 "HTTP reason phrase must be a 'string', received '" .
-                (is_object($reasonPhrase) ? get_class($reasonPhrase) : gettype($reasonPhrase))."'"
+                    (is_object($reasonPhrase) ? get_class($reasonPhrase) : gettype($reasonPhrase)) . "'"
             );
         }
 
@@ -267,7 +238,7 @@ class Response implements ResponseInterface
         }
 
         if ($reasonPhrase === '') {
-            InvalidArgumentException::alertMessage(417, 'The HTTP reason phrase must be supplied for this code');
+            InvalidArgumentHttpException::invalidExceptionMessage(417, 'The HTTP reason phrase must be supplied for this code');
         }
 
         $clone->reasonPhrase = $reasonPhrase;
@@ -278,12 +249,12 @@ class Response implements ResponseInterface
     /**
      * @param mixed $code
      * @return int
-     * @throws \InvalidArgumentException For invalid status code arguments.
+     * @throws \InvalidArgumentHttpException For invalid status code arguments.
      */
-    private function sanitizeStatus($code) : int
+    private function sanitizeStatus($code): int
     {
-        if (! is_numeric($code) || is_float($code) || $code < 100 || $code > 599) {
-            InvalidArgumentException::alertMessage(400, 'Invalid HTTP status code. Must be numeric and between 100 and 599');
+        if (!is_numeric($code) || is_float($code) || $code < 100 || $code > 599) {
+            InvalidArgumentHttpException::invalidExceptionMessage(400, 'Invalid HTTP status code. Must be numeric and between 100 and 599');
         }
 
         return (int) $code;
@@ -292,7 +263,7 @@ class Response implements ResponseInterface
     /**
      * @return string Reason phrase; must return an empty string if none present.
      */
-    public function getReasonPhrase() : string
+    public function getReasonPhrase(): string
     {
         if ($this->reasonPhrase) {
             return $this->reasonPhrase;

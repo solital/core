@@ -4,6 +4,7 @@ namespace Solital\Core\Course\Route;
 
 use Solital\Core\Http\Request;
 use Solital\Core\Course\Router;
+use Solital\Core\Course\Route\RouteInterface;
 
 interface LoadableRouteInterface extends RouteInterface
 {
@@ -83,5 +84,4 @@ interface LoadableRouteInterface extends RouteInterface
      * @return static
      */
     public function setMatch($regex): self;
-
 }

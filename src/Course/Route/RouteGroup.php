@@ -3,14 +3,32 @@
 namespace Solital\Core\Course\Route;
 
 use Solital\Core\Http\Request;
-use Solital\Core\Course\Handlers\ExceptionHandlerInterface;
+use Solital\Core\Course\Route\Route;
+use Solital\Core\Course\Route\RouteInterface;
+use Solital\Core\Course\Route\GroupRouteInterface;
+use Solital\Core\Exceptions\ExceptionHandlerInterface;
 
 class RouteGroup extends Route implements GroupRouteInterface
 {
+    /**
+     * @var string
+     */
     protected $prefix;
+    
+    /**
+     * @var string
+     */
     protected $name;
-    protected $domains = [];
-    protected $exceptionHandlers = [];
+    
+    /**
+     * @var array
+     */
+    protected array $domains = [];
+
+    /**
+     * @var array
+     */
+    protected array $exceptionHandlers = [];
 
     /**
      * Method called to check if a domain matches
@@ -199,5 +217,4 @@ class RouteGroup extends Route implements GroupRouteInterface
 
         return array_merge($values, parent::toArray());
     }
-
 }

@@ -2,6 +2,7 @@
 
 namespace Solital\Core\Course\Route;
 
+use Closure;
 use Solital\Core\Http\Middleware\MiddlewareInterface;
 use Solital\Core\Http\Request;
 use Solital\Core\Exceptions\NotFoundHttpException;
@@ -20,7 +21,10 @@ abstract class Route implements RouteInterface
     public const REQUEST_TYPE_DELETE = 'delete';
     public const REQUEST_TYPE_HEAD = 'head';
 
-    public static $requestTypes = [
+    /**
+     * @var array
+     */
+    public static array $requestTypes = [
         self::REQUEST_TYPE_GET,
         self::REQUEST_TYPE_POST,
         self::REQUEST_TYPE_PUT,
@@ -36,7 +40,7 @@ abstract class Route implements RouteInterface
      *
      * @var bool
      */
-    protected $filterEmptyParams = true;
+    protected bool $filterEmptyParams = true;
 
     /**
      * Default regular expression used for parsing parameters.
@@ -50,20 +54,22 @@ abstract class Route implements RouteInterface
     protected $parent;
     protected $callback;
     protected $defaultNamespace;
+    protected $controller_name;
 
     /* Default options */
     protected $namespace;
-    protected $requestMethods = [];
-    protected $where = [];
-    protected $parameters = [];
-    protected $originalParameters = [];
-    protected $middlewares = [];
+    protected array $requestMethods = [];
+    protected array $where = [];
+    protected array $parameters = [];
+    protected array $originalParameters = [];
+    protected array $middlewares = [];
 
     /**
      * Render route
      *
      * @param Request $request
      * @param Router $router
+     * 
      * @return string|null
      * @throws NotFoundHttpException
      */
@@ -95,12 +101,13 @@ abstract class Route implements RouteInterface
             $router->debug('Executing callback');
 
             /* When the callback is a function */
-
             return $router->getClassLoader()->loadClosure($callback, $parameters);
         }
 
         /* When the callback is a class + method */
         $controller = explode('@', $callback);
+
+        $this->setControllerName($controller);
 
         $namespace = $this->getNamespace();
 
@@ -124,11 +131,17 @@ abstract class Route implements RouteInterface
         return \call_user_func_array([$class, $method], $parameters);
     }
 
+    /**
+     * @param mixed $route
+     * @param mixed $url
+     * @param null $parameterRegex
+     * 
+     * @return mixed
+     */
     protected function parseParameters($route, $url, $parameterRegex = null)
     {
         $regex = (strpos($route, $this->paramModifiers[0]) === false) ? null :
-            sprintf
-            (
+            sprintf(
                 static::PARAMETERS_REGEX_FORMAT,
                 $this->paramModifiers[0],
                 $this->paramOptionalSymbol,
@@ -291,6 +304,9 @@ abstract class Route implements RouteInterface
         return $this->callback;
     }
 
+    /**
+     * @return string|null
+     */
     public function getMethod(): ?string
     {
         if (\is_string($this->callback) === true && strpos($this->callback, '@') !== false) {
@@ -302,6 +318,9 @@ abstract class Route implements RouteInterface
         return null;
     }
 
+    /**
+     * @return string|null
+     */
     public function getClass(): ?string
     {
         if (\is_string($this->callback) === true && strpos($this->callback, '@') !== false) {
@@ -313,6 +332,11 @@ abstract class Route implements RouteInterface
         return null;
     }
 
+    /**
+     * @param string $method
+     * 
+     * @return RouteInterface
+     */
     public function setMethod(string $method): RouteInterface
     {
         $this->callback = sprintf('%s@%s', $this->getClass(), $method);
@@ -320,6 +344,11 @@ abstract class Route implements RouteInterface
         return $this;
     }
 
+    /**
+     * @param string $class
+     * 
+     * @return RouteInterface
+     */
     public function setClass(string $class): RouteInterface
     {
         $this->callback = sprintf('%s@%s', $class, $this->getMethod());
@@ -577,4 +606,27 @@ abstract class Route implements RouteInterface
         return $this->defaultParameterRegex;
     }
 
+    /**
+     * Get the value of controller_name
+     */
+    public function getControllerName()
+    {
+        return $this->controller_name;
+    }
+
+    /**
+     * Set the value of controller_name
+     *
+     * @return  self
+     */
+    public function setControllerName($controller_name)
+    {
+        if ($controller_name instanceof Closure) {
+            $controller_name = "Closure";
+        }
+
+        $this->controller_name = $controller_name;
+
+        return $this;
+    }
 }

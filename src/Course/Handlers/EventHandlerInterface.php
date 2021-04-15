@@ -6,14 +6,13 @@ use Solital\Core\Course\Router;
 
 interface EventHandlerInterface
 {
-
     /**
      * Get events.
      *
      * @param string|null $name Filter events by name.
      * @return array
      */
-    public function getEvents(?string $name): array;
+    public function getEvents(?string $name, ...$names): array;
 
     /**
      * Fires any events registered with given event-name

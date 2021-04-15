@@ -13,7 +13,7 @@ class ListenerProvider implements ListenerProviderInterface
     /**
      * @var array
      */
-    private $listeners = [];
+    private array $listeners = [];
 
     /**
      * @param object $event

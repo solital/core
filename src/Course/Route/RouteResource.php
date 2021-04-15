@@ -9,7 +9,10 @@ use Solital\Core\Course\Route\ControllerRouteInterface;
 
 class RouteResource extends LoadableRoute implements ControllerRouteInterface
 {
-    protected $urls = [
+    /**
+     * @var array
+     */
+    protected array $urls = [
         'index'   => '',
         'create'  => 'create',
         'store'   => '',
@@ -19,7 +22,10 @@ class RouteResource extends LoadableRoute implements ControllerRouteInterface
         'destroy' => '',
     ];
 
-    protected $methodNames = [
+    /**
+     * @var array
+     */
+    protected array $methodNames = [
         'index'   => 'index',
         'create'  => 'create',
         'store'   => 'store',
@@ -29,9 +35,20 @@ class RouteResource extends LoadableRoute implements ControllerRouteInterface
         'destroy' => 'destroy',
     ];
 
-    protected $names = [];
+    /**
+     * @var array
+     */
+    protected array $names = [];
+
+    /**
+     * @var mixed
+     */
     protected $controller;
 
+    /**
+     * @param mixed $url
+     * @param mixed $controller
+     */
     public function __construct($url, $controller)
     {
         #$this->setUrl($url);
@@ -170,6 +187,11 @@ class RouteResource extends LoadableRoute implements ControllerRouteInterface
         return $this;
     }
 
+    /**
+     * @param string $name
+     * 
+     * @return LoadableRouteInterface
+     */
     public function setName(string $name): LoadableRouteInterface
     {
         $this->name = $name;
@@ -229,5 +251,4 @@ class RouteResource extends LoadableRoute implements ControllerRouteInterface
 
         return parent::setSettings($values, $merge);
     }
-
 }

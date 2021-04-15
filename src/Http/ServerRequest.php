@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace Solital\Core\Http;
 
-use Solital\Core\Http\Traits\RequestTrait;
-use Solital\Core\Http\Exceptions\InvalidArgumentException;
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
+use Solital\Core\Http\Traits\RequestTrait;
 use Psr\Http\Message\UploadedFileInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Solital\Core\Exceptions\InvalidArgumentHttpException;
 
 class ServerRequest implements ServerRequestInterface
 {
-
     use RequestTrait;
 
     /**
@@ -20,28 +19,28 @@ class ServerRequest implements ServerRequestInterface
      *
      * @var array
      */
-    private $serverParams;
+    private array $serverParams;
 
     /**
      * The request cookies.
      *
      * @var array
      */
-    private $cookieParams;
+    private array $cookieParams;
 
     /**
      * THe request query string params.
      *
      * @var array
      */
-    private $queryParams;
+    private array $queryParams;
 
     /**
      * The uplaoded files.
      *
      * @var array
      */
-    private $uploadedFiles;
+    private array $uploadedFiles;
 
     /**
      * The request body parsed  into a PHP array or object.
@@ -55,7 +54,7 @@ class ServerRequest implements ServerRequestInterface
      *
      * @var array
      */
-    private $attributes = [];
+    private array $attributes = [];
 
     /**
      * Create a new server request instance.
@@ -70,7 +69,7 @@ class ServerRequest implements ServerRequestInterface
      * @param array                                      $headers
      * @param string                                     $protocol
      *
-     * @throws \InvalidArgumentException for any invalid value.
+     * @throws \InvalidArgumentHttpException for any invalid value.
      */
     public function __construct(
         string $method = null,
@@ -82,8 +81,7 @@ class ServerRequest implements ServerRequestInterface
         array $uploadedFiles = [],
         array $headers = [],
         $protocol = '1.1'
-    )
-    {
+    ) {
         $this->validateUploadedFiles($uploadedFiles);
         $this->validateProtocolVersion($protocol);
         $this->initialize($method, $uri, $body, $headers);
@@ -97,7 +95,7 @@ class ServerRequest implements ServerRequestInterface
     /**
      * @return array
      */
-    public function getServerParams() : array
+    public function getServerParams(): array
     {
         return $this->serverParams;
     }
@@ -105,7 +103,7 @@ class ServerRequest implements ServerRequestInterface
     /**
      * @return array
      */
-    public function getCookieParams() : array
+    public function getCookieParams(): array
     {
         return $this->cookieParams;
     }
@@ -123,7 +121,7 @@ class ServerRequest implements ServerRequestInterface
     /**
      * @return array
      */
-    public function getQueryParams() : array
+    public function getQueryParams(): array
     {
         return $this->queryParams;
     }
@@ -141,7 +139,7 @@ class ServerRequest implements ServerRequestInterface
      * @return array An array tree of UploadedFileInterface instances; an empty array MUST be returned if no data is
      *               present.
      */
-    public function getUploadedFiles() : array
+    public function getUploadedFiles(): array
     {
         return $this->uploadedFiles;
     }
@@ -150,7 +148,7 @@ class ServerRequest implements ServerRequestInterface
      * @param array $uploadedFiles An array tree of UploadedFileInterface instances.
      *
      * @return static
-     * @throws \InvalidArgumentException if an invalid structure is provided.
+     * @throws \InvalidArgumentHttpException if an invalid structure is provided.
      */
     public function withUploadedFiles(array $uploadedFiles)
     {
@@ -162,7 +160,7 @@ class ServerRequest implements ServerRequestInterface
     /**
      * @param array $uploadedFiles
      *
-     * @throws InvalidArgumentException if any leaf is not an UploadedFileInterface instance.
+     * @throws InvalidArgumentHttpException if any leaf is not an UploadedFileInterface instance.
      */
     private function validateUploadedFiles(array $uploadedFiles)
     {
@@ -173,7 +171,7 @@ class ServerRequest implements ServerRequestInterface
             }
 
             /*if (! $file instanceof UploadedFileInterface) {
-                InvalidArgumentException::alertMessage(400, 
+                InvalidArgumentHttpException::alertMessage(400, 
                     'Invalid uploaded files structure. ' .
                     'Each file must be an instance of Psr\Http\Message\UploadedFileInterface'
                 );
@@ -194,12 +192,12 @@ class ServerRequest implements ServerRequestInterface
      *
      * @return static
      *
-     * @throws \InvalidArgumentException if an unsupported argument type is provided.
+     * @throws \InvalidArgumentHttpException if an unsupported argument type is provided.
      */
     public function withParsedBody($data)
     {
-        if ($data !== null && ! is_object($data) && ! is_array($data)) {
-            InvalidArgumentException::alertMessage(400, 'Parsed body value must be an array, object or null');
+        if ($data !== null && !is_object($data) && !is_array($data)) {
+            InvalidArgumentHttpException::invalidExceptionMessage(400, 'Parsed body value must be an array, object or null');
         }
 
         return $this->cloneWithProperty('parsedBody', $data);
@@ -208,7 +206,7 @@ class ServerRequest implements ServerRequestInterface
     /**
      * @return array Attributes derived from the request.
      */
-    public function getAttributes() : array
+    public function getAttributes(): array
     {
         return $this->attributes;
     }

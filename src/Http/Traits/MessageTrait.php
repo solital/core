@@ -4,26 +4,25 @@ declare(strict_types=1);
 
 namespace Solital\Core\Http\Traits;
 
-use Solital\Core\Http\Stream;
-use Solital\Core\Http\Exceptions\InvalidArgumentException;
 use Psr\Http\Message\StreamInterface;
+use Solital\Core\Http\Stream;
+use Solital\Core\Exceptions\InvalidArgumentHttpException;
 
 trait MessageTrait
 {
-
     /**
      * The HTTP protocol version.
      *
      * @var string
      */
-    private $protocolVersion = '1.1';
+    private string $protocolVersion = '1.1';
 
     /**
      * Available valid HTTP protocol versions.
      *
      * @var array
      */
-    private static $validProtocolVersions = [
+    private static array $validProtocolVersions = [
         '1.0',
         '1.1',
         '2.0',
@@ -34,14 +33,14 @@ trait MessageTrait
      *
      * @var array
      */
-    private $headers = [];
+    private array $headers = [];
 
     /**
      * The normalized HTTP header names.
      *
      * @var array
      */
-    private $headerNames = [];
+    private array $headerNames = [];
 
     /**
      * The stream instance.
@@ -60,7 +59,7 @@ trait MessageTrait
      */
     public function __set($name, $value)
     {
-        InvalidArgumentException::alertMessage(400, 'Cannot add new property $' . $name . ' to instance of ' . __CLASS__);
+        InvalidArgumentHttpException::invalidExceptionMessage(400, 'Cannot add new property $' . $name . ' to instance of ' . __CLASS__);
     }
 
     /**
@@ -70,7 +69,7 @@ trait MessageTrait
      *
      * @return string HTTP protocol version.
      */
-    public function getProtocolVersion() : string
+    public function getProtocolVersion(): string
     {
         return $this->protocolVersion;
     }
@@ -103,14 +102,15 @@ trait MessageTrait
      *
      * @param mixed $version
      *
-     * @throws \InvalidArgumentException If the HTTP protocol version is invalid.
+     * @throws \InvalidArgumentHttpException If the HTTP protocol version is invalid.
      */
     private function validateProtocolVersion($version)
     {
-        if (! is_string($version) || ! in_array($version, self::$validProtocolVersions, true)) {
-            InvalidArgumentException::alertMessage(400, 
+        if (!is_string($version) || !in_array($version, self::$validProtocolVersions, true)) {
+            InvalidArgumentHttpException::invalidExceptionMessage(
+                400,
                 'Invalid HTTP protocol version. Must be ' .
-                implode(', ', self::$validProtocolVersions)
+                    implode(', ', self::$validProtocolVersions)
             );
         }
     }
@@ -120,7 +120,7 @@ trait MessageTrait
      *
      * @param array $originalHeaders
      *
-     * @throws \InvalidArgumentException for invalid header values.
+     * @throws \InvalidArgumentHttpException for invalid header values.
      */
     private function setHeaders(array $originalHeaders)
     {
@@ -144,28 +144,30 @@ trait MessageTrait
      *
      * @return array
      *
-     * @throws \InvalidArgumentException for invalid header values.
+     * @throws \InvalidArgumentHttpException for invalid header values.
      */
-    private function sanitizeHeaderValue($value) : array
+    private function sanitizeHeaderValue($value): array
     {
-        if (! is_array($value)) {
+        if (!is_array($value)) {
             $value = [$value];
         }
 
         $value = array_map(function ($value) {
-            if (! is_string($value) && ! is_numeric($value)) {
-                InvalidArgumentException::alertMessage(400, 
+            if (!is_string($value) && !is_numeric($value)) {
+                InvalidArgumentHttpException::invalidExceptionMessage(
+                    400,
                     'Invalid header value type. Must be a string or numeric, received ' .
-                    (is_object($value) ? get_class($value) : gettype($value))
+                        (is_object($value) ? get_class($value) : gettype($value))
                 );
             }
 
             $value = (string) $value;
 
-            if (preg_match("#(?:(?:(?<!\r)\n)|(?:\r(?!\n))|(?:\r\n(?![ \t])))#", $value) ||
+            if (
+                preg_match("#(?:(?:(?<!\r)\n)|(?:\r(?!\n))|(?:\r\n(?![ \t])))#", $value) ||
                 preg_match('/[^\x09\x0a\x0d\x20-\x7E\x80-\xFE]/', $value)
             ) {
-                InvalidArgumentException::alertMessage(400, $value . ' is not a valid header name');
+                InvalidArgumentHttpException::invalidExceptionMessage(400, $value . ' is not a valid header name');
             }
 
             return $value;
@@ -179,19 +181,20 @@ trait MessageTrait
      *
      * @param mixed $name
      *
-     * @throws \InvalidArgumentException for invalid header names.
+     * @throws \InvalidArgumentHttpException for invalid header names.
      */
     private function validateHeaderName($name)
     {
-        if (! is_string($name)) {
-            InvalidArgumentException::alertMessage(400, 
+        if (!is_string($name)) {
+            InvalidArgumentHttpException::invalidExceptionMessage(
+                400,
                 'Invalid header name type. Must be a string, received ' .
-                (is_object($name) ? get_class($name) : gettype($name))
+                    (is_object($name) ? get_class($name) : gettype($name))
             );
         }
 
-        if (! preg_match('/^[a-zA-Z0-9\'`#$%&*+.^_|~!-]+$/', $name)) {
-            InvalidArgumentException::alertMessage(400, $name . ' is not a valid header name');
+        if (!preg_match('/^[a-zA-Z0-9\'`#$%&*+.^_|~!-]+$/', $name)) {
+            InvalidArgumentHttpException::invalidExceptionMessage(400, $name . ' is not a valid header name');
         }
     }
 
@@ -220,7 +223,7 @@ trait MessageTrait
      *     key MUST be a header name, and each value MUST be an array of strings
      *     for that header.
      */
-    public function getHeaders() : array
+    public function getHeaders(): array
     {
         return $this->headers;
     }
@@ -234,7 +237,7 @@ trait MessageTrait
      *     name using a case-insensitive string comparison. Returns false if
      *     no matching header name is found in the message.
      */
-    public function hasHeader($name) : bool
+    public function hasHeader($name): bool
     {
         return isset($this->headerNames[strtolower($name)]);
     }
@@ -254,9 +257,9 @@ trait MessageTrait
      *    header. If the header does not appear in the message, this method MUST
      *    return an empty array.
      */
-    public function getHeader($name) : array
+    public function getHeader($name): array
     {
-        if (! $this->hasHeader($name)) {
+        if (!$this->hasHeader($name)) {
             return [];
         }
 
@@ -285,7 +288,7 @@ trait MessageTrait
      *    concatenated together using a comma. If the header does not appear in
      *    the message, this method MUST return an empty string.
      */
-    public function getHeaderLine($name) : string
+    public function getHeaderLine($name): string
     {
         return implode(', ', $this->getHeader($name));
     }
@@ -305,7 +308,7 @@ trait MessageTrait
      *
      * @return static
      *
-     * @throws \InvalidArgumentException for invalid header names or values.
+     * @throws \InvalidArgumentHttpException for invalid header names or values.
      */
     public function withHeader($name, $value)
     {
@@ -342,13 +345,13 @@ trait MessageTrait
      *
      * @return static
      *
-     * @throws \InvalidArgumentException for invalid header names or values.
+     * @throws \InvalidArgumentHttpException for invalid header names or values.
      */
     public function withAddedHeader($name, $value)
     {
         $this->validateHeaderName($name);
 
-        if (! $this->hasHeader($name)) {
+        if (!$this->hasHeader($name)) {
             return $this->withHeader($name, $value);
         }
 
@@ -376,7 +379,7 @@ trait MessageTrait
      */
     public function withoutHeader($name)
     {
-        if (! $this->hasHeader($name)) {
+        if (!$this->hasHeader($name)) {
             return clone $this;
         }
 
@@ -395,7 +398,7 @@ trait MessageTrait
      *
      * @param string|resource|\Psr\Http\Message\StreamInterface $stream
      *
-     * @throws \InvalidArgumentException When the stream is not valid.
+     * @throws \InvalidArgumentHttpException When the stream is not valid.
      */
     private function setStreamInstance($stream)
     {
@@ -403,10 +406,11 @@ trait MessageTrait
             $stream = new Stream($stream, 'wb+');
         }
 
-        if (! $stream instanceof StreamInterface && $stream !== null) {
-            InvalidArgumentException::alertMessage(400, 
+        if (!$stream instanceof StreamInterface && $stream !== null) {
+            InvalidArgumentHttpException::invalidExceptionMessage(
+                400,
                 'The stream must be a string stream identifier, ' .
-                'stream resource or a Psr\Http\Message\StreamInterface implementation'
+                    'stream resource or a Psr\Http\Message\StreamInterface implementation'
             );
         }
 
@@ -418,7 +422,7 @@ trait MessageTrait
      *
      * @return StreamInterface Returns the body as a stream.
      */
-    public function getBody() : StreamInterface
+    public function getBody(): StreamInterface
     {
         return $this->stream;
     }

@@ -3,7 +3,7 @@
 namespace Solital\Core\Course\Route;
 
 use Solital\Core\Http\Request;
-use Solital\Core\Course\Handlers\IExceptionHandler;
+use Solital\Core\Course\Handlers\ExceptionHandler;
 
 interface GroupRouteInterface extends RouteInterface
 {
@@ -18,7 +18,7 @@ interface GroupRouteInterface extends RouteInterface
     /**
      * Add exception handler
      *
-     * @param IExceptionHandler|string $handler
+     * @param ExceptionHandlerInterface|string $handler
      * @return static
      */
     public function addExceptionHandler($handler): self;

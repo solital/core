@@ -10,17 +10,17 @@ class InputHandler
     /**
      * @var array
      */
-    protected $get = [];
+    protected array $get = [];
 
     /**
      * @var array
      */
-    protected $post = [];
+    protected array $post = [];
 
     /**
      * @var array
      */
-    protected $file = [];
+    protected array $file = [];
 
     /**
      * @var Request
@@ -34,7 +34,6 @@ class InputHandler
     public function __construct(Request $request)
     {
         $this->request = $request;
-
         $this->parseInputs();
     }
 
@@ -87,7 +86,6 @@ class InputHandler
                 try {
                     $list[$key] = InputFile::createFromArray($values + $value);
                 } catch (InvalidArgumentException $e) {
-
                 }
                 continue;
             }
@@ -100,7 +98,6 @@ class InputHandler
             } else {
                 $list[$key] = $files;
             }
-
         }
 
         return $list;
@@ -143,9 +140,7 @@ class InputHandler
 
                     $output[$key] = $file;
                     continue;
-
                 } catch (InvalidArgumentException $e) {
-
                 }
             }
 
@@ -158,7 +153,6 @@ class InputHandler
             } else {
                 $output[$key] = $files;
             }
-
         }
 
         return $output;
@@ -319,6 +313,16 @@ class InputHandler
     }
 
     /**
+     * @return string
+     */
+    public function getAllJson()
+    {
+        $json = encodeJSON($_GET);
+
+        return $json;
+    }
+
+    /**
      * Add GET parameter
      *
      * @param string $key
@@ -350,5 +354,4 @@ class InputHandler
     {
         $this->file[$key] = $item;
     }
-
 }

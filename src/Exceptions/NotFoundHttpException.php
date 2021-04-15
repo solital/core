@@ -13,15 +13,14 @@ class NotFoundHttpException extends HttpException
      * @var string
      */
     protected static $url;
-    
+
     /**
-     * alertMessage
-     *
      * @param int $code
      * @param string $msg
+     * 
      * @return void
      */
-    public static function alertMessage(int $code, string $msg) 
+    public static function alertMessage(int $code, string $msg, string $description = "", string $component = 'Solital'): void
     {
         if (self::$error == true) {
             header('Location: ' . self::$url);
@@ -29,7 +28,7 @@ class NotFoundHttpException extends HttpException
         }
 
         http_response_code($code);
-        include_once dirname(__DIR__).'/Exceptions/templates/error-router.php';   
+        include_once dirname(__DIR__) . '/Exceptions/templates/view-error.php';
         die;
     }
 }

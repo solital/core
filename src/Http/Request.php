@@ -4,31 +4,31 @@ declare(strict_types=1);
 
 namespace Solital\Core\Http;
 
-use Solital\Core\Course\Course;
-use Solital\Core\Course\Route\RouteUrl;
-use Solital\Core\Course\Route\LoadableRouteInterface;
 use Solital\Core\Http\Uri;
+use Solital\Core\Course\Course;
+use Psr\Http\Message\RequestInterface;
+use Solital\Core\Course\Route\RouteUrl;
 use Solital\Core\Http\Input\InputHandler;
 use Solital\Core\Http\Traits\RequestTrait;
-use Solital\Core\Http\Exceptions\MalformedUrlException;
-use Psr\Http\Message\RequestInterface;
+use Solital\Core\Exceptions\MalformedUrlException;
+use Solital\Core\Course\Route\LoadableRouteInterface;
 
 class Request implements RequestInterface
 {
     use RequestTrait;
-    
+
     /**
      * Additional data
      *
      * @var array
      */
-    private $data = [];
+    private array $data = [];
 
     /**
      * Server headers
      * @var array
      */
-    private $headers = [];
+    private array $headers = [];
 
     /**
      * Request host
@@ -49,12 +49,6 @@ class Request implements RequestInterface
     protected $scheme;
 
     /**
-     * Request method
-     * @var string
-     */
-    #protected $method = '';
-
-    /**
      * Input handler
      * @var InputHandler
      */
@@ -64,7 +58,7 @@ class Request implements RequestInterface
      * Defines if request has pending rewrite
      * @var bool
      */
-    protected $hasPendingRewrite = false;
+    protected bool $hasPendingRewrite = false;
 
     /**
      * @var LoadableRouteInterface|null
@@ -80,19 +74,19 @@ class Request implements RequestInterface
     /**
      * @var array
      */
-    protected $loadedRoutes = [];
+    protected array $loadedRoutes = [];
 
     /**
      * @var string
      */
-    private $server;
+    private string $server;
 
     /**
      * List of request body parsers (e.g., url-encoded, JSON, XML, multipart)
      *
-     * @var callable[]
+     * @var array
      */
-    protected $bodyParsers = [];
+    protected array $bodyParsers = [];
 
     /**
      * Request constructor.
@@ -114,19 +108,22 @@ class Request implements RequestInterface
             $this->scheme = 'http://';
         }
 
-        $this->setHost($this->scheme.$this->getHeader('http-host'));
+        $this->setHost($this->scheme . $this->getHeader('http-host'));
 
         // Check if special IIS header exist, otherwise use default.
         if ($this->getHeader('unencoded-url', $this->getHeader('request-uri'))) {
             $this->setUrl(new Uri($this->getHeader('unencoded-url', $this->getHeader('request-uri'))));
         }
-        
+
         $method_server = $this->getHeader('request-method');
         $this->method = strtolower($method_server);
         $this->inputHandler = new InputHandler($this);
         $this->method = strtolower($this->inputHandler->value('_method', $method_server));
     }
 
+    /**
+     * @return bool
+     */
     public function isSecure(): bool
     {
         return $this->getHeader('http-x-forwarded-proto') === 'https' || $this->getHeader('https') !== null || $this->getHeader('server-port') === 443;
@@ -149,13 +146,13 @@ class Request implements RequestInterface
 
         if ($this->url->getHost() === null) {
             if ($this->url->getScheme() !== null) {
-                $this->url->setHost((string)$this->getHost());    
+                $this->url->setHost((string)$this->getHost());
             }
-            
+
             $this->url->setHost((string)$this->getHost());
         }
     }
-    
+
     /**
      * Copy url object
      *
@@ -452,6 +449,9 @@ class Request implements RequestInterface
         return $this;
     }
 
+    /**
+     * @return array|null
+     */
     public function getParamsInput(): ?array
     {
         $body = file_get_contents('php://input');
@@ -459,24 +459,41 @@ class Request implements RequestInterface
         return $json;
     }
 
+    /**
+     * @param string $param
+     * 
+     * @return string
+     */
     public function getParamInput(string $param)
     {
         $body = file_get_contents('php://input');
         $json = json_decode($body);
-    
+
         return $json->$param;
     }
 
+    /**
+     * @param string $name
+     * 
+     * @return bool
+     */
     public function __isset($name)
     {
         return array_key_exists($name, $this->data) === true;
     }
 
+    /**
+     * @param string $name
+     * @param null $value
+     */
     public function __set($name, $value = null)
     {
         $this->data[$name] = $value;
     }
 
+    /**
+     * @param string $name
+     */
     public function __get($name)
     {
         return $this->data[$name] ?? null;

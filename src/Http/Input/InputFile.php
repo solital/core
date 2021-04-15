@@ -6,18 +6,47 @@ use Solital\Core\Exceptions\InvalidArgumentException;
 
 class InputFile implements InputItemInterface
 {
-    public $index;
-    public $name;
-    public $filename;
-    public $size;
-    public $type;
-    public $errors;
-    public $tmpName;
+    /**
+     * @var string
+     */
+    public string $index;
 
+    /**
+     * @var string
+     */
+    public string $name;
+
+    /**
+     * @var string
+     */
+    public string $filename;
+
+    /**
+     * @var int
+     */
+    public int $size;
+
+    /**
+     * @var string
+     */
+    public string $type;
+
+    /**
+     * @var mixed
+     */
+    public $errors;
+
+    /**
+     * @var string
+     */
+    public string $tmpName;
+
+    /**
+     * @param string $index
+     */
     public function __construct(string $index)
     {
         $this->index = $index;
-
         $this->errors = 0;
 
         // Make the name human friendly, by replace _ with space
@@ -53,7 +82,6 @@ class InputFile implements InputItemInterface
             ->setType($values['type'])
             ->setTmpName($values['tmp_name'])
             ->setFilename($values['name']);
-
     }
 
     /**
@@ -261,6 +289,9 @@ class InputFile implements InputItemInterface
         return $this->getTmpName();
     }
 
+    /**
+     * @return string|null
+     */
     public function getValue(): ?string
     {
         return $this->getFilename();
@@ -277,6 +308,9 @@ class InputFile implements InputItemInterface
         return $this;
     }
 
+    /**
+     * @return array
+     */
     public function toArray(): array
     {
         return [
@@ -288,5 +322,4 @@ class InputFile implements InputItemInterface
             'filename' => $this->filename,
         ];
     }
-
 }

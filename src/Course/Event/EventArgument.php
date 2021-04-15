@@ -12,7 +12,7 @@ class EventArgument implements EventArgumentInterface
      * Event name
      * @var string
      */
-    protected $eventName;
+    protected string $eventName;
 
     /**
      * @var Router
@@ -22,8 +22,13 @@ class EventArgument implements EventArgumentInterface
     /**
      * @var array
      */
-    protected $arguments = [];
+    protected array $arguments = [];
 
+    /**
+     * @param mixed $eventName
+     * @param mixed $router
+     * @param array $arguments
+     */
     public function __construct($eventName, $router, array $arguments = [])
     {
         $this->eventName = $eventName;
@@ -108,5 +113,4 @@ class EventArgument implements EventArgumentInterface
     {
         return $this->arguments;
     }
-
 }

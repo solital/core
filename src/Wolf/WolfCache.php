@@ -12,7 +12,7 @@ abstract class WolfCache
     /**
      * @var string
      */
-    protected static $cache_dir = ROOT . DIRECTORY_SEPARATOR . "vendor" . DIRECTORY_SEPARATOR . "solital" . DIRECTORY_SEPARATOR . "core" . DIRECTORY_SEPARATOR . "src" . DIRECTORY_SEPARATOR . "Cache" . DIRECTORY_SEPARATOR . "tmp" . DIRECTORY_SEPARATOR;
+    protected static $cache_dir;
 
     /**
      * @var date
@@ -20,11 +20,63 @@ abstract class WolfCache
     protected static $time;
 
     /**
-     * @param date $time
+     * @return string
      */
-    public static function cache($time)
+    protected static function getFolderCache()
     {
-        self::$time = $time;
+        self::$cache_dir = SITE_ROOT . DIRECTORY_SEPARATOR . "app" . DIRECTORY_SEPARATOR . "Storage" . DIRECTORY_SEPARATOR . "cache" . DIRECTORY_SEPARATOR . "wolf" . DIRECTORY_SEPARATOR;
+
+        if (!is_dir(self::$cache_dir)) {
+            \mkdir(self::$cache_dir);
+        }
+
+        return self::$cache_dir;
+    }
+
+    /**
+     * @return static
+     */
+    public static function cache()
+    {
+        return new static();
+    }
+
+    /**
+     * @return string
+     */
+    public function forOneMinute(): string
+    {
+        self::$time = date('Hi');
+
+        return self::$time;
+    }
+
+    /**
+     * @return string
+     */
+    public function forOneHour(): string
+    {
+        self::$time = date('H');
+
+        return self::$time;
+    }
+
+    /**
+     * @return string
+     */
+    public function forOneDay(): string
+    {
+        self::$time = date('N');
+
+        return self::$time;
+    }
+
+    /**
+     * @return string
+     */
+    public function forOneWeek(): string
+    {
+        self::$time = date('W');
 
         return self::$time;
     }
