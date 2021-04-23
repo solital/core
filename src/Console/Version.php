@@ -6,7 +6,7 @@ use Katrina\Katrina;
 
 class Version
 {
-    const SOLITAL_VERSION = "2.0.0";
+    const SOLITAL_VERSION = "2.1.0";
 
     /**
      * @return string
