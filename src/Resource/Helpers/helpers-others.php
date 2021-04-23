@@ -1,6 +1,6 @@
 <?php
 
-use Solital\Core\Resource\Session;
+use Respect\Validation\Validator;
 
 /**
  * Remove all get param
@@ -36,30 +36,19 @@ function remove_param(): void
 }
 
 /**
- * @param mixed $string
+ * @param mixed $json
  * 
  * @return bool
  */
-function is_json($string): bool
+function is_json($json): bool
 {
-    $response = false;
+    $res = Validator::json()->validate($json);
 
-    if (
-        is_string($string) &&
-        ($string = trim($string)) &&
-        ($stringLength = strlen($string)) &&
-        (
-            (stripos($string, '{') === 0 &&
-                (stripos($string, '}', -1) + 1) === $stringLength) ||
-            (stripos($string, '[{') === 0 &&
-                (stripos($string, '}]', -1) + 2) === $stringLength)) &&
-        ($decodedString = json_decode($string, true)) &&
-        is_array($decodedString)
-    ) {
-        $response = true;
+    if ($res == true) {
+        return true;
+    } else {
+        return false;
     }
-
-    return $response;
 }
 
 /**

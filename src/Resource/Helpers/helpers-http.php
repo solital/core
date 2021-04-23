@@ -5,6 +5,7 @@ use Solital\Core\Http\Request;
 use Solital\Core\Http\Response;
 use Solital\Core\Http\UploadedFile;
 use Solital\Core\Http\ServerRequest;
+use Solital\Core\Resource\Session;
 use Solital\Core\Course\Course as Course;
 
 /**

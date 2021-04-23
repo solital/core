@@ -3,3 +3,4 @@ vendor/
 tests/tmp/*
 /nbproject/
 tests/files_test/*
+.phpunit.result.cache

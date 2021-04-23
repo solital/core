@@ -92,3 +92,20 @@ function decodeJSON($value, bool $toArray = false)
     $json = (new InputJson())->decode($value, $toArray);
     return $json;
 }
+
+/**
+ * @param mixed ...$messages
+ * 
+ * @return void
+ */
+function console_log(...$messages): void
+{
+    $msgs = '';
+    foreach ($messages as $msg) {
+        $msgs .= json_encode($msg);
+    }
+
+    echo '<script>';
+    echo 'console.log(' . json_encode($msgs) . ')';
+    echo '</script>';
+}

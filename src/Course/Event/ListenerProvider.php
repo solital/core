@@ -39,7 +39,7 @@ class ListenerProvider implements ListenerProviderInterface
      * 
      * @return self
      */
-    public function listen(callable $listener, int $priority = 0): self
+    public function addListener(callable $listener, int $priority = 0): self
     {
         $type = $this->getParameterType($listener);
         $this->listeners[] = [

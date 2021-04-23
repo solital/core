@@ -2,6 +2,8 @@
 
 namespace Solital\Core\Resource\Validation;
 
+use Respect\Validation\Validator;
+
 class Valid
 {
     /**
@@ -11,7 +13,9 @@ class Valid
      */
     public static function email(string $email): ?string
     {
-        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $res = Validator::email()->validate($email);
+
+        if ($res == true) {
             return $email;
         } else {
             return null;
@@ -25,21 +29,13 @@ class Valid
      */
     public static function number($number)
     {
-        if (is_int($number)) {
-            if (filter_var($number, FILTER_VALIDATE_INT)) {
-                return $number;
-            } else {
-                return null;
-            }
-        } elseif (is_float($number)) {
-            if (filter_var($number, FILTER_VALIDATE_FLOAT)) {
-                return $number;
-            } else {
-                return null;
-            }
-        }
+        $res = Validator::number()->validate($number);
 
-        return null;
+        if ($res == true) {
+            return $number;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -49,7 +45,9 @@ class Valid
      */
     public static function isNull($value): bool
     {
-        if (is_null($value)) {
+        $res = Validator::nullType()->validate($value);
+
+        if ($res == true) {
             return true;
         } else {
             return false;
@@ -81,6 +79,39 @@ class Valid
             return $value;
         } else {
             return strtoupper($value);
+        }
+    }
+
+    /**
+     * @param string $value
+     * 
+     * @return bool
+     */
+    public static function isBase64(string $value): bool
+    {
+        $res = Validator::base64()->validate($value);
+
+        if ($res == true) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @param string $value
+     * @param string $identical_to
+     * 
+     * @return bool
+     */
+    public static function identical($value, $identical_to): bool
+    {
+        $res = Validator::identical($value)->validate($identical_to);
+
+        if ($res == true) {
+            return true;
+        } else {
+            return false;
         }
     }
 }

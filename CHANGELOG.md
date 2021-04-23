@@ -1,5 +1,22 @@
 # Released Notes
 
+## v2.1.0 - (2021-04-23)
+
+### Added
+
+- Added new helper: `console_log()`
+- Added support for Sodium encryption
+- Added `respect\validation` package
+- Added `isBase64` and `identical` methods in `Valid`
+- Added new tests
+
+### Fixed
+
+- Fixed namespace in helper output 
+- Fixed PSR-14
+- Fixed validation in `Valid` and `is_json`
+
+--------------------------------------------------------------------------
 ## v2.0.0 - (2021-04-15)
 
 ### Added

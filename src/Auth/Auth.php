@@ -3,6 +3,7 @@
 namespace Solital\Core\Auth;
 
 use Solital\Core\Auth\Reset;
+use Solital\Core\Security\Hash;
 use Solital\Core\Resource\Session;
 use Solital\Core\Security\Guardian;
 
@@ -262,6 +263,39 @@ class Auth extends Reset
         Session::delete($index);
         response()->redirect($redirect);
         exit;
+    }
+
+    /**
+     * @param string $message
+     * @param string $key
+     * 
+     * @return string
+     */
+    public static function sodium(string $message, string $key): string
+    {
+        Hash::checkSodium();
+
+        $ciphertext = sodium_crypto_auth($message, $key);
+        $encoded = base64_encode($ciphertext);
+
+        return $encoded;
+    }
+
+    /**
+     * @param string $hash
+     * @param string $message
+     * @param string $key
+     * 
+     * @return bool
+     */
+    public static function sodiumVerify(string $hash, string $message, string $key): bool
+    {
+        Hash::checkSodium();
+
+        $decoded = base64_decode($hash);
+        $result = sodium_crypto_auth_verify($decoded, $message, $key);
+
+        return $result;
     }
 
     /**

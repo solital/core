@@ -130,7 +130,7 @@ class SystemCommands extends Commands
             ]
         ];
 
-        $link = $this->color->stringColor("https://solitalframework.com/docs/", "cyan", null);
+        $link = $this->color->stringColor("http://solitalframework.com/", "cyan", null);
         $thanks = "Thank you for using Solital, you can see the full documentation at $link\n";
 
         print_r($this->color->stringColor("\nSolital framework - Fast, easy and practical\n", "yellow", null, true));
