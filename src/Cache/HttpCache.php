@@ -63,8 +63,6 @@ class HttpCache extends Cache
         $date = new DateTime();
         $atual_time = $date->getTimestamp();
 
-        #var_dump($atual_time, $this->time);
-
         if (strtotime($this->time) < strtotime($atual_time)) {
             $this->code = 200;
         } else {
@@ -72,13 +70,6 @@ class HttpCache extends Cache
         }
 
         $date = gmdate("D, d M Y H:i:s", time() + $this->time) . " GMT";
-
-        /* $date = date("d M Y", strtotime($date));
-        $day = date("D", strtotime($date));
-        $hour = date("H:i:s", strtotime($hour)); */
-
-        #$code = (new HttpCode())->responseCode($this->code);
-        #header($code);
 
         http_response_code($this->code);
         header("Expires: " . $date);

@@ -2,6 +2,7 @@
 
 namespace Solital\Core\Console\Command;
 
+use Solital\Core\Wolf\Wolf;
 use Solital\Core\Database\Create\Create;
 use Solital\Core\Console\Command\Commands;
 use Solital\Core\Console\Command\DatabaseCommand;
@@ -166,20 +167,6 @@ class FileCommands extends Commands
             $file_forgot_routers = $this->dir . "forgot-routers.php";
         }
 
-        /* if (
-            is_file($file_forgot_controller) &&
-            is_file($file_forgot_view) &&
-            is_file($file_forgot_change) &&
-            is_file($file_forgot_routers) &&
-            is_file($file_forgot_header) &&
-            is_file($file_forgot_footer)
-        ) {
-            $msg = $this->color->stringColor("ERROR: Password recovery files already exist!", "yellow", "red", true);
-            print_r($msg);
-
-            die;
-        } */
-
         $dir_forgot_controller = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Components' . DIRECTORY_SEPARATOR . 'ForgotComponents' . DIRECTORY_SEPARATOR . 'ForgotController.php';
         $dir_forgot_view = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Components' . DIRECTORY_SEPARATOR . 'ForgotComponents' . DIRECTORY_SEPARATOR . 'forgot-form.php';
         $dir_forgot_header = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Components' . DIRECTORY_SEPARATOR . 'Templates' . DIRECTORY_SEPARATOR . 'header.php';
@@ -232,6 +219,45 @@ class FileCommands extends Commands
         print_r($msg);
 
         return false;
+    }
+
+    /**
+     * @return FileCommands
+     */
+    public function minifyCss(): FileCommands
+    {
+        Wolf::minify()->style();
+
+        $msg = $this->color->stringColor("CSS minified successfully!", "green", null, true);
+        print_r($msg);
+
+        return $this;
+    }
+
+    /**
+     * @return FileCommands
+     */
+    public function minifyJs(): FileCommands
+    {
+        Wolf::minify()->script();
+
+        $msg = $this->color->stringColor("JavaScript minified successfully!", "green", null, true);
+        print_r($msg);
+
+        return $this;
+    }
+
+    /**
+     * @return FileCommands
+     */
+    public function minifyAll(): FileCommands
+    {
+        Wolf::minify()->all();
+
+        $msg = $this->color->stringColor("CSS and JavaScript minified successfully!", "green", null, true);
+        print_r($msg);
+
+        return $this;
     }
 
     /**

@@ -142,6 +142,9 @@ class Console
             'remove-login' => 'removeLogin',
             'forgot' => 'forgot',
             'remove-forgot' => 'removeForgot',
+            'minify-css' => 'minifyCss',
+            'minify-js' => 'minifyJs',
+            'minify-all' => 'minifyAll'
         ];
     }
 }

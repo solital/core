@@ -323,6 +323,29 @@ class InputHandler
     }
 
     /**
+     * @return mixed
+     */
+    public function getHttpParams()
+    {
+        $body = file_get_contents('php://input');
+        $json = decodeJSON($body, true);
+        return $json;
+    }
+
+    /**
+     * @param string $param
+     * 
+     * @return string|null
+     */
+    public function getHttpParam(string $param): ?string
+    {
+        $body = file_get_contents('php://input');
+        $json = decodeJSON($body);
+
+        return $json->$param;
+    }
+
+    /**
      * Add GET parameter
      *
      * @param string $key

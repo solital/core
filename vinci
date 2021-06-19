@@ -6,6 +6,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 use Solital\Core\Console\Command\CustomCommand;
 use Solital\Core\Console\Console;
 
+define('SITE_ROOT', __DIR__);
 define('SITE_ROOT_VINCI', __DIR__);
 
 $command = $argv[1];

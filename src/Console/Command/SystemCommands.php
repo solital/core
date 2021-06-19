@@ -293,7 +293,10 @@ class SystemCommands extends Commands
             "login",
             "remove-login",
             "forgot",
-            "remove-forgot"
+            "remove-forgot",
+            "minify-css",
+            "minify-js",
+            "minify-all"
         ];
 
         $desc = [
@@ -305,7 +308,10 @@ class SystemCommands extends Commands
             "Create classes for login",
             "Removes the components created for login",
             "Create classes for forgot password",
-            "Removes the components created for forgot password"
+            "Removes the components created for forgot password",
+            "Minimize CSS files",
+            "Minimize JavaScript files",
+            "Minimize CSS and JavaScript files"
         ];
 
         return [
