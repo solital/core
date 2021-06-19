@@ -1,5 +1,19 @@
 # Released Notes
 
+## v2.2.0 - (2021-06-19)
+
+### Added
+
+- Added Added minify by Vinci
+- Added method to get data from `php://input`
+
+### Removed
+
+- Removed `WolfMinify` class
+- Removed unnecessary comments
+
+--------------------------------------------------------------------------
+
 ## v2.1.0 - (2021-04-23)
 
 ### Added
