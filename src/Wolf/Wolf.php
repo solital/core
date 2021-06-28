@@ -33,7 +33,7 @@ class Wolf extends WolfCache
      */
     private static function getDirView(): string
     {
-        self::$dir_view = SITE_ROOT . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR;
+        self::$dir_view = SITE_ROOT . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . "view" . DIRECTORY_SEPARATOR;
 
         return self::$dir_view;
     }
@@ -49,7 +49,7 @@ class Wolf extends WolfCache
     {
         $view = str_replace(".", DIRECTORY_SEPARATOR, $view);
 
-        $file = self::getDirView() . "view" . DIRECTORY_SEPARATOR . $view . '.' . $ext;
+        $file = self::getDirView() . $view . '.' . $ext;
 
         /** Create or browse the cached file  */
         self::$file_cache = self::getFolderCache() . $view . "-" . date('Ymd') . "-" . self::$time . ".cache.php";
