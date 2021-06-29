@@ -44,6 +44,10 @@ class Guardian
         $sql = "SELECT * FROM $this->table WHERE $email_column = '$email';";
         $res = ORM::query($sql);
 
+        if (!is_array($res) || !$res) {
+            return false;
+        }
+
         if (password_verify($password, $res[$pass_column])) {
             return $res;
         } else {

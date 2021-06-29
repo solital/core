@@ -1,5 +1,21 @@
 # Released Notes
 
+## v2.2.2 - (2021-06-29)
+
+### Added
+
+- Added test for Cache
+
+### Change
+
+- Change Bootstrap CDN
+
+### Fixed
+
+- Fixed bug Database in `Guardian` class
+- Fixed return type in `Cache` class
+--------------------------------------------------------------------------
+
 ## v2.2.1 - (2021-06-28)
 
 ### Fixed

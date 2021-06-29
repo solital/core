@@ -13,16 +13,25 @@ class Cache implements CacheInterface
     private string $value;
 
     /**
+     * @var array
+     */
+    private array $multiple_results = [];
+
+    /**
      * Return a directory of the cache
      */
-    public function __construct()
+    public function __construct($test = false)
     {
-        $this->value = SITE_ROOT . DIRECTORY_SEPARATOR . "app" . DIRECTORY_SEPARATOR . "Storage" . DIRECTORY_SEPARATOR . "cache" . DIRECTORY_SEPARATOR;
+        if ($test == true) {
+            $this->value = "tests" . DIRECTORY_SEPARATOR . "files_test" . DIRECTORY_SEPARATOR;
+        } else {
+            $this->value = SITE_ROOT . DIRECTORY_SEPARATOR . "app" . DIRECTORY_SEPARATOR . "Storage" . DIRECTORY_SEPARATOR . "cache" . DIRECTORY_SEPARATOR;
+        }
     }
 
     /**
      * @param string $key A value of key
-     * @return array
+     * @return mixed
      */
     public function get($key, $default = null)
     {
@@ -39,8 +48,7 @@ class Cache implements CacheInterface
             if ($decoded['expire_at'] < time() || $decoded['expire_at'] == null) {
                 $this->delete($key);
             } else {
-                print_r($decoded);
-                exit;
+                return $decoded;
             }
         }
     }
@@ -173,16 +181,12 @@ class Cache implements CacheInterface
                 if ($decoded['expire_at'] < time() || $decoded['expire_at'] == null) {
                     $this->deleteMultiple($value);
                 } else {
-                    print_r($decoded);
+                    $this->multiple_results[] = $decoded;
                 }
             }
         }
 
-        if (file_exists($file_in_cache)) {
-            exit;
-        }
-
-        return null;
+        return $this->multiple_results;
     }
 
     /**
