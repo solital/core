@@ -1,12 +1,40 @@
 # Released Notes
 
+## v2.3.0 - (2021-10-06)
+
+### Added
+
+- Added Modern PHP Exception component
+- Added CRUD skeleton in Model template
+- Added `session` helper
+- Added `isWeekend` method in `Convertime` class
+- Added new tests
+
+### Changed
+
+- Changed cache test directory
+- Changed `is_json` helper
+- Changed `Valid` class
+
+### Fixed
+
+- Fixed `all` method in `InputHandler` class
+- Fixed `refresh` method in `Response` class
+- Fixed directory in Wolf template
+
+### Removed
+
+- Removed comments
+
+--------------------------------------------------------------------------
+
 ## v2.2.2 - (2021-06-29)
 
 ### Added
 
 - Added test for Cache
 
-### Change
+### Changed
 
 - Change Bootstrap CDN
 
@@ -14,6 +42,7 @@
 
 - Fixed bug Database in `Guardian` class
 - Fixed return type in `Cache` class
+
 --------------------------------------------------------------------------
 
 ## v2.2.1 - (2021-06-28)
@@ -21,6 +50,7 @@
 ### Fixed
 
 - Fixed bug in Wolf Template
+
 --------------------------------------------------------------------------
 
 ## v2.2.0 - (2021-06-19)
@@ -34,6 +64,7 @@
 
 - Removed `WolfMinify` class
 - Removed unnecessary comments
+
 --------------------------------------------------------------------------
 
 ## v2.1.0 - (2021-04-23)

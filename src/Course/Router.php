@@ -2,6 +2,7 @@
 
 namespace Solital\Core\Course;
 
+use ModernPHPException\ModernPHPException;
 use Solital\Core\Console\Command\SystemCommandsCourse;
 use Solital\Core\Http\Uri;
 use Solital\Core\Http\Request;
@@ -305,7 +306,7 @@ class Router
 
         if (isset($routeDuplicate)) {
             foreach ($routeDuplicate as $duplicate) {
-                NotFoundHttpException::alertMessage(404, "Duplicate '$duplicate' route");
+                throw new \Exception("Duplicate '$duplicate' route", 404);
             }
         }
 
@@ -403,9 +404,7 @@ class Router
     public function routeRequest(): ?string
     {
         $this->debug('Routing request');
-
-        $methodNotAllowed = false;
-
+        
         try {
             $url = $this->request->getRewriteUrl() ?? $this->request->getUri()->getPath();
 
@@ -424,7 +423,9 @@ class Router
                     /* Check if request method matches */
                     if (\count($route->getRequestMethods()) !== 0 && \in_array($this->request->getMethod(), $route->getRequestMethods(), true) === false) {
                         $this->debug('Method "%s" not allowed', $this->request->getMethod());
-                        $methodNotAllowed = true;
+
+                        throw new \Exception("Route '" . $this->request->getUri()->getPath() . "' or method '" . strtoupper($this->request->getMethod()) . "' not allowed", 403);
+
                         continue;
                     }
 
@@ -439,8 +440,6 @@ class Router
                     if ($output !== null) {
                         return $output;
                     }
-
-                    $methodNotAllowed = false;
 
                     $this->request->addLoadedRoute($route);
 
@@ -460,11 +459,17 @@ class Router
                 }
             }
         } catch (\Exception $e) {
-            $this->handleException($e);
-        }
+            if (!empty($_ENV['PRODUCTION_MODE'])) {
+                if ($_ENV['PRODUCTION_MODE'] == "true") {
+                    (new ModernPHPException())->productionMode();
+                } else {
+                    (new ModernPHPException())->start()->errorHandler($e->getCode(), $e->getMessage(), $e->getFile(), $e->getLine());
+                }
+            } else {
+                (new ModernPHPException())->start()->errorHandler($e->getCode(), $e->getMessage(), $e->getFile(), $e->getLine());
+            }
 
-        if ($methodNotAllowed === true) {
-            return NotFoundHttpException::alertMessage(403, "Route '" . $this->request->getUri()->getPath() . "' or method '" . strtoupper($this->request->getMethod()) . "' not allowed", "This route was not defined with method " . strtoupper($this->request->getMethod()) . ", but with another method.");
+            $this->handleException($e);
         }
 
         if (\count($this->request->getLoadedRoutes()) === 0) {
@@ -472,13 +477,29 @@ class Router
             $rewriteUrl = $this->request->getRewriteUrl();
 
             if ($rewriteUrl !== null) {
-                return NotFoundHttpException::alertMessage(404, "Route '" . $rewriteUrl . "' not found (rewrite from: '" . $this->request->getUri()->getPath() . "')");
+                $this->checkProductionMode();
+
+                throw new \Exception("Route '" . $rewriteUrl . "' not found (rewrite from: '" . $this->request->getUri()->getPath() . "')", 404);
             } else {
-                return NotFoundHttpException::alertMessage(404, "Route '" . $this->request->getUri()->getPath() . "' not found", "Check if the given route exists in the 'routers.php' file or another route file.");
+                $this->checkProductionMode();
+
+                throw new \Exception("Route '" . $this->request->getUri()->getPath() . "' not found", 404);
             }
         }
 
         return null;
+    }
+
+    /**
+     * @return void
+     */
+    public function checkProductionMode(): void
+    {
+        if (!empty($_ENV['PRODUCTION_MODE'])) {
+            if ($_ENV['PRODUCTION_MODE'] == "true") {
+                (new ModernPHPException())->productionMode();
+            }
+        }
     }
 
     /**
@@ -552,7 +573,7 @@ class Router
             $this->debug('Processing exception-handler "%s"', \get_class($handler));
 
             if (($handler instanceof ExceptionHandlerInterface) === false) {
-                NotFoundHttpException::alertMessage(500, "Exception handler must implement the ExceptionHandlerInterface interface.");
+                throw new \Exception("Exception handler must implement the ExceptionHandlerInterface interface.", 500);
             }
 
             try {

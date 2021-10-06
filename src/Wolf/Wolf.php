@@ -2,9 +2,9 @@
 
 namespace Solital\Core\Wolf;
 
+use ModernPHPException\ModernPHPException;
 use Solital\Core\Wolf\WolfCache;
 use Solital\Core\Wolf\WolfMinifyTrait;
-use Solital\Core\Exceptions\NotFoundException;
 
 class Wolf extends WolfCache
 {
@@ -48,7 +48,6 @@ class Wolf extends WolfCache
     public static function loadView(string $view, array $data = null, string $ext = "php")
     {
         $view = str_replace(".", DIRECTORY_SEPARATOR, $view);
-
         $file = self::getDirView() . $view . '.' . $ext;
 
         /** Create or browse the cached file  */
@@ -72,22 +71,32 @@ class Wolf extends WolfCache
             die;
         }
 
-        if (file_exists($file)) {
-            if (self::$time != null) {
-                ob_start();
-            }
+        try {
+            if (file_exists($file)) {
+                if (self::$time != null) {
+                    ob_start();
+                }
 
-            include $file;
+                include_once $file;
 
-            if (self::$time != null) {
-                $res = ob_get_contents();
-                ob_flush();
-                file_put_contents(self::$file_cache, $res);
+                if (self::$time != null) {
+                    $res = ob_get_contents();
+                    ob_flush();
+                    file_put_contents(self::$file_cache, $res);
+                }
+            } else {
+                throw new \Exception("Template '$view.$ext' not found");
             }
-        } else {
-            NotFoundException::notFound(403, "Template '$view.$ext' not found", "Check if the informed 
-            template is in the 'resources/view' folder or if the file extension corresponds to 
-            the informed in the 'loadView()' method. ", "Wolf");
+        } catch (\Exception $e) {
+            if (!empty($_ENV['PRODUCTION_MODE'])) {
+                if ($_ENV['PRODUCTION_MODE'] == "true") {
+                    (new ModernPHPException())->productionMode();
+                } else {
+                    (new ModernPHPException())->start()->errorHandler(403, "Template '$view.$ext' not found", $e->getFile(), $e->getLine());
+                }
+            } else {
+                (new ModernPHPException())->start()->errorHandler(403, "Template '$view.$ext' not found", $e->getFile(), $e->getLine());
+            }
         }
 
         return __CLASS__;

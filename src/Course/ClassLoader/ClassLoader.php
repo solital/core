@@ -33,7 +33,7 @@ class ClassLoader implements ClassLoaderInterface
     public function loadClass(string $class)
     {
         if (class_exists($class) === false) {
-            NotFoundHttpException::alertMessage(404, "Class '$class' does not exist");
+            throw new \Exception("Class '$class' does not exist", 404);
         }
 
         return new $class();
@@ -78,7 +78,7 @@ class ClassLoader implements ClassLoaderInterface
         if (empty($diff1) && empty($diff2)) {
             return \call_user_func_array($closure, $parameters);
         } else {
-            NotFoundHttpException::alertMessage(404, "Parameter not defined in the URL or function");
+            throw new \Exception("Parameter not defined in the URL or function", 404);
         }
 
         return null;

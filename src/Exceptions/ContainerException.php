@@ -2,6 +2,7 @@
 
 namespace Solital\Core\Exceptions;
 
+use ModernPHPException\ModernPHPException;
 use Psr\Container\ContainerExceptionInterface;
 
 class ContainerException extends \Exception implements ContainerExceptionInterface
@@ -10,6 +11,7 @@ class ContainerException extends \Exception implements ContainerExceptionInterfa
     public function __construct($id, \Exception $exception, $code = 0)
     {
         $message = "Error retrieving the entry: " . $id . "\nThrew an exception with the message: " . $exception->getMessage();
-        parent::__construct($message, $code, $exception);
+
+        (new ModernPHPException())->start()->errorHandler($code, $message, $exception->getFile(), $exception->getLine());
     }
 }

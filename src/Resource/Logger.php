@@ -2,6 +2,7 @@
 
 namespace Solital\Core\Resource;
 
+use ModernPHPException\ModernPHPException;
 use Psr\Log\LogLevel;
 use Psr\Log\LoggerInterface;
 
@@ -37,6 +38,11 @@ class Logger implements LoggerInterface
     private string $stdout;
 
     /**
+     * @var ModernPHPException
+     */
+    private ModernPHPException $exception;
+
+    /**
      * Log fields separated by tabs to form a TSV (CSV with tabs).
      */
     const TAB = "\t";
@@ -69,6 +75,7 @@ class Logger implements LoggerInterface
      */
     public function __construct(string $channel, string $log_level = LogLevel::DEBUG)
     {
+        $this->exception = new ModernPHPException();
         $this->log_file  = SITE_ROOT . DIRECTORY_SEPARATOR . "app" . DIRECTORY_SEPARATOR . "Storage" . DIRECTORY_SEPARATOR . "log" . DIRECTORY_SEPARATOR . "solital-log.txt";
         $this->channel   = $channel;
         $this->stdout    = false;
@@ -85,7 +92,7 @@ class Logger implements LoggerInterface
     public function setLogLevel(string $log_level): void
     {
         if (!array_key_exists($log_level, self::LEVELS)) {
-            throw new \DomainException("Log level $log_level is not a valid log level. Must be one of (" . implode(', ', array_keys(self::LEVELS)) . ')');
+            $this->exception->errorHandler(500, "Log level $log_level is not a valid log level. Must be one of (" . implode(', ', array_keys(self::LEVELS)) . ')', __FILE__, __LINE__);
         }
 
         $this->log_level = self::LEVELS[$log_level];

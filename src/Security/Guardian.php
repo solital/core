@@ -4,7 +4,6 @@ namespace Solital\Core\Security;
 
 use Solital\Core\Database\ORM;
 use Solital\Core\Resource\Session;
-use Solital\Core\Exceptions\NotFoundException;
 
 class Guardian
 {
@@ -101,8 +100,7 @@ class Guardian
     private static function verifyConstants(): void
     {
         if ($_ENV['INDEX_LOGIN'] == "" || empty($_ENV['INDEX_LOGIN'])) {
-            NotFoundException::notFound(404, "INDEX_LOGIN not defined", "You have not determined any 
-            indexes in the INDEX_LOGIN constant. Check your 'config.php' file", "Guardian");
+            throw new \Exception("INDEX_LOGIN not defined", 404);
         }
     }
 }

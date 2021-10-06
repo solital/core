@@ -2,6 +2,7 @@
 
 namespace Solital\Core\Course\Container;
 
+use Exception;
 use Psr\Container\ContainerInterface;
 use Solital\Core\Exceptions\ContainerException;
 use Solital\Core\Exceptions\ContainerNotFoundException;
@@ -59,7 +60,7 @@ class Container implements ContainerInterface
             // If this dependency isn't yet loaded, try to load it
             if (!isset($this->functions[$id]) || !isset($this->arguments[$id])) {
                 // Throw an exception ContainerNotFoundException
-                throw new ContainerNotFoundException($id);
+                throw new \Exception($id);
             }
             try {
                 $this->loaded_dependencies[$id] = $this->functions[$id]($this->arguments[$id]);

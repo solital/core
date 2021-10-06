@@ -45,7 +45,7 @@ abstract class LoadableRoute extends Route implements LoadableRouteInterface
             $router->debug('Loading middleware "%s"', $class);
 
             if (!method_exists($class, 'handle')) {
-                NotFoundHttpException::alertMessage(404, "'handle' method not found in namespace " . $this->getMiddlewares()[0]);
+                throw new \Exception("'handle' method not found in namespace " . $this->getMiddlewares()[0], 404);
             }
 
             call_user_func_array([$class, 'handle'], $middleware);

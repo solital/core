@@ -123,7 +123,7 @@ abstract class Route implements RouteInterface
         $method = $controller[1];
 
         if (method_exists($class, $method) === false) {
-            NotFoundHttpException::alertMessage(404, "Method '$method' doesn't exist in namespace '$className'");
+            throw new \Exception("Method '$method' doesn't exist in namespace '$className'", 404);
         }
 
         $router->debug('Executing callback');

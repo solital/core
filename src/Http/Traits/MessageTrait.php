@@ -6,7 +6,7 @@ namespace Solital\Core\Http\Traits;
 
 use Psr\Http\Message\StreamInterface;
 use Solital\Core\Http\Stream;
-use Solital\Core\Exceptions\InvalidArgumentHttpException;
+use Solital\Core\Exceptions\InvalidArgumentException;
 
 trait MessageTrait
 {
@@ -59,7 +59,7 @@ trait MessageTrait
      */
     public function __set($name, $value)
     {
-        InvalidArgumentHttpException::invalidExceptionMessage(400, 'Cannot add new property $' . $name . ' to instance of ' . __CLASS__);
+        throw new InvalidArgumentException("Cannot add new property $" . $name . " to instance of " . __CLASS__, 400);
     }
 
     /**
@@ -102,16 +102,12 @@ trait MessageTrait
      *
      * @param mixed $version
      *
-     * @throws \InvalidArgumentHttpException If the HTTP protocol version is invalid.
+     * @throws \InvalidArgumentException If the HTTP protocol version is invalid.
      */
     private function validateProtocolVersion($version)
     {
         if (!is_string($version) || !in_array($version, self::$validProtocolVersions, true)) {
-            InvalidArgumentHttpException::invalidExceptionMessage(
-                400,
-                'Invalid HTTP protocol version. Must be ' .
-                    implode(', ', self::$validProtocolVersions)
-            );
+            throw new InvalidArgumentException("Invalid HTTP protocol version. Must be " . implode(', ', self::$validProtocolVersions), 400);
         }
     }
 
@@ -120,7 +116,7 @@ trait MessageTrait
      *
      * @param array $originalHeaders
      *
-     * @throws \InvalidArgumentHttpException for invalid header values.
+     * @throws \InvalidArgumentException for invalid header values.
      */
     private function setHeaders(array $originalHeaders)
     {
@@ -144,7 +140,7 @@ trait MessageTrait
      *
      * @return array
      *
-     * @throws \InvalidArgumentHttpException for invalid header values.
+     * @throws \InvalidArgumentException for invalid header values.
      */
     private function sanitizeHeaderValue($value): array
     {
@@ -154,11 +150,7 @@ trait MessageTrait
 
         $value = array_map(function ($value) {
             if (!is_string($value) && !is_numeric($value)) {
-                InvalidArgumentHttpException::invalidExceptionMessage(
-                    400,
-                    'Invalid header value type. Must be a string or numeric, received ' .
-                        (is_object($value) ? get_class($value) : gettype($value))
-                );
+                throw new InvalidArgumentException("Invalid header value type. Must be a string or numeric, received " . (is_object($value) ? get_class($value) : gettype($value)));
             }
 
             $value = (string) $value;
@@ -167,7 +159,7 @@ trait MessageTrait
                 preg_match("#(?:(?:(?<!\r)\n)|(?:\r(?!\n))|(?:\r\n(?![ \t])))#", $value) ||
                 preg_match('/[^\x09\x0a\x0d\x20-\x7E\x80-\xFE]/', $value)
             ) {
-                InvalidArgumentHttpException::invalidExceptionMessage(400, $value . ' is not a valid header name');
+                throw new InvalidArgumentException($value . " is not a valid header name", 400);
             }
 
             return $value;
@@ -181,20 +173,18 @@ trait MessageTrait
      *
      * @param mixed $name
      *
-     * @throws \InvalidArgumentHttpException for invalid header names.
+     * @throws \InvalidArgumentException for invalid header names.
      */
     private function validateHeaderName($name)
     {
         if (!is_string($name)) {
-            InvalidArgumentHttpException::invalidExceptionMessage(
-                400,
-                'Invalid header name type. Must be a string, received ' .
-                    (is_object($name) ? get_class($name) : gettype($name))
+            throw new InvalidArgumentException(
+                "Invalid header name type. Must be a string, received " . (is_object($name) ? get_class($name) : gettype($name))
             );
         }
 
         if (!preg_match('/^[a-zA-Z0-9\'`#$%&*+.^_|~!-]+$/', $name)) {
-            InvalidArgumentHttpException::invalidExceptionMessage(400, $name . ' is not a valid header name');
+            throw new InvalidArgumentException($name . " is not a valid header name", 400);
         }
     }
 
@@ -308,7 +298,7 @@ trait MessageTrait
      *
      * @return static
      *
-     * @throws \InvalidArgumentHttpException for invalid header names or values.
+     * @throws \InvalidArgumentException for invalid header names or values.
      */
     public function withHeader($name, $value)
     {
@@ -345,7 +335,7 @@ trait MessageTrait
      *
      * @return static
      *
-     * @throws \InvalidArgumentHttpException for invalid header names or values.
+     * @throws \InvalidArgumentException for invalid header names or values.
      */
     public function withAddedHeader($name, $value)
     {
@@ -398,7 +388,7 @@ trait MessageTrait
      *
      * @param string|resource|\Psr\Http\Message\StreamInterface $stream
      *
-     * @throws \InvalidArgumentHttpException When the stream is not valid.
+     * @throws \InvalidArgumentException When the stream is not valid.
      */
     private function setStreamInstance($stream)
     {
@@ -407,11 +397,7 @@ trait MessageTrait
         }
 
         if (!$stream instanceof StreamInterface && $stream !== null) {
-            InvalidArgumentHttpException::invalidExceptionMessage(
-                400,
-                'The stream must be a string stream identifier, ' .
-                    'stream resource or a Psr\Http\Message\StreamInterface implementation'
-            );
+            throw new InvalidArgumentException("The stream must be a string stream identifier, stream resource or a Psr\Http\Message\StreamInterface implementation", 400);
         }
 
         $this->stream = $stream;

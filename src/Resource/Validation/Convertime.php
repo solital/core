@@ -102,4 +102,20 @@ class Convertime
 
         return date('H:i:s', $temp);
     }
+
+    /**
+     * @param string $date
+     * 
+     * @return bool
+     */
+    public function isWeekend(string $date): bool
+    {
+        $date = $this->formatDate($date, 'Y-m-d');
+
+        if (date('N', strtotime($date)) > 5) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

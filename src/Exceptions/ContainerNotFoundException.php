@@ -2,13 +2,13 @@
 
 namespace Solital\Core\Exceptions;
 
+use ModernPHPException\ModernPHPException;
 use Psr\Container\NotFoundExceptionInterface;
 
 class ContainerNotFoundException extends \Exception implements NotFoundExceptionInterface
 {
-    // Redefine the exception so message isn't optional
-    public function __construct($id, $code = 0, \Exception $previous = null)
+    public function __construct($id)
     {
-        parent::__construct("Dependency \"" . $id . "\" not found. Make sure it is properly injected in this domain", $code, $previous);
+        (new ModernPHPException())->start()->errorHandler(404, "Dependency \"" . $id . "\" not found", __FILE__, __LINE__);
     }
 }

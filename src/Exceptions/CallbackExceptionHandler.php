@@ -3,7 +3,7 @@
 namespace Solital\Core\Exceptions;
 
 use Solital\Core\Http\Request;
-use Solital\Core\Course\Handlers\ExceptionHandlerInterface;
+use Solital\Core\Exceptions\ExceptionHandlerInterface;
 
 /**
  * Class CallbackExceptionHandler
@@ -15,9 +15,11 @@ use Solital\Core\Course\Handlers\ExceptionHandlerInterface;
  */
 class CallbackExceptionHandler implements ExceptionHandlerInterface
 {
-
     protected $callback;
 
+    /**
+     * @param \Closure $callback
+     */
     public function __construct(\Closure $callback)
     {
         $this->callback = $callback;

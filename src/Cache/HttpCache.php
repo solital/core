@@ -4,7 +4,6 @@ namespace Solital\Core\Cache;
 
 use DateTime;
 use Solital\Core\Cache\Cache;
-use Solital\Core\Exceptions\HttpCacheException;
 
 class HttpCache extends Cache
 {
@@ -29,7 +28,7 @@ class HttpCache extends Cache
         $this->time = $max_age;
 
         if ($privacity != "public" && $privacity != "private") {
-            HttpCacheException::alertMessage(404, "'$privacity' is invalid. Use 'public' or 'private'");
+            throw new \Exception("'$privacity' is invalid. Use 'public' or 'private'", 404);
 
             return $this;
         }

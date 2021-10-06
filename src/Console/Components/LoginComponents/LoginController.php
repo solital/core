@@ -5,7 +5,6 @@ namespace Solital\Components\Controller\Auth;
 use Solital\Components\Controller\Controller;
 use Solital\Core\Auth\Auth;
 use Solital\Core\Wolf\Wolf;
-use Solital\Core\Resource\Message;
 
 class LoginController extends Controller
 {

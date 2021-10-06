@@ -24,7 +24,7 @@ class Hash
     public static function checkSecrets(): void
     {
         if ($_ENV['FIRST_SECRET'] == "" || $_ENV['SECOND_SECRET'] == "") {
-            NotFoundException::notFound(404, "Empty OPENSSL variables", "Check that the FIRST_SECRET and SECOND_SECRET variables have a value defined in the '.env' file", "Hash");
+            throw new \Exception("Empty OPENSSL variables", 404);
         }
     }
 
@@ -171,7 +171,7 @@ class Hash
         if (is_array($sodium_constants)) {
             return true;
         } else {
-            NotFoundException::notFound(404, "libsodium not installed");
+            throw new \Exception("libsodium not installed", 404);
         }
     }
 }

@@ -32,7 +32,7 @@ class HandleFiles extends HandleFolders
 
             return $this->files;
         } else {
-            NotFoundException::notFound(404, "Folder '" . $this->folder . "'", "", "HandleFiles");
+            throw new \Exception("Folder '" . $this->folder . "' not found", 404);
         }
     }
 

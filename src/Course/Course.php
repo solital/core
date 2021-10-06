@@ -8,13 +8,13 @@ use Solital\Core\Course\Router;
 use Solital\Core\Http\Response;
 use Solital\Core\Course\Route\RouteUrl;
 use Solital\Core\Course\Route\RouteGroup;
+use ModernPHPException\ModernPHPException;
 use Solital\Core\Course\Route\RouteResource;
 use Solital\Core\Course\Route\RouteInterface;
 use Solital\Core\Course\Route\RouteController;
 use Solital\Core\Course\Route\RoutePartialGroup;
 use Solital\Core\Course\Route\GroupRouteInterface;
 use Solital\Core\Exceptions\MalformedUrlException;
-use Solital\Core\Exceptions\NotFoundHttpException;
 use Solital\Core\Http\Middleware\BaseCsrfVerifier;
 use Solital\Core\Course\RouterBootManagerInterface;
 use Solital\Core\Exceptions\InvalidArgumentException;
@@ -22,7 +22,7 @@ use Solital\Core\Course\Handlers\EventHandlerInterface;
 use Solital\Core\Course\Route\PartialGroupRouteInterface;
 use Solital\Core\Course\Handlers\CallbackExceptionHandler;
 
-class Course extends NotFoundHttpException
+class Course
 {
     /**
      * Default namespace added to all routes
@@ -58,6 +58,8 @@ class Course extends NotFoundHttpException
      */
     public static function start(bool $send_console = false): void
     {
+        (new ModernPHPException())->start();
+
         if (!defined('DB_CONFIG')) {
             define('DB_CONFIG', [
                 'DRIVE' => $_ENV['DB_DRIVE'],
@@ -536,7 +538,7 @@ class Course extends NotFoundHttpException
             $callback = $route->getCallback();
 
             if (empty($callback)) {
-                NotFoundHttpException::alertMessage(404, "Callback not found");
+                throw new \Exception("Callback not found", 404);
             }
 
             /* Only add default namespace on relative callbacks */

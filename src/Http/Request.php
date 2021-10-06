@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace Solital\Core\Http;
 
+use Psr\Http\Message\RequestInterface;
 use Solital\Core\Http\Uri;
 use Solital\Core\Course\Course;
-use Psr\Http\Message\RequestInterface;
 use Solital\Core\Course\Route\RouteUrl;
 use Solital\Core\Http\Input\InputHandler;
 use Solital\Core\Http\Traits\RequestTrait;
-use Solital\Core\Exceptions\MalformedUrlException;
 use Solital\Core\Course\Route\LoadableRouteInterface;
 
 class Request implements RequestInterface
@@ -90,7 +89,6 @@ class Request implements RequestInterface
 
     /**
      * Request constructor.
-     * @throws MalformedUrlException
      */
     public function __construct(string $method, $uri, $body = 'php://memory', array $headers = [])
     {
@@ -447,29 +445,6 @@ class Request implements RequestInterface
         $this->hasPendingRewrite = $boolean;
 
         return $this;
-    }
-
-    /**
-     * @return array|null
-     */
-    public function getParamsInput(): ?array
-    {
-        $body = file_get_contents('php://input');
-        $json = json_decode($body, true);
-        return $json;
-    }
-
-    /**
-     * @param string $param
-     * 
-     * @return string
-     */
-    public function getParamInput(string $param)
-    {
-        $body = file_get_contents('php://input');
-        $json = json_decode($body);
-
-        return $json->$param;
     }
 
     /**

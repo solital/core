@@ -1,6 +1,7 @@
 <?php
 
 use Respect\Validation\Validator;
+use Solital\Core\Resource\Session;
 
 /**
  * Remove all get param
@@ -71,4 +72,23 @@ function get_url(string $uri = null): string
     }
 
     return $url;
+}
+
+/**
+ * @param string $index
+ * @param mixed $value
+ * @param string|null $key
+ * @param bool $delete
+ * 
+ * @return mixed
+ */
+function session(string $index, $value = null, ?string $key = null, bool $delete = false)
+{
+    if ($value != null) {
+        return Session::new($index, $value, $key);
+    } elseif ($delete == true) {
+        return Session::delete($index, $key);
+    }
+
+    return Session::show($index, $key);
 }
