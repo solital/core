@@ -1,5 +1,21 @@
 # Released Notes
 
+## v2.3.1 - (2021-11-30)
+
+### Changed
+
+- Changed `loadView` method
+
+### Fixed
+
+- Fixed ModernPHPException in `Course` class
+- Fixed `error` method
+- Fixed Bootstrap CSS version
+- Fixed `Colors` class
+- Fixed `ob_get_clean()` function in Wolf template
+
+--------------------------------------------------------------------------
+
 ## v2.3.0 - (2021-10-06)
 
 ### Added

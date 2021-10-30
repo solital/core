@@ -131,7 +131,7 @@ class SystemCommands extends Commands
         ];
 
         $link = $this->color->stringColor("http://solitalframework.com/", "cyan", null);
-        $thanks = "Thank you for using Solital, you can see the full documentation at $link\n";
+        $thanks = "Thank you for using Solital, you can see the full documentation at " . $link . "\n";
 
         print_r($this->color->stringColor("\nSolital framework - Fast, easy and practical\n", "yellow", null, true));
         print_r($this->color->stringColor($thanks, "white", null, true));
@@ -183,7 +183,7 @@ class SystemCommands extends Commands
                 $_SERVER["REQUEST_METHOD"] = "GET";
                 $_SERVER["REQUEST_URI"] = "/";
             }
-    
+
             SystemCommandsCourse::start(true);
         } else {
             $msg = $this->color->stringColor("Debug enabled! You cannot run this command.\n", "white", null, true);

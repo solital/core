@@ -43,9 +43,22 @@ class Wolf extends WolfCache
      * @param array|null $data
      * @param string $ext
      * 
-     * @return Wolf
+     * @return bool
      */
-    public static function loadView(string $view, array $data = null, string $ext = "php")
+    public static function loadView(string $view, array $data = null, string $ext = "php"): bool
+    {
+        $template = self::generateTemplate($view, $data, $ext);
+        echo $template;
+
+        return true;
+    }
+
+    /**
+     * @param string $view
+     * @param array|null $data
+     * @param string $ext
+     */
+    private  static function generateTemplate(string $view, array $data = null, string $ext = "php")
     {
         $view = str_replace(".", DIRECTORY_SEPARATOR, $view);
         $file = self::getDirView() . $view . '.' . $ext;
@@ -73,9 +86,7 @@ class Wolf extends WolfCache
 
         try {
             if (file_exists($file)) {
-                if (self::$time != null) {
-                    ob_start();
-                }
+                ob_start();
 
                 include_once $file;
 
@@ -83,6 +94,10 @@ class Wolf extends WolfCache
                     $res = ob_get_contents();
                     ob_flush();
                     file_put_contents(self::$file_cache, $res);
+
+                    return ob_get_clean();
+                } else {
+                    return ob_get_clean();
                 }
             } else {
                 throw new \Exception("Template '$view.$ext' not found");

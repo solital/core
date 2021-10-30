@@ -135,6 +135,16 @@ class Router
     private bool $send_console;
 
     /**
+     * @var string
+     */
+    private static string $url_redirect;
+
+    /**
+     * @var bool
+     */
+    private static bool $redirect = false;
+
+    /**
      * Router constructor.
      */
     public function __construct()
@@ -152,7 +162,7 @@ class Router
 
         try {
             $this->request = new Request($_SERVER["REQUEST_METHOD"], $_SERVER["REQUEST_URI"], 'php://memory');
-        } catch (MalformedUrlException $e) {
+        } catch (\Exception $e) {
             $this->debug(sprintf('Invalid request-uri url: %s', $e->getMessage()));
         }
 
@@ -478,16 +488,39 @@ class Router
 
             if ($rewriteUrl !== null) {
                 $this->checkProductionMode();
+                self::redirectRoute();
 
                 throw new \Exception("Route '" . $rewriteUrl . "' not found (rewrite from: '" . $this->request->getUri()->getPath() . "')", 404);
             } else {
                 $this->checkProductionMode();
+                self::redirectRoute();
 
                 throw new \Exception("Route '" . $this->request->getUri()->getPath() . "' not found", 404);
             }
         }
 
         return null;
+    }
+
+    /**
+     * @param string $url
+     * @param bool $redirect
+     */
+    public static function setUrlRedirect(string $url, bool $redirect)
+    {
+        self::$url_redirect = $url;
+        self::$redirect = $redirect;
+    }
+
+    /**
+     * @return void
+     */
+    private static function redirectRoute(): void
+    {
+        if (self::$redirect == true) {
+            response()->redirect(self::$url_redirect);
+            exit;
+        }
     }
 
     /**

@@ -58,7 +58,11 @@ class Course
      */
     public static function start(bool $send_console = false): void
     {
-        (new ModernPHPException())->start();
+        if ($_ENV['PRODUCTION_MODE'] == "true") {
+            (new ModernPHPException())->productionMode();
+        } else {
+            (new ModernPHPException())->start();
+        }
 
         if (!defined('DB_CONFIG')) {
             define('DB_CONFIG', [
@@ -440,18 +444,14 @@ class Course
     }
 
     /**
-     * @param bool $bool
+     * @param bool $redirect
      * @param string $url
-     * @return __CLASS__
      */
-    public static function error(bool $bool, string $url)
+    public static function error(bool $redirect, string $url)
     {
-        if ($bool == true) {
-            self::$error = true;
-            self::$url = $url;
+        if ($redirect == true) {
+            Router::setUrlRedirect($url, $redirect);
         }
-
-        return __CLASS__;
     }
 
     /**
@@ -469,6 +469,7 @@ class Course
      * @param string|null $name
      * @param string|array|null $parameters
      * @param array|null $getParams
+     * 
      * @return Uri
      */
     public static function getUri(?string $name = null, $parameters = null, ?array $getParams = null): Uri
@@ -478,7 +479,7 @@ class Course
         } catch (\Exception $e) {
             try {
                 return new Uri('/');
-            } catch (MalformedUrlException $e) {
+            } catch (\Exception $e) {
                 #echo $e->getMessage();
             }
         }
