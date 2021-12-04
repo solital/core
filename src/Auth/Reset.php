@@ -48,11 +48,6 @@ abstract class Reset
     protected bool $mailerExceptions = false;
 
     /**
-     * @var bool
-     */
-    protected bool $native = true;
-
-    /**
      * @var string
      */
     protected string $subject = "Forgot Password";
@@ -193,16 +188,12 @@ abstract class Reset
             <small>Sent from the solital framework</small>";
         }
 
-        if ($this->native == true) {
-            $res = NativeMail::send($_ENV['MAIL_SENDER'], $email, $this->subject, $this->message, null, "text/html");
-        } else {
-            $res = $this->mailer->add($_ENV['MAIL_SENDER'], $this->name_sender, $email, $this->name_recipient)
-                ->sendEmail($this->subject, $this->message);
+        $res = $this->mailer->add($_ENV['MAIL_SENDER'], $this->name_sender, $email, $this->name_recipient)
+            ->sendEmail($this->subject, $this->message);
 
-            if ($this->mailer->error()) {
-                echo $this->mailer->error();
-                exit;
-            }
+        if ($this->mailer->error()) {
+            echo $this->mailer->error();
+            exit;
         }
 
         if ($res == true) {

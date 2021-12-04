@@ -1,6 +1,7 @@
 <?php
 
 use Solital\Core\Http\Input\InputJson;
+use Solital\Core\Resource\Message;
 use Symfony\Component\VarDumper\VarDumper;
 use Symfony\Component\VarExporter\VarExporter;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
@@ -108,4 +109,21 @@ function console_log(...$messages): void
     echo '<script>';
     echo 'console.log(' . json_encode($msgs) . ')';
     echo '</script>';
+}
+
+/**
+ * @param string $key
+ * @param string $msg
+ * 
+ * @return string|null
+ */
+function message(string $key, string $msg = ""): ?string
+{
+    $message = new Message();
+
+    if ($msg == "" || empty($msg)) {
+        return $message->get($key);
+    } else {
+        $message->new($key, $msg);
+    }
 }

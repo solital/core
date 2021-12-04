@@ -92,3 +92,22 @@ function session(string $index, $value = null, ?string $key = null, bool $delete
 
     return Session::show($index, $key);
 }
+
+/**
+ * @param string $name
+ * @param array $array
+ * 
+ * @return mixed
+ */
+function multi_array_value(string $name, array $array): mixed
+{
+    foreach ($array as $keys) {
+        foreach ($keys as $key => $_user_record) {
+            if ($_user_record == $name) {
+                return [$key => $_user_record];
+            }
+        }
+    }
+
+    return null;
+}

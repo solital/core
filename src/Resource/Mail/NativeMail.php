@@ -4,6 +4,9 @@ namespace Solital\Core\Resource\Mail;
 
 use Solital\Core\Resource\Validation\Valid;
 
+/**
+ * @deprecated No longer used by internal code and not recommended.
+ */
 class NativeMail extends PHPMailerClass
 {
     /**

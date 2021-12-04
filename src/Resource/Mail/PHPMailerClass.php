@@ -20,6 +20,7 @@ class PHPMailerClass
      */
     public function __construct($exceptions = true)
     {
+        $this->checkEnvMail();
         $this->mail = new PHPMailer($exceptions);
 
         $this->mail->SMTPDebug = (int)$_ENV['PHPMAILER_DEBUG'];
@@ -116,5 +117,27 @@ class PHPMailerClass
     public function error(): string
     {
         return $this->mail->ErrorInfo;
+    }
+
+    /**
+     * @return PHPMailerClass
+     */
+    private function checkEnvMail(): PHPMailerClass
+    {
+        /* getenv('PHPMAILER_DEBUG');
+        getenv('PHPMAILER_HOST');
+        getenv('PHPMAILER_USER');
+        getenv('PHPMAILER_PASS');
+        getenv('PHPMAILER_SECURITY');
+        getenv('PHPMAILER_PORT'); */
+
+        if (
+            getenv('PHPMAILER_DEBUG') || getenv('PHPMAILER_HOST') || getenv('PHPMAILER_USER')
+            || getenv('PHPMAILER_PASS') || getenv('PHPMAILER_SECURITY') || getenv('PHPMAILER_PORT')
+        ) {
+            throw new \Exception("Email variables have not been defined in the .env file");
+        }
+
+        return $this;
     }
 }

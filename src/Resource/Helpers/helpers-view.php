@@ -3,6 +3,16 @@
 use Solital\Core\Wolf\Wolf;
 
 /**
+ * @param string $view
+ * @param array|null $data
+ * @param string $ext
+ */
+function view(string $view, array $data = null, string $ext = "php")
+{
+    return Wolf::loadView($view, $data, $ext);
+}
+
+/**
  * @param string $asset
  * 
  * @return string

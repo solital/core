@@ -569,5 +569,6 @@ class Table
     public function display()
     {
         print $this->get();
+        echo "\e[1;37m";
     }
 }

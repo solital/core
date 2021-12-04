@@ -75,6 +75,7 @@ class Wolf extends WolfCache
 
         /** Convert array indexes to variables  */
         if (isset($data)) {
+            $data = array_map("htmlspecialchars", $data);
             extract($data, EXTR_SKIP);
         }
 

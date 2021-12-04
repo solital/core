@@ -326,6 +326,18 @@ class InputHandler
     }
 
     /**
+     * @param array $filter
+     * 
+     * @return object
+     */
+    public function getAllObject(array $filter = []): object
+    {
+        $object = $this->all($filter);
+
+        return (object)$object;
+    }
+
+    /**
      * Add GET parameter
      *
      * @param string $key

@@ -9,7 +9,7 @@ class AuthTest extends TestCase
     /**
      * Test Auth Sodium
      */
-    public function testAuth()
+    public function testSodiumAuth()
     {
         $key = Hash::getSodiumKey();
         $encoded = Auth::sodium('password', $key);
@@ -20,7 +20,7 @@ class AuthTest extends TestCase
     /**
      * Test Auth Sodium Verify
      */
-    public function testAuthVerify()
+    public function testSodiumAuthVerify()
     {
         $key = Hash::getSodiumKey();
         $encoded = Auth::sodium('password', $key);

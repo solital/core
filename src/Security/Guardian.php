@@ -2,7 +2,9 @@
 
 namespace Solital\Core\Security;
 
+use Respect\Validation\Validator;
 use Solital\Core\Database\ORM;
+use Solital\Core\Resource\Mail\PHPMailerClass;
 use Solital\Core\Resource\Session;
 
 class Guardian
@@ -11,6 +13,16 @@ class Guardian
      * @var string
      */
     private string $table;
+
+    /**
+     * @var PHPMailerClass
+     */
+    private static PHPMailerClass $mailer;
+
+    /**
+     * @var string
+     */
+    private static string $domain;
 
     /**
      * Verify login
@@ -93,6 +105,60 @@ class Guardian
     }
 
     /**
+     * @param string $domain
+     * 
+     * @return new static
+     */
+    public static function validateDomain(string $domain)
+    {
+        self::checkEnvMail();
+        self::$mailer = new PHPMailerClass();
+        self::$domain = $domain;
+
+        $domain_validation = Validator::url()->validate($domain);
+
+        if ($domain_validation == false) {
+            throw new \Exception("Domain is not valid");
+        }
+
+        return new static;
+    }
+
+    /**
+     * @param string $recipient_name
+     * @param string $recipient_mail
+     * 
+     * @return Guardian
+     */
+    public function sendTo(string $recipient_name, string $recipient_mail): Guardian
+    {
+        $url = get_url();
+
+        $email_validation = Validator::email()->validate($recipient_mail);
+
+        if ($email_validation == false) {
+            throw new \Exception("Recipient email not valid");
+        }
+
+        if ($url != self::$domain) {
+            self::$mailer->add(getenv('PHPMAILER_USER'), 'Solital Guardian', $recipient_mail, $recipient_name)
+                ->sendEmail('Solital: Security Alert', 'We detected that your project made in Solital is in another domain. The detected domain is: ' . $url);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Return error
+     */
+    public function error()
+    {
+        if (self::$mailer->error()) {
+            return self::$mailer->error();
+        }
+    }
+
+    /**
      * Checks for constants
      * 
      * @return void
@@ -101,6 +167,19 @@ class Guardian
     {
         if ($_ENV['INDEX_LOGIN'] == "" || empty($_ENV['INDEX_LOGIN'])) {
             throw new \Exception("INDEX_LOGIN not defined", 404);
+        }
+    }
+
+    /**
+     * Check if email variable have defined
+     */
+    private static function checkEnvMail()
+    {
+        if (
+            getenv('PHPMAILER_DEBUG') || getenv('PHPMAILER_HOST') || getenv('PHPMAILER_USER')
+            || getenv('PHPMAILER_PASS') || getenv('PHPMAILER_SECURITY') || getenv('PHPMAILER_PORT')
+        ) {
+            throw new \Exception("Email variables have not been defined in the .env file");
         }
     }
 }

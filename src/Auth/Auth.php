@@ -4,6 +4,7 @@ namespace Solital\Core\Auth;
 
 use Solital\Core\Auth\Reset;
 use Solital\Core\Security\Hash;
+use Solital\Core\Resource\Cookie;
 use Solital\Core\Resource\Session;
 use Solital\Core\Security\Guardian;
 
@@ -38,6 +39,16 @@ class Auth extends Reset
      * @var string
      */
     private string $pass_post;
+
+    /**
+     * @var bool
+     */
+    private bool $remember = false;
+
+    /**
+     * @var int
+     */
+    private int $time;
 
     /**
      * @var string
@@ -204,6 +215,30 @@ class Auth extends Reset
     }
 
     /**
+     * @param int $time
+     * 
+     * @return Auth
+     */
+    public function remember(int $time = 644800): Auth
+    {
+        $this->remember = true;
+        $this->time = $time;
+
+        return $this;
+    }
+
+    /**
+     * @param string $redirect
+     */
+    public static function isRemembering(string $redirect)
+    {
+        if (Cookie::has('auth_remember_login') == true) {
+            $user = Cookie::show('auth_remember_login');
+            Guardian::validate($redirect, $user);
+        }
+    }
+
+    /**
      * @param string $time
      * 
      * @return Auth
@@ -211,17 +246,6 @@ class Auth extends Reset
     public function timeHash(string $time): Auth
     {
         $this->time_hash = $time;
-
-        return $this;
-    }
-
-    /**
-     * @return Auth
-     */
-    public function usePHPMailer(bool $exceptions = false): Auth
-    {
-        $this->native = false;
-        $this->mailerExceptions = $exceptions;
 
         return $this;
     }
@@ -317,6 +341,10 @@ class Auth extends Reset
             ->fields($this->user_column, $this->pass_column, $user, $pass);
 
         if ($res) {
+            if ($this->remember == true) {
+                Cookie::new("auth_remember_login", $this->user_post, time() + $this->time, "/");
+            }
+
             Guardian::validate($redirect, $user);
         } else {
             return false;

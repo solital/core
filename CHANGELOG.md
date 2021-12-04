@@ -1,6 +1,35 @@
 # Released Notes
 
-## v2.3.1 - (2021-11-30)
+## v2.4.0 - (2021-12-04)
+
+### Added
+
+- Added helper for `Message` class
+- Added helper for view
+- Added helper `multi_array_value`
+- Added support localstorage and sessionstorage
+- Added support to verify different domain
+- Added remember password when logging in
+- Added `JsonSerializable` class
+- Added `Crypt` class
+- Added `Diff` class
+
+### Changed
+
+- Changed `NativeMail` class as deprecated
+
+### Fixed
+
+- Fixed special characters in Wolf
+
+### Removed
+
+- Removed helpers `ServerRequest` and `Upload`
+- Removed support for NativeMail in `Auth` and `Reset` class
+
+--------------------------------------------------------------------------
+
+## v2.3.1 - (2021-10-30)
 
 ### Changed
 
@@ -73,7 +102,7 @@
 
 ### Added
 
-- Added Added minify by Vinci
+- Added minify by Vinci
 - Added method to get data from `php://input`
 
 ### Removed

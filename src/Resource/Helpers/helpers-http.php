@@ -56,55 +56,6 @@ function input(string $index = null, string $defaultValue = null, ...$methods)
 }
 
 /**
- * Upload a file
- * @param string
- */
-function uploadFile($file): UploadedFile
-{
-    $upload = new UploadedFile($file);
-    return $upload;
-}
-
-/**
- * Creates an instance of the ServerRequest class
- * @param array $headers
- * @param mixed $protocol
- * @return ServerRequest
- */
-function serverRequest(array $headers = null, $protocol = null): ServerRequest
-{
-    if (request()->getParamsInput()) {
-        $queryParams = request()->getParamsInput();
-    } else {
-        $queryParams = [];
-    }
-
-    $method = request()->getMethod();
-    $uri = request()->getUri()->getHost();
-    $body = "php://input";
-    $serverParams = $_SERVER;
-    $cookieParams = $_COOKIE;
-    #$queryParams = request()->getParamsInput();
-    $uploadedFiles = $_FILES;
-    $headers = [];
-    $protocol = '1.1';
-
-    $server = new ServerRequest(
-        $method,
-        $uri,
-        $body,
-        $serverParams,
-        $cookieParams,
-        $queryParams,
-        $uploadedFiles,
-        $headers,
-        $protocol
-    );
-
-    return $server;
-}
-
-/**
  * @param string $url
  * @param int|null $code
  */
@@ -125,7 +76,7 @@ function redirect(string $url, ?int $code = null): void
  * 
  * @return bool
  */
-function request_limit(string $key, int $limit = 5, int $seconds = 60) : bool
+function request_limit(string $key, int $limit = 5, int $seconds = 60): bool
 {
     if (Session::has($key) && $_SESSION[$key]->time >= time() && $_SESSION[$key]->requests < $limit) {
         Session::new($key, [

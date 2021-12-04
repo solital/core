@@ -488,12 +488,12 @@ class Router
 
             if ($rewriteUrl !== null) {
                 $this->checkProductionMode();
-                self::redirectRoute();
+                $this->redirectRoute();
 
                 throw new \Exception("Route '" . $rewriteUrl . "' not found (rewrite from: '" . $this->request->getUri()->getPath() . "')", 404);
             } else {
                 $this->checkProductionMode();
-                self::redirectRoute();
+                $this->redirectRoute();
 
                 throw new \Exception("Route '" . $this->request->getUri()->getPath() . "' not found", 404);
             }
@@ -515,7 +515,7 @@ class Router
     /**
      * @return void
      */
-    private static function redirectRoute(): void
+    private function redirectRoute(): void
     {
         if (self::$redirect == true) {
             response()->redirect(self::$url_redirect);
