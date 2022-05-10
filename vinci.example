@@ -1,0 +1,10 @@
+#!/usr/bin/env php
+<?php
+
+require_once 'vendor/autoload.php';
+
+$class_commands = [
+    \Solital\Core\Kernel\Console\SolitalCommands::class
+];
+
+(new \Solital\Core\Console\Command($class_commands))->read($argv[1], $argv);

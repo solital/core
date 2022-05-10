@@ -13,7 +13,7 @@ class CookieTokenProvider implements TokenProviderInterface
     /**
      * @var mixed
      */
-    protected $token;
+    protected mixed $token;
 
     /**
      * CookieTokenProvider constructor.
@@ -34,7 +34,12 @@ class CookieTokenProvider implements TokenProviderInterface
      */
     public function validate(): bool
     {
-        if ($this->getToken() == null || Session::has(static::CSRF_KEY) == false || empty($_REQUEST['csrf_token']) || $_REQUEST['csrf_token'] != Session::show(static::CSRF_KEY)) {
+        if (
+            $this->getToken() == null || 
+            Session::has(static::CSRF_KEY) == false || 
+            empty($_REQUEST['csrf_token']) || 
+            $_REQUEST['csrf_token'] != Session::get(static::CSRF_KEY)
+        ) {
             return false;
         }
 
@@ -44,22 +49,24 @@ class CookieTokenProvider implements TokenProviderInterface
     /**
      * Set csrf token
      * @param int $seconds
+     * 
      * @return string
      */
     public function setToken(int $seconds = 20): string
     {
-        if (Session::show(static::CSRF_VALIDATE) < time() || empty(Session::show(static::CSRF_VALIDATE))) {
-            Session::new(static::CSRF_VALIDATE, time() + $seconds);
+        if (Session::get(static::CSRF_VALIDATE) < time() || empty(Session::get(static::CSRF_VALIDATE))) {
+            Session::set(static::CSRF_VALIDATE, time() + $seconds);
             $token = base64_encode(random_bytes(20));
-            Session::new(static::CSRF_KEY, $token);
+            Session::set(static::CSRF_KEY, $token);
         }
 
-        return Session::show(static::CSRF_KEY);
+        return Session::get(static::CSRF_KEY);
     }
 
     /**
      * Get csrf token
      * @param string|null $defaultValue
+     * 
      * @return string|null
      */
     public function getToken(?string $defaultValue = null): ?string
@@ -70,6 +77,7 @@ class CookieTokenProvider implements TokenProviderInterface
 
     /**
      * Returns whether the csrf token has been defined
+     * 
      * @return bool
      */
     public function hasToken(): bool

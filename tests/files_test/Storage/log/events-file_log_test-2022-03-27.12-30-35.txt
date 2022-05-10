@@ -1,0 +1,1 @@
+2022-03-27 12:30:35.659006	[info]	[events]	[pid:2072]	Logger really is simple.	{}	{}

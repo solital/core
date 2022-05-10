@@ -2,7 +2,6 @@
 
 namespace Solital\Core\Http\Input;
 
-use Solital\Core\Exceptions\InvalidArgumentException;
 use Solital\Core\Http\Request;
 
 class InputHandler
@@ -43,7 +42,11 @@ class InputHandler
      */
     public function parseInputs(): void
     {
-        $getVars = filter_input_array(INPUT_GET, FILTER_SANITIZE_STRING);
+        $getVars = filter_input_array(INPUT_GET, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+
+        if (empty($getVars) || $getVars == null) {
+            $getVars = filter_var_array($_GET, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        }
 
         /* Parse get requests */
         if (is_array($getVars)) {
@@ -53,7 +56,11 @@ class InputHandler
         }
 
         /* Parse post requests */
-        $postVars = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+        $postVars = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+
+        if (empty($postVars) || $postVars == null) {
+            $postVars = filter_var_array($_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        }
 
         if (\in_array($this->request->getMethod(), ['put', 'patch', 'delete'], false) === true) {
             parse_str(file_get_contents('php://input'), $postVars);
@@ -69,6 +76,8 @@ class InputHandler
         if (\count($_FILES) !== 0) {
             $this->file = $this->parseFiles();
         }
+
+        #var_dump($this->post);exit;
     }
 
     /**
@@ -85,8 +94,8 @@ class InputHandler
                 $values['index'] = $key;
                 try {
                     $list[$key] = InputFile::createFromArray($values + $value);
-                } catch (InvalidArgumentException $e) {
-                    throw new InvalidArgumentException($e->getMessage());
+                } catch (\InvalidArgumentException $e) {
+                    throw new \InvalidArgumentException($e->getMessage());
                 }
                 continue;
             }
@@ -141,8 +150,8 @@ class InputHandler
 
                     $output[$key] = $file;
                     continue;
-                } catch (InvalidArgumentException $e) {
-                    throw new InvalidArgumentException($e->getMessage());
+                } catch (\InvalidArgumentException $e) {
+                    throw new \InvalidArgumentException($e->getMessage());
                 }
             }
 
@@ -299,7 +308,19 @@ class InputHandler
         if ($this->request->getMethod() === 'post') {
             if (filter_input_array(INPUT_POST) != null) {
                 // Append POST data
-                $output += filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+                $output += filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                $contents = file_get_contents('php://input');
+
+                // Append any PHP-input json
+                if (strpos(trim($contents), '{') === 0) {
+                    $post = json_decode($contents, true);
+                    if ($post !== false) {
+                        $output += $post;
+                    }
+                }
+            } elseif ($_POST != null) {
+                // Append POST data
+                $output += filter_var_array($_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
                 $contents = file_get_contents('php://input');
 
                 // Append any PHP-input json

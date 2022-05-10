@@ -2,8 +2,7 @@
 
 namespace Solital\Core\Course\Handlers;
 
-use Solital\Core\Course\Event\EventArgument;
-use Solital\Core\Course\Router;
+use Solital\Core\Course\{Router, Event\EventArgument};
 
 class DebugEventHandler implements EventHandler
 {

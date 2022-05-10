@@ -1,12 +1,11 @@
 <?php
 require_once 'Exception/MiddlewareLoadedException.php';
 
-use Solital\Core\Http\Request;
-use Solital\Core\Http\Middleware\MiddlewareInterface;
+use Solital\Core\Http\Middleware\BaseMiddlewareInterface;
 
-class DummyMiddleware implements MiddlewareInterface
+class DummyMiddleware implements BaseMiddlewareInterface
 {
-	public function handle(Request $request) : void
+	public function handle() : void
 	{
 		throw new MiddlewareLoadedException('Middleware loaded!');
 	}

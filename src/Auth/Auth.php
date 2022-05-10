@@ -2,11 +2,11 @@
 
 namespace Solital\Core\Auth;
 
+use Symfony\Component\Yaml\Yaml;
 use Solital\Core\Auth\Reset;
-use Solital\Core\Security\Hash;
-use Solital\Core\Resource\Cookie;
-use Solital\Core\Resource\Session;
-use Solital\Core\Security\Guardian;
+use Solital\Core\Kernel\Application;
+use Solital\Core\Resource\{Cookie, Session};
+use Solital\Core\Security\{Hash, Guardian};
 
 class Auth extends Reset
 {
@@ -53,26 +53,12 @@ class Auth extends Reset
     /**
      * @var string
      */
-    protected static string $login_url = "/auth";
+    protected static string $login_url;
 
     /**
      * @var string
      */
-    protected static string $dashboard_url = "/dashboard";
-
-    /**
-     * @param string $login_url
-     * @param string $dashboard_url
-     * 
-     * @return null
-     */
-    public static function defineUrl(string $login_url, string $dashboard_url)
-    {
-        self::$login_url = $login_url;
-        self::$dashboard_url = $dashboard_url;
-
-        return null;
-    }
+    protected static string $dashboard_url;
 
     /**
      * @param string $index
@@ -81,6 +67,8 @@ class Auth extends Reset
      */
     public static function isLogged(string $redirect = "", string $index = "")
     {
+        self::getEnv();
+
         if ($index == '') {
             $index = $_ENV['INDEX_LOGIN'];
         }
@@ -104,6 +92,8 @@ class Auth extends Reset
      */
     public static function isNotLogged(string $redirect = "", string $index = "")
     {
+        self::getEnv();
+
         if ($index == '') {
             $index = $_ENV['INDEX_LOGIN'];
         }
@@ -130,7 +120,7 @@ class Auth extends Reset
         self::$type = 'login';
         self::$table_db = $table;
 
-        return new static();
+        return new static;
     }
 
     /**
@@ -166,6 +156,8 @@ class Auth extends Reset
      */
     public function register(string $redirect = "")
     {
+        self::getEnv();
+
         switch (self::$type) {
             case 'login':
                 return $this->registerLogin($redirect);
@@ -232,8 +224,8 @@ class Auth extends Reset
      */
     public static function isRemembering(string $redirect)
     {
-        if (Cookie::has('auth_remember_login') == true) {
-            $user = Cookie::show('auth_remember_login');
+        if (Cookie::exists('auth_remember_login') == true) {
+            $user = Cookie::get('auth_remember_login');
             Guardian::validate($redirect, $user);
         }
     }
@@ -246,6 +238,18 @@ class Auth extends Reset
     public function timeHash(string $time): Auth
     {
         $this->time_hash = $time;
+
+        return $this;
+    }
+
+    /**
+     * @param string $mail_sender
+     * 
+     * @return Auth
+     */
+    public function mailSender(string $mail_sender): Auth
+    {
+        $this->mail_sender = $mail_sender;
 
         return $this;
     }
@@ -276,6 +280,8 @@ class Auth extends Reset
      */
     public static function logoff(string $redirect = "", string $index = ''): void
     {
+        self::getEnv();
+
         if ($index == '') {
             $index = $_ENV['INDEX_LOGIN'];
         }
@@ -285,6 +291,7 @@ class Auth extends Reset
         }
 
         Session::delete($index);
+        Cookie::unset("auth_remember_login");
         response()->redirect($redirect);
         exit;
     }
@@ -342,7 +349,7 @@ class Auth extends Reset
 
         if ($res) {
             if ($this->remember == true) {
-                Cookie::new("auth_remember_login", $this->user_post, time() + $this->time, "/");
+                Cookie::setcookie("auth_remember_login", $this->user_post, time() + $this->time, "/");
             }
 
             Guardian::validate($redirect, $user);
@@ -386,5 +393,15 @@ class Auth extends Reset
         } else {
             return false;
         }
+    }
+
+    /**
+     * @return void
+     */
+    private static function getEnv(): void
+    {
+        $config = Yaml::parseFile(Application::getDirConfigFiles(5) . 'auth.yaml');
+        self::$dashboard_url = $config['auth']['auth_dashboard_url'];
+        self::$login_url = $config['auth']['auth_login_url'];
     }
 }

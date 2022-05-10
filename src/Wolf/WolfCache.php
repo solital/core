@@ -2,82 +2,146 @@
 
 namespace Solital\Core\Wolf;
 
-abstract class WolfCache
+use Solital\Core\Kernel\Application;
+use Solital\Core\Wolf\Functions\ExtendsTrait;
+
+class WolfCache
 {
-    /**
-     * @var string
-     */
-    protected static $file_cache;
+    use ExtendsTrait;
 
     /**
      * @var string
      */
-    protected static $cache_dir;
+    protected string $file_cache = "";
 
     /**
-     * @var date
+     * @var string
      */
-    protected static $time;
+    protected string $cache_dir;
+
+    /**
+     * @var null|string
+     */
+    protected ?string $time = null;
+
+    /**
+     * @return self
+     */
+    public static function cache(): self
+    {
+        return new static;
+    }
 
     /**
      * @return string
      */
-    protected static function getFolderCache()
+    protected function getFolderCache(): string
     {
-        self::$cache_dir = SITE_ROOT . DIRECTORY_SEPARATOR . "app" . DIRECTORY_SEPARATOR . "Storage" . DIRECTORY_SEPARATOR . "cache" . DIRECTORY_SEPARATOR . "wolf" . DIRECTORY_SEPARATOR;
-
-        if (!is_dir(self::$cache_dir)) {
-            \mkdir(self::$cache_dir);
+        if (Application::isCli() == true) {
+            $this->cache_dir = Application::getRootTest('view/cache/');
+        } else {
+            $this->cache_dir = Application::getRootApp("Storage/cache/wolf/");
         }
 
-        return self::$cache_dir;
+        if (!is_dir($this->cache_dir)) {
+            \mkdir($this->cache_dir);
+        }
+
+        return $this->cache_dir;
     }
 
     /**
-     * @return static
+     * @param string $view
+     * 
+     * @return null|string
      */
-    public static function cache()
+    protected function generateCache(string $view): ?string
     {
-        return new static();
+        if (!empty($this->time) || $this->time != null) {
+            $this->file_cache = $this->getFolderCache() . basename($view, ".php") . "-" . date('Ymd') . "-" . $this->time . ".cache.php";
+            return $this->file_cache;
+        }
+
+        return null;
     }
 
     /**
-     * @return string
+     * @param string $view
+     * 
+     * @return bool
      */
-    public function forOneMinute(): string
+    public function makeCache(string $view): bool
     {
-        self::$time = date('Hi');
+        $dir_view = Application::getRoot("/resources/view");
+        $cache_template = $this->generateCache($view);
 
-        return self::$time;
+        if (file_exists($cache_template)) {
+            include_once $cache_template;
+            exit;
+        }
+
+        $cache_template = file_get_contents($dir_view . $view . ".php");
+        $cache_template = str_replace(["{{", "}}"], ["<?=", "?>"], $cache_template);
+        $cache_template = str_replace(["{%", "%}"], ["<?php", "?>"], $cache_template);
+
+        file_put_contents($this->file_cache, $cache_template);
+
+        return true;
     }
 
     /**
-     * @return string
+     * @param string|null $view
+     * 
+     * @return string|null
      */
-    public function forOneHour(): string
+    protected function loadCache(?string $view): ?string
     {
-        self::$time = date('H');
+        if (file_exists($view)) {
+            ob_start();
+            include_once $view;
+            return ob_get_clean();
+        }
 
-        return self::$time;
+        return null;
     }
 
     /**
-     * @return string
+     * @return WolfCache
      */
-    public function forOneDay(): string
+    public function forOneMinute(): WolfCache
     {
-        self::$time = date('N');
+        $this->time = date('Hi');
 
-        return self::$time;
+        return $this;
     }
 
     /**
-     * @return string
+     * @return WolfCache
      */
-    public function forOneWeek(): string
+    public function forOneHour(): WolfCache
     {
-        self::$time = date('W');
+        $this->time = date('H');
 
-        return self::$time;
+        return $this;
+    }
+
+    /**
+     * @return WolfCache
+     */
+    public function forOneDay(): WolfCache
+    {
+        $this->time = date('N');
+
+        return $this;
+    }
+
+    /**
+     * @return WolfCache
+     */
+    public function forOneWeek(): WolfCache
+    {
+        $this->time = date('W');
+
+        return $this;
     }
 }

@@ -1,12 +1,13 @@
 <?php
 
 use Solital\Core\Cache\Cache;
+use PHPUnit\Framework\TestCase;
 
-class CacheTest extends \PHPUnit\Framework\TestCase
+class CacheTest extends TestCase
 {
     public function testCache()
     {
-        $cache = new Cache(true);
+        $cache = new Cache();
 
         $list = [
             'name' => 'Lorem Ipsum',
@@ -24,7 +25,7 @@ class CacheTest extends \PHPUnit\Framework\TestCase
 
     public function testMultipleCache()
     {
-        $cache = new Cache(true);
+        $cache = new Cache();
 
         $list = [
             'nome' => 'Harvey Specter',

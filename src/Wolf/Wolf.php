@@ -2,167 +2,188 @@
 
 namespace Solital\Core\Wolf;
 
-use ModernPHPException\ModernPHPException;
-use Solital\Core\Wolf\WolfCache;
-use Solital\Core\Wolf\WolfMinifyTrait;
+use Symfony\Component\Yaml\Yaml;
+use Solital\Core\Logger\Logger;
+use Solital\Core\Kernel\Application;
+use Solital\Core\Wolf\{WolfCache, WolfMinifyTrait};
+use Solital\Core\Wolf\Functions\{AssetsTrait, ExtendsTrait};
 
 class Wolf extends WolfCache
 {
     use WolfMinifyTrait;
+    use AssetsTrait;
+    use ExtendsTrait;
+
+    /**
+     * @var null|string
+     */
+    private ?string $main_url;
 
     /**
      * @var string
      */
-    private static string $main_url;
+    private string $dir_view;
 
     /**
      * @var string
      */
-    private static string $dir_view;
+    private string $view;
 
     /**
-     * @return string
+     * @var array
      */
-    private static function getInstance(): string
+    private array $args = [];
+
+    /**
+     * @var array
+     */
+    protected static array $allArgs = [];
+
+    /**
+     * @var Logger
+     */
+    protected Logger $logger;
+
+    /**
+     * Construct
+     */
+    public function __construct()
     {
-        return self::$main_url = '//' . $_SERVER['HTTP_HOST'] . "/";
+        if (Application::isCli() == true) {
+            $this->main_url = Application::getRootTest("view/assets/");
+            $this->dir_view = Application::getRootTest("view/");
+        } else {
+            $this->main_url = '//' . $_SERVER['HTTP_HOST'] . "/";
+            $this->dir_view = Application::getRoot("/resources/view");
+        }
+
+        $this->logger = new Logger('wolf');
     }
 
     /**
-     * @return string
+     * @param array $args
      */
-    private static function getDirView(): string
+    public static function setAllArgs(array $args)
     {
-        self::$dir_view = SITE_ROOT . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . "view" . DIRECTORY_SEPARATOR;
+        self::$allArgs = $args;
+    }
 
-        return self::$dir_view;
+    /**
+     * @return null|array
+     */
+    public static function getAllArgs(): ?array
+    {
+        return self::$allArgs;
     }
 
     /**
      * @param string $view
-     * @param array|null $data
-     * @param string $ext
+     * @param array|null $args
      * 
-     * @return bool
+     * @return mixed
      */
-    public static function loadView(string $view, array $data = null, string $ext = "php"): bool
-    {
-        $template = self::generateTemplate($view, $data, $ext);
-        echo $template;
-
-        return true;
-    }
-
-    /**
-     * @param string $view
-     * @param array|null $data
-     * @param string $ext
-     */
-    private  static function generateTemplate(string $view, array $data = null, string $ext = "php")
+    public function loadView(string $view, array $args = null): mixed
     {
         $view = str_replace(".", DIRECTORY_SEPARATOR, $view);
-        $file = self::getDirView() . $view . '.' . $ext;
 
-        /** Create or browse the cached file  */
-        self::$file_cache = self::getFolderCache() . $view . "-" . date('Ymd') . "-" . self::$time . ".cache.php";
+        $config = Yaml::parseFile(Application::getDirConfigFiles(5) . '/bootstrap.yaml');
 
-        if (strpos($view, "/")) {
-            $file = self::getDirView() . $view . '.' . $ext;
+        $this->setArgs($args);
+        $this->setView($view);
 
-            $viewForCache = str_replace("/", ".", $view);
-            self::$file_cache = self::getFolderCache() . $viewForCache . "-" . date('Ymd') . "-" . self::$time . ".cache.php";
+        if ($config['wolf_cache']['enabled'] == true) {
+            switch ($config['wolf_cache']['time']) {
+                case 'minute':
+                    $this->forOneMinute();
+                    break;
+
+                case 'hour':
+                    $this->forOneHour();
+                    break;
+
+                case 'day':
+                    $this->forOneDay();
+                    break;
+
+                case 'week':
+                    $this->forOneWeek();
+                    break;
+            }
         }
 
-        /** Convert array indexes to variables  */
-        if (isset($data)) {
-            $data = array_map("htmlspecialchars", $data);
-            extract($data, EXTR_SKIP);
+        return $this->render();
+    }
+
+    /**
+     * @param array|null $args
+     * 
+     * @return Wolf
+     */
+    public function setArgs(?array $args): Wolf
+    {
+        if (isset($args)) {
+            $this->args = $args;
+            self::$allArgs = $args;
+            $this->args = $this->htmlspecialcharsRecursive($this->args);
         }
 
-        /** Checks whether the cached file exists  */
-        if (file_exists(self::$file_cache)) {
-            include_once self::$file_cache;
+        return $this;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getArgs(): ?array
+    {
+        return $this->args;
+    }
+
+    /**
+     * @param string $view
+     * @param array|null $data
+     * 
+     * @return Wolf
+     */
+    public function setView(string $view): Wolf
+    {
+        if (str_contains('.', $view)) {
+            $view = str_replace(".", DIRECTORY_SEPARATOR, $view);
+        }
+
+        $this->view = $this->dir_view . $view . '.php';
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function render(): string
+    {
+        $cache_template = $this->generateCache($this->view);
+        $cache_template = $this->loadCache($cache_template);
+
+        if (!empty($cache_template) || $cache_template != null) {
+            echo $cache_template;
             die;
         }
 
-        try {
-            if (file_exists($file)) {
-                ob_start();
+        return $this->generateTemplate($this->view);
+    }
 
-                include_once $file;
-
-                if (self::$time != null) {
-                    $res = ob_get_contents();
-                    ob_flush();
-                    file_put_contents(self::$file_cache, $res);
-
-                    return ob_get_clean();
-                } else {
-                    return ob_get_clean();
-                }
-            } else {
-                throw new \Exception("Template '$view.$ext' not found");
-            }
-        } catch (\Exception $e) {
-            if (!empty($_ENV['PRODUCTION_MODE'])) {
-                if ($_ENV['PRODUCTION_MODE'] == "true") {
-                    (new ModernPHPException())->productionMode();
-                } else {
-                    (new ModernPHPException())->start()->errorHandler(403, "Template '$view.$ext' not found", $e->getFile(), $e->getLine());
-                }
-            } else {
-                (new ModernPHPException())->start()->errorHandler(403, "Template '$view.$ext' not found", $e->getFile(), $e->getLine());
-            }
+    /**
+     * @param mixed $input
+     * 
+     * @return mixed
+     */
+    private function htmlspecialcharsRecursive(mixed $input): mixed
+    {
+        if (is_array($input)) {
+            return array_map(array($this, 'htmlspecialcharsRecursive'), $input);
+        } else if (is_scalar($input)) {
+            return htmlspecialchars($input, ENT_COMPAT | ENT_HTML401, 'UTF-8', false);
+        } else {
+            return $input;
         }
-
-        return __CLASS__;
-    }
-
-    /**
-     * @param string $asset
-     * 
-     * @return string
-     */
-    public static function loadFile(string $asset): string
-    {
-        $file = self::getInstance() . $asset;
-
-        return $file;
-    }
-
-    /**
-     * @param string $asset
-     * 
-     * @return string
-     */
-    public static function loadCss(string $asset): string
-    {
-        $file = self::getInstance() . 'assets/_css/' . $asset;
-
-        return $file;
-    }
-
-    /**
-     * @param string $asset
-     * 
-     * @return string
-     */
-    public static function loadJs(string $asset): string
-    {
-        $file = self::getInstance() . 'assets/_js/' . $asset;
-
-        return $file;
-    }
-
-    /**
-     * @param string $asset
-     * 
-     * @return string
-     */
-    public static function loadImg(string $asset): string
-    {
-        $file = self::getInstance() . 'assets/_img/' . $asset;
-
-        return $file;
     }
 }

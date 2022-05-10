@@ -21,22 +21,22 @@ class EventPsr14Test extends TestCase
 
         $user = new UserTest();
 
-        $provider->addListener(function (UserTest $user) {
-            $GLOBALS['high'] = $user->testHigh();
+        $provider->addListener(function (UserTest $user) use (&$high) {
+            $high = $user->testHigh();
         }, 3);
 
-        $provider->addListener(function (UserTest $user) {
-            $GLOBALS['low'] = $user->testLow();
+        $provider->addListener(function (UserTest $user) use (&$low) {
+            $low = $user->testLow();
         }, 1);
 
-        $provider->addListener(function (UserTest $user) {
-            $GLOBALS['normal'] = $user->testNormal();
+        $provider->addListener(function (UserTest $user) use (&$normal) {
+            $normal = $user->testNormal();
         }, 2);
 
         $event->dispatch($user);
 
-        $this->assertEquals($GLOBALS['high'], "Running High...");
-        $this->assertEquals($GLOBALS['normal'], "Running Normal...");
-        $this->assertEquals($GLOBALS['low'], "Running Low...");
+        $this->assertEquals($high, "Running High...");
+        $this->assertEquals($normal, "Running Normal...");
+        $this->assertEquals($low, "Running Low...");
     }
 }

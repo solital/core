@@ -3,7 +3,7 @@
 namespace Solital\Core\Course\Route;
 
 use Solital\Core\Http\Request;
-use Solital\Core\Course\Handlers\ExceptionHandler;
+use Solital\Core\Exceptions\ExceptionHandlerInterface;
 
 interface GroupRouteInterface extends RouteInterface
 {

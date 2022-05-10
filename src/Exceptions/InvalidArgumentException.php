@@ -2,7 +2,6 @@
 
 namespace Solital\Core\Exceptions;
 
-class InvalidArgumentException extends \InvalidArgumentException
+class InvalidArgumentException extends \Exception
 {
-
 }

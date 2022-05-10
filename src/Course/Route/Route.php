@@ -2,11 +2,9 @@
 
 namespace Solital\Core\Course\Route;
 
-use Closure;
-use Solital\Core\Http\Middleware\MiddlewareInterface;
-use Solital\Core\Http\Request;
-use Solital\Core\Exceptions\NotFoundHttpException;
 use Solital\Core\Course\Router;
+use Solital\Core\Http\{Request, Middleware\MiddlewareInterface};
+use Solital\Core\Exceptions\{NotFoundHttpException, RuntimeException};
 
 abstract class Route implements RouteInterface
 {
@@ -75,19 +73,13 @@ abstract class Route implements RouteInterface
      */
     public function renderRoute(Request $request, Router $router): ?string
     {
-        $router->debug('Starting rendering route "%s"', \get_class($this));
-
         $callback = $this->getCallback();
 
         if ($callback === null) {
             return null;
         }
 
-        $router->debug('Parsing parameters');
-
         $parameters = $this->getParameters();
-
-        $router->debug('Finished parsing parameters');
 
         /* Filter parameters with null-value */
         if ($this->filterEmptyParams === true) {
@@ -98,22 +90,15 @@ abstract class Route implements RouteInterface
 
         /* Render callback function */
         if (\is_callable($callback) === true) {
-            $router->debug('Executing callback');
-
             /* When the callback is a function */
             return $router->getClassLoader()->loadClosure($callback, $parameters);
         }
 
         /* When the callback is a class + method */
         $controller = explode('@', $callback);
-
         $this->setControllerName($controller);
-
         $namespace = $this->getNamespace();
-
         $className = ($namespace !== null && $controller[0][0] !== '\\') ? $namespace . '\\' . $controller[0] : $controller[0];
-
-        $router->debug('Loading class %s', $className);
         $class = $router->getClassLoader()->loadClass($className);
 
         if (\count($controller) === 1) {
@@ -123,10 +108,8 @@ abstract class Route implements RouteInterface
         $method = $controller[1];
 
         if (method_exists($class, $method) === false) {
-            throw new \Exception("Method '$method' doesn't exist in namespace '$className'", 404);
+            throw new RuntimeException("Method '$method' doesn't exist in namespace '$className'", 404);
         }
-
-        $router->debug('Executing callback');
 
         return \call_user_func_array([$class, $method], $parameters);
     }
@@ -266,7 +249,6 @@ abstract class Route implements RouteInterface
         $this->group = $group;
 
         /* Add/merge parent settings with child */
-
         return $this->setSettings($group->toArray(), true);
     }
 
@@ -621,7 +603,7 @@ abstract class Route implements RouteInterface
      */
     public function setControllerName($controller_name)
     {
-        if ($controller_name instanceof Closure) {
+        if ($controller_name instanceof \Closure) {
             $controller_name = "Closure";
         }
 

@@ -5,12 +5,10 @@ declare(strict_types=1);
 namespace Solital\Core\Http;
 
 use Psr\Http\Message\StreamInterface;
-use Solital\Core\Exceptions\RuntimeException;
-use Solital\Core\Exceptions\InvalidArgumentException;
+use Solital\Core\Exceptions\{RuntimeException, InvalidArgumentException};
 
 class Stream implements StreamInterface
 {
-
     /**
      * The HTTP stream resource.
      *

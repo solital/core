@@ -3,7 +3,8 @@
 namespace Solital\Core\Cache;
 
 use Psr\SimpleCache\CacheInterface;
-use Solital\Core\Exceptions\InvalidArgumentException;
+use Solital\Core\Kernel\Application;
+use Solital\Core\Cache\Exception\InvalidArgumentException;
 
 class Cache implements CacheInterface
 {
@@ -20,23 +21,25 @@ class Cache implements CacheInterface
     /**
      * Return a directory of the cache
      */
-    public function __construct($test = false)
+    public function __construct()
     {
-        if ($test == true) {
-            $this->value = "tests" . DIRECTORY_SEPARATOR . "files_test" . DIRECTORY_SEPARATOR;
+        if (Application::DEBUG == true) {
+            $this->value = Application::getRootTest('cache/');
         } else {
-            $this->value = SITE_ROOT . DIRECTORY_SEPARATOR . "app" . DIRECTORY_SEPARATOR . "Storage" . DIRECTORY_SEPARATOR . "cache" . DIRECTORY_SEPARATOR;
+            $this->value = Application::getRootApp("Storage/cache/");
         }
     }
 
     /**
      * @param string $key A value of key
      * @return mixed
+     * 
+     * @throws InvalidArgumentException
      */
-    public function get($key, $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         if (!is_string($key)) {
-            throw new InvalidArgumentException("The parameter informed must be equal to string", 500);
+            throw new InvalidArgumentException("$key must be equal to string");
         }
 
         $file_in_cache = $this->value . $key . ".cache.php";
@@ -57,18 +60,20 @@ class Cache implements CacheInterface
      * @param string           $key A value of key
      * @param mixed            $value The value that will be created the cache
      * @param int|DateInterval $ttl The TTL value of this item
+     * 
+     * @throws InvalidArgumentException
      */
-    public function set($key, $value, $ttl = null): bool
+    public function set(string $key, mixed $value, null|int|\DateInterval $ttl = null): bool
     {
         if ($ttl == null) {
             $ttl = 20;
         }
 
         if (!is_string($key)) {
-            throw new InvalidArgumentException("The parameter $key informed must be equal to string", 500);
+            throw new InvalidArgumentException("$key must be equal to string");
         }
 
-        if (!$ttl instanceof \DateInterval && !is_int($ttl)) {
+        if (!$ttl instanceof \DateInterval || !is_int($ttl)) {
             throw new InvalidArgumentException("$ttl is not a valid value. Enter a value equal to int or DateInterval", 500);
         }
 
@@ -99,11 +104,14 @@ class Cache implements CacheInterface
 
     /**
      * @param string $key The unique cache key of the item to delete.
+     * 
+     * @return bool
+     * @throws InvalidArgumentException
      */
-    public function delete($key): bool
+    public function delete(string $key): bool
     {
         if (!is_string($key)) {
-            throw new InvalidArgumentException("The parameter informed must be equal to string", 500);
+            throw new InvalidArgumentException("$key must be equal to string");
         }
 
         $file_for_cache = $this->value . $key . ".cache.php";
@@ -144,10 +152,10 @@ class Cache implements CacheInterface
      * 
      * @return bool
      */
-    public function has($key): bool
+    public function has(string $key): bool
     {
         if (!is_string($key)) {
-            throw new InvalidArgumentException("The parameter informed must be equal to string", 500);
+            throw new InvalidArgumentException("$key must be equal to string");
         }
 
         $file_in_cache = $this->value . $key . ".cache.php";
@@ -163,12 +171,13 @@ class Cache implements CacheInterface
      * @param mixed $keys A list of keys that can obtained in a single operation.
      * @param null $default
      * 
-     * @return iterable|null
+     * @return iterable
+     * @throws InvalidArgumentException
      */
-    public function getMultiple($keys, $default = null): ?iterable
+    public function getMultiple(iterable $keys, mixed $default = null): iterable
     {
-        if (!is_array($keys)) {
-            throw new InvalidArgumentException("The parameter informed must be equal to array", 500);
+        if (!is_iterable($keys)) {
+            throw new InvalidArgumentException("$keys must be equal to array or a Traversable");
         }
 
         foreach ($keys as $key => $value) {
@@ -190,23 +199,24 @@ class Cache implements CacheInterface
     }
 
     /**
-     * @param array $values The value that will be created the cache with the keys
-     * @param mixed $ttl     The TTL value of this item
+     * @param iterable $values The value that will be created the cache with the keys
+     * @param null|int|\DateInterval $ttl     The TTL value of this item
      * 
      * @return bool
+     * @throws InvalidArgumentException
      */
-    public function setMultiple($values, $ttl = null): bool
+    public function setMultiple(iterable $values, null|int|\DateInterval $ttl = null): bool
     {
         if ($ttl == null) {
             $ttl = 20;
         }
 
-        if (!is_array($values)) {
-            throw new InvalidArgumentException("The parameter informed must be equal to array", 500);
+        if (!is_iterable($values)) {
+            throw new InvalidArgumentException("$values must be equal to array or a Traversable");
         }
 
         if (!$ttl instanceof \DateInterval && !is_int($ttl)) {
-            throw new InvalidArgumentException("$ttl is not a valid value. Enter a value equal to int or DateInterval", 500);
+            throw new InvalidArgumentException("$ttl is not a valid value. Enter a value equal to int or DateInterval");
         }
 
         foreach ($values as $key => $value) {
@@ -238,12 +248,12 @@ class Cache implements CacheInterface
     /**
      * @param iterable $keys A list of string-based keys to be deleted.
      * 
-     * @return Cache
+     * @return bool
      */
-    public function deleteMultiple($keys)
+    public function deleteMultiple(iterable $keys): bool
     {
-        if (!is_array($keys) && !is_string($keys)) {
-            throw new InvalidArgumentException("The parameter informed must be equal to array", 500);
+        if (!is_iterable($keys)) {
+            throw new InvalidArgumentException("$keys must be equal to array or a Traversable");
         }
 
         if (is_array($keys)) {
@@ -262,12 +272,14 @@ class Cache implements CacheInterface
      * 
      * @return Cache
      */
-    private function verifyMultipleKeys($keys)
+    private function verifyMultipleKeys($keys): Cache
     {
         $file_in_cache = $this->value . $keys . ".cache.php";
 
         if (file_exists($file_in_cache)) {
             unlink($file_in_cache);
         }
+
+        return $this;
     }
 }

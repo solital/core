@@ -3,8 +3,7 @@
 namespace Solital\Core\Course\Event;
 
 use Solital\Core\Http\Request;
-use Solital\Core\Course\Router;
-use Solital\Core\Course\Event\EventArgumentInterface;
+use Solital\Core\Course\{Router, Event\EventArgumentInterface};
 
 class EventArgument implements EventArgumentInterface
 {

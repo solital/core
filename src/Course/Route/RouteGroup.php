@@ -3,10 +3,8 @@
 namespace Solital\Core\Course\Route;
 
 use Solital\Core\Http\Request;
-use Solital\Core\Course\Route\Route;
-use Solital\Core\Course\Route\RouteInterface;
-use Solital\Core\Course\Route\GroupRouteInterface;
 use Solital\Core\Exceptions\ExceptionHandlerInterface;
+use Solital\Core\Course\{Route\Route, Route\RouteInterface, Route\GroupRouteInterface};
 
 class RouteGroup extends Route implements GroupRouteInterface
 {
@@ -14,12 +12,12 @@ class RouteGroup extends Route implements GroupRouteInterface
      * @var string
      */
     protected $prefix;
-    
+
     /**
      * @var string
      */
     protected $name;
-    
+
     /**
      * @var array
      */

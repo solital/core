@@ -3,9 +3,7 @@
 namespace Solital\Core\Course\Route;
 
 use Solital\Core\Http\Request;
-use Solital\Core\Course\Route\LoadableRoute;
-use Solital\Core\Course\Route\RouteInterface;
-use Solital\Core\Course\Route\ControllerRouteInterface;
+use Solital\Core\Course\{Route\RouteInterface, Route\LoadableRoute, Route\ControllerRouteInterface};
 
 class RouteController extends LoadableRoute implements ControllerRouteInterface
 {
@@ -17,12 +15,12 @@ class RouteController extends LoadableRoute implements ControllerRouteInterface
     /**
      * @var mixed
      */
-    protected $controller;
+    protected mixed $controller;
 
     /**
      * @var string
      */
-    protected string $method;
+    protected ?string $method = null;
 
     /**
      * @var array
@@ -103,7 +101,7 @@ class RouteController extends LoadableRoute implements ControllerRouteInterface
             $url .= '//' . $group->getDomains()[0];
         }
 
-        $url .= '/' . trim($this->getUrl(), '/') . '/' . strtolower($method) . implode('/', $parameters);
+        $url .= '/' . trim($this->getUri(), '/') . '/' . strtolower($method) . implode('/', $parameters);
 
         return '/' . trim($url, '/') . '/';
     }

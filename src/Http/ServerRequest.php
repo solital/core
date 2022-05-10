@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Solital\Core\Http;
 
-use Psr\Http\Message\StreamInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Solital\Core\Http\Traits\RequestTrait;
 use Solital\Core\Exceptions\InvalidArgumentException;
+use Psr\Http\Message\{StreamInterface, ServerRequestInterface};
 
 class ServerRequest implements ServerRequestInterface
 {

@@ -10,56 +10,56 @@ class Uri implements \JsonSerializable, UriInterface
     /**
      * @var null|string
      */
-    private $originalUrl;
+    private ?string $originalUrl;
 
     /**
      * The URI user info.
      *
      * @var null|string
      */
-    private $userInfo;
+    private ?string $userInfo;
 
     /**
      * The URI scheme without "://" suffix.
      *
      * @var null|string
      */
-    private $scheme;
+    private ?string $scheme;
 
     /**
      * The URI host.
      *
-     * @var string
+     * @var null|string
      */
-    private $host;
+    private ?string $host;
 
     /**
      * The URI port.
      *
-     * @var int|null
+     * @var null|int
      */
-    private $port;
+    private ?int $port;
 
     /**
      * The URI username.
      *
      * @var null|string
      */
-    private $username;
+    private ?string $username;
 
     /**
      * The URI password.
      *
      * @var null|string
      */
-    private $password;
+    private ?string $password;
 
     /**
      * The URI path.
      *
      * @var null|string
      */
-    private $path;
+    private ?string $path;
 
     /**
      * Params.
@@ -72,14 +72,14 @@ class Uri implements \JsonSerializable, UriInterface
      *
      * @var null|string
      */
-    private $fragment;
+    private ?string $fragment;
 
     /**
      * The URI query.
      *
      * @var null|string
      */
-    private $query;
+    private ?string $query;
 
     /**
      * Url constructor.

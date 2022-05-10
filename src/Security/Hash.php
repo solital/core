@@ -23,8 +23,8 @@ class Hash
      */
     public static function checkSecrets(): void
     {
-        if ($_ENV['FIRST_SECRET'] == "" || $_ENV['SECOND_SECRET'] == "") {
-            throw new \Exception("Empty OPENSSL variables", 404);
+        if (getenv('FIRST_SECRET') == "" || getenv('SECOND_SECRET') == "") {
+            throw new \Exception("Empty OPENSSL secrets", 404);
         }
     }
 
@@ -49,7 +49,7 @@ class Hash
             'expire_at' => $res
         ];
 
-        $key = openssl_encrypt(json_encode($data), "AES-128-CBC", pack('a16', $_ENV['FIRST_SECRET']), 0, pack('a16', $_ENV['SECOND_SECRET']));
+        $key = openssl_encrypt(json_encode($data), "AES-128-CBC", pack('a16', getenv('FIRST_SECRET')), 0, pack('a16', getenv('SECOND_SECRET')));
         $key = base64_encode($key);
         $key = str_replace("==", "EQUALS", $key);
 
@@ -73,7 +73,7 @@ class Hash
 
         $key = str_replace("EQUALS", "==", $key);
         $decode = base64_decode($key);
-        $decode = openssl_decrypt($decode, "AES-128-CBC", pack('a16', $_ENV['FIRST_SECRET']), 0, pack('a16', $_ENV['SECOND_SECRET']));
+        $decode = openssl_decrypt($decode, "AES-128-CBC", pack('a16', getenv('FIRST_SECRET')), 0, pack('a16', getenv('SECOND_SECRET')));
 
         self::$decoded = $decode;
 

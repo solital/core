@@ -3,11 +3,8 @@
 namespace Solital\Core\Course\Route;
 
 use Solital\Core\Http\Request;
-use Solital\Core\Course\Router;
-use Solital\Core\Course\Route\Route;
 use Solital\Core\Exceptions\NotFoundHttpException;
-use Solital\Core\Course\Route\LoadableRouteInterface;
-use Solital\Core\Http\Middleware\MiddlewareInterface;
+use Solital\Core\Course\{Router, Route\Route, Route\LoadableRouteInterface};
 
 abstract class LoadableRoute extends Route implements LoadableRouteInterface
 {
@@ -36,24 +33,16 @@ abstract class LoadableRoute extends Route implements LoadableRouteInterface
 
     public function loadMiddleware(Request $request, Router $router): void
     {
-        $router->debug('Loading middlewares');
-
         foreach ($this->getMiddlewares() as $middleware) {
             $middleware = explode(':', $middleware);
             $class = $router->getClassLoader()->loadClass(array_shift($middleware));
-
-            $router->debug('Loading middleware "%s"', $class);
 
             if (!method_exists($class, 'handle')) {
                 throw new \Exception("'handle' method not found in namespace " . $this->getMiddlewares()[0], 404);
             }
 
             call_user_func_array([$class, 'handle'], $middleware);
-
-            $router->debug('Finished loading middleware "%s"', $class);
         }
-
-        $router->debug('Finished loading middlewares');
     }
 
     /**

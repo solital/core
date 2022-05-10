@@ -1,171 +1,64 @@
 # Released Notes
 
-## v2.4.0 - (2021-12-04)
+## v3.0.0 - (2022-04-xx)
 
 ### Added
 
-- Added helper for `Message` class
-- Added helper for view
-- Added helper `multi_array_value`
-- Added support localstorage and sessionstorage
-- Added support to verify different domain
-- Added remember password when logging in
-- Added `JsonSerializable` class
-- Added `Crypt` class
-- Added `Diff` class
+- Added PHP 8.0 support
+- Added `SecurePassword` component
+- Added PSR-6
+- Added `getenv` function
+- Added command to copy configuration files
+- Added YAML support
+- Added `BaseController` class
+- Added `mapped_implode`, `middleware`, `cache` and `view` helpers
+- Added Kernel component
+- Added Migrations and Seeds
+- Added logging on Wolf and routes
+- Added Katrina ORM 2
+- Added autoload in helpers and routers files
+- Added Queue and QueueMail
+- Added support for creating custom commands
+- Added `Request::limit` and `Request::repeat`
+- Added WolfException class
+- Added pure HTML template support in Wolf Template
+- Added `makeCache` method in WolfCache class
+- Added new `Session`, `Cookie`, `Console`, `Container` and `Logger` components
 
 ### Changed
 
-- Changed `NativeMail` class as deprecated
+- Changed namespace of all classes
+- Changed `Controller.php` and `Model.php`
+- Changed password helpers compatible with `SecurePassword` component
+- Changed constantes in `Auth` class
+- Changed Bootstrap version
+- Changed Wolf Template Cache
+- Changed `FileSystem,`, `Mail` and `Validation` folders to root
+- Changed method to check different project domain
+- Changed `Dump` class
 
 ### Fixed
 
-- Fixed special characters in Wolf
+- Fixed methods in `Request` class
+- Fixed `copy` in `HandleFiles`
+- Fixed `Convertime` class
+- Fixed return in helper `view`
+- Fixed Exception in Logger
+- Fixed messages in Console
+- Fixed constant SITE_ROOT
+- Fixed Wolf Template
+- Fixed Exceptions
+- Fixed Mailer
+- Fixed Guardian login
+- Fixed `htmlspecialchars` in Wolf
+- Fixed filter FILTER_SANITIZE_STRING to FILTER_SANITIZE_FULL_SPECIAL_CHARS
+- Fixed verify `$_GET` and `$_POST` variables
 
 ### Removed
 
-- Removed helpers `ServerRequest` and `Upload`
-- Removed support for NativeMail in `Auth` and `Reset` class
-
+- Removed deprecated class
+- Removed `NativeMail` class
+- Removed `logger` helper
+- Removed debug methods
+- Removed command to minify assets
 --------------------------------------------------------------------------
-
-## v2.3.1 - (2021-10-30)
-
-### Changed
-
-- Changed `loadView` method
-
-### Fixed
-
-- Fixed ModernPHPException in `Course` class
-- Fixed `error` method
-- Fixed Bootstrap CSS version
-- Fixed `Colors` class
-- Fixed `ob_get_clean()` function in Wolf template
-
---------------------------------------------------------------------------
-
-## v2.3.0 - (2021-10-06)
-
-### Added
-
-- Added Modern PHP Exception component
-- Added CRUD skeleton in Model template
-- Added `session` helper
-- Added `isWeekend` method in `Convertime` class
-- Added new tests
-
-### Changed
-
-- Changed cache test directory
-- Changed `is_json` helper
-- Changed `Valid` class
-
-### Fixed
-
-- Fixed `all` method in `InputHandler` class
-- Fixed `refresh` method in `Response` class
-- Fixed directory in Wolf template
-
-### Removed
-
-- Removed comments
-
---------------------------------------------------------------------------
-
-## v2.2.2 - (2021-06-29)
-
-### Added
-
-- Added test for Cache
-
-### Changed
-
-- Change Bootstrap CDN
-
-### Fixed
-
-- Fixed bug Database in `Guardian` class
-- Fixed return type in `Cache` class
-
---------------------------------------------------------------------------
-
-## v2.2.1 - (2021-06-28)
-
-### Fixed
-
-- Fixed bug in Wolf Template
-
---------------------------------------------------------------------------
-
-## v2.2.0 - (2021-06-19)
-
-### Added
-
-- Added minify by Vinci
-- Added method to get data from `php://input`
-
-### Removed
-
-- Removed `WolfMinify` class
-- Removed unnecessary comments
-
---------------------------------------------------------------------------
-
-## v2.1.0 - (2021-04-23)
-
-### Added
-
-- Added new helper: `console_log()`
-- Added support for Sodium encryption
-- Added `respect\validation` package
-- Added `isBase64` and `identical` methods in `Valid`
-- Added new tests
-
-### Fixed
-
-- Fixed namespace in helper output 
-- Fixed PSR-14
-- Fixed validation in `Valid` and `is_json`
-
---------------------------------------------------------------------------
-## v2.0.0 - (2021-04-15)
-
-### Added
-
-- Added typing on attributes
-- Added new commands in Vinci Console
-- Added support for CSS/JS minification
-- Added new features in `HandleFiles`
-- Added functions to helpers
-- Added cache when executing Katrina command
-- Added CSS bootstrap in login, forgot and dashboard files
-- Added JSON return in the `input` method
-- Added database dump support 
-- Added `Controller.php`
-- Added support and tests to PHPUnit
-- Added `katrinaVersion` command 
-
-### Fixed
-
-- Fixed several bugs during the alpha and beta versions
-- Fixed typing on attributes
-- Fixed bugs in Console
-- Fixed comments and typing in the Container 
-
-### Removed
-
-- Removed the `clear` method in the `Message` class
-- Removed `destroy` method in the `Session` class
-- Removed the `cache` and `json` methods from the `Response` class
-
-### Changed
-
-- Changed error template
-- Changed helpers to the Core
-- Changed Database folder for Core
-- Changed `AuthController` to `Auth`
-- Changed Vinci Console in a scalable way
-- Changed `Hash` class method
-- Changed Wolf cache
-- Changed Login and Forgot structure

@@ -1,16 +1,12 @@
 <?php
 
+use Solital\Core\Http\Middleware\BaseMiddlewareInterface;
 use Solital\Core\Http\Request;
-use Solital\Core\Http\Middleware\MiddlewareInterface;
 
-class RewriteMiddleware implements MiddlewareInterface {
-
-    public function handle(Request $request)  : void {
-
-        $request->setRewriteCallback(function() {
-            return 'ok';
-        });
-
+class RewriteMiddleware implements BaseMiddlewareInterface
+{
+    public function handle(): void
+    {
+        echo 'middleware-';
     }
-
 }

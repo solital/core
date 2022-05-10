@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace Solital\Core\Http;
 
-use Psr\Http\Message\StreamInterface;
-use Psr\Http\Message\UploadedFileInterface;
-use Solital\Core\Exceptions\RuntimeException;
-use Solital\Core\Exceptions\InvalidArgumentException;
+use Psr\Http\Message\{StreamInterface, UploadedFileInterface};
+use Solital\Core\Exceptions\{RuntimeException, InvalidArgumentException};
 
 class UploadedFile implements UploadedFileInterface
 {
-
     /**
      * The client-provided full path to the file.
      *
@@ -24,7 +21,7 @@ class UploadedFile implements UploadedFileInterface
      *
      * @var \Psr\Http\Message\StreamInterface
      */
-    private $stream;
+    private StreamInterface $stream;
 
     /**
      * The size of the file in bytes.
@@ -45,14 +42,14 @@ class UploadedFile implements UploadedFileInterface
      *
      * @var null|string
      */
-    private $clientFilename;
+    private ?string $clientFilename;
 
     /**
      * The client-provided media type of the file.
      *
      * @var null|string
      */
-    private $clientMediaType;
+    private ?string $clientMediaType;
 
     /**
      * Indicates if the uploaded file has already been moved.
@@ -66,7 +63,7 @@ class UploadedFile implements UploadedFileInterface
      *
      * @var bool
      */
-    private $sapi;
+    private bool $sapi;
 
     /**
      * Create a new uploaded file instance.

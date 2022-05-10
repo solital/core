@@ -55,12 +55,12 @@ class SilentTokenProvider implements TokenProviderInterface {
      */
     public function setToken(int $seconds = 20): string
     {
-        if (Session::show(static::CSRF_VALIDATE) < time() || empty(Session::show(static::CSRF_VALIDATE))) {
-            Session::new(static::CSRF_VALIDATE, time() + $seconds);
+        if (Session::get(static::CSRF_VALIDATE) < time() || empty(Session::get(static::CSRF_VALIDATE))) {
+            Session::set(static::CSRF_VALIDATE, time() + $seconds);
             $token = base64_encode(random_bytes(20));
-            Session::new(static::CSRF_KEY, $token);
+            Session::set(static::CSRF_KEY, $token);
         }
 
-        return Session::show(static::CSRF_KEY);
+        return Session::get(static::CSRF_KEY);
     }
 }

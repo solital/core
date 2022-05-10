@@ -1,0 +1,1 @@
+<h1>home test <?= strtoupper($name) ?></h1><p><?= $email ?></p>

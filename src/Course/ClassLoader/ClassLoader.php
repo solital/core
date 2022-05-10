@@ -2,8 +2,7 @@
 
 namespace Solital\Core\Course\ClassLoader;
 
-use ReflectionFunction;
-use Solital\Core\Exceptions\NotFoundHttpException;
+use Solital\Core\Exceptions\RuntimeException;
 
 class ClassLoader implements ClassLoaderInterface
 {
@@ -28,12 +27,12 @@ class ClassLoader implements ClassLoaderInterface
      * @param string $class
      * 
      * @return mixed
-     * @throws NotFoundHttpException
+     * @throws RuntimeException
      */
     public function loadClass(string $class)
     {
         if (class_exists($class) === false) {
-            throw new \Exception("Class '$class' does not exist", 404);
+            throw new RuntimeException("Class '$class' does not exist", 404);
         }
 
         return new $class();
@@ -42,12 +41,12 @@ class ClassLoader implements ClassLoaderInterface
     /**
      * Load closure
      *
-     * @param \Closure $closure
+     * @param mixed $closure
      * @param array $parameters
      * 
      * @return void
      */
-    public function loadClosure(\Closure $closure, array $parameters)
+    public function loadClosure(mixed $closure, array $parameters)
     {
         $this->closureHasParam($closure, $parameters);
     }
@@ -57,11 +56,11 @@ class ClassLoader implements ClassLoaderInterface
      * @param array $parameters
      * 
      * @return mixed|null
-     * @throws NotFoundHttpException
+     * @throws RuntimeException
      */
     public function closureHasParam(\Closure $closure, array $parameters)
     {
-        $reflect = new ReflectionFunction($closure);
+        $reflect = new \ReflectionFunction($closure);
 
         foreach ($reflect->getParameters() as $closure_params) {
             $closure_params = (array)$closure_params;
@@ -78,7 +77,7 @@ class ClassLoader implements ClassLoaderInterface
         if (empty($diff1) && empty($diff2)) {
             return \call_user_func_array($closure, $parameters);
         } else {
-            throw new \Exception("Parameter not defined in the URL or function", 404);
+            throw new RuntimeException("Parameter not defined in the URL or function", 404);
         }
 
         return null;

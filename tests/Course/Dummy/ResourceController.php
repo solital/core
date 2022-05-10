@@ -2,7 +2,6 @@
 
 class ResourceController
 {
-
     public function index() : ?string
     {
         echo 'index';

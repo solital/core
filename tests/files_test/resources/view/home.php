@@ -1,0 +1,1 @@
+<h1>home test {{ $name }}</h1><p>{% strtoupper("$name") %}</p>

@@ -2,7 +2,6 @@
 
 namespace Solital\Core\Http;
 
-use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Solital\Core\Http\Traits\MessageTrait;
 use Solital\Core\Exceptions\InvalidArgumentHttpException;
@@ -23,7 +22,7 @@ class Response implements ResponseInterface
      *
      * @var string
      */
-    private $header;
+    private ?string $header;
 
     /**
      * Reason phrase
@@ -37,7 +36,7 @@ class Response implements ResponseInterface
      *
      * @var Request
      */
-    protected $request;
+    protected Request $request;
 
     /**
      * Status codes and reason phrases
@@ -118,11 +117,11 @@ class Response implements ResponseInterface
 
     /**
      * @param Request $request
-     * @param null $body
+     * @param mixed $body
      * @param int $code
      * @param array $headers
      */
-    public function __construct(Request $request, $body = null, $code = 200, array $headers = [])
+    public function __construct(Request $request, mixed $body = null, int $code = 200, array $headers = [])
     {
         $this->request = $request;
 
@@ -140,9 +139,10 @@ class Response implements ResponseInterface
      * Set the http status code
      *
      * @param int $code
-     * @return static
+     * 
+     * @return Response
      */
-    public function httpCode(int $code): self
+    public function httpCode(int $code): Response
     {
         http_response_code($code);
 
@@ -153,7 +153,7 @@ class Response implements ResponseInterface
      * Redirect the response
      *
      * @param string $url
-     * @param int $httpCode
+     * @param null|int $httpCode
      */
     public function redirect(string $url, ?int $httpCode = null): void
     {
@@ -223,37 +223,23 @@ class Response implements ResponseInterface
         $code = $this->sanitizeStatus($code);
 
         if (!is_string($reasonPhrase)) {
-            throw new InvalidArgumentException("HTTP reason phrase must be a 'string', received '" . (is_object($reasonPhrase) ? get_class($reasonPhrase) : gettype($reasonPhrase)) . "'", 400);
+            throw new \InvalidArgumentException("HTTP reason phrase must be a 'string', received '" . (is_object($reasonPhrase) ? get_class($reasonPhrase) : gettype($reasonPhrase)) . "'", 400);
         }
 
         $clone = clone $this;
         $clone->statusCode = $code;
 
-        if ($reasonPhrase === '' && isset(self::$messages[$code])) {
-            $reasonPhrase = self::$messages[$code];
+        if ($reasonPhrase === '' && isset($this->messages[$code])) {
+            $reasonPhrase = $this->messages[$code];
         }
 
         if ($reasonPhrase === '') {
-            throw new InvalidArgumentException("The HTTP reason phrase must be supplied for this code", 417);
+            throw new \InvalidArgumentException("The HTTP reason phrase must be supplied for this code", 417);
         }
 
         $clone->reasonPhrase = $reasonPhrase;
 
         return $clone;
-    }
-
-    /**
-     * @param mixed $code
-     * @return int
-     * @throws \InvalidArgumentHttpException For invalid status code arguments.
-     */
-    private function sanitizeStatus($code): int
-    {
-        if (!is_numeric($code) || is_float($code) || $code < 100 || $code > 599) {
-            throw new InvalidArgumentException("Invalid HTTP status code. Must be numeric and between 100 and 599", 400);
-        }
-
-        return (int) $code;
     }
 
     /**
@@ -265,8 +251,22 @@ class Response implements ResponseInterface
             return $this->reasonPhrase;
         }
 
-        if (isset(self::$messages[$this->statusCode])) {
-            return self::$messages[$this->statusCode];
+        if (isset($this->messages[$this->statusCode])) {
+            return $this->messages[$this->statusCode];
         }
+    }
+
+    /**
+     * @param mixed $code
+     * @return int
+     * @throws \InvalidArgumentHttpException For invalid status code arguments.
+     */
+    private function sanitizeStatus($code): int
+    {
+        if (!is_numeric($code) || is_float($code) || $code < 100 || $code > 599) {
+            throw new \InvalidArgumentException("Invalid HTTP status code. Must be numeric and between 100 and 599", 400);
+        }
+
+        return (int) $code;
     }
 }

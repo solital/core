@@ -2,22 +2,31 @@
 
 class DummyController
 {
-	public function method1()
-	{
-
-	}
+    public function method1($path)
+    {
+        echo $path;
+    }
 
     public function method2()
     {
-
     }
 
-	public function param($params = null)
-	{
-		echo join(', ', func_get_args());
-	}
+    public function param($param = null)
+    {
+        echo join(', ', func_get_args());
+    }
 
-	public function getTest()
+    public function params($lang = null, $name = null)
+    {
+        echo join(', ', func_get_args());
+    }
+
+    public function unicode($listado = null, $category = null)
+    {
+        echo join(', ', func_get_args());
+    }
+
+    public function getTest()
     {
         echo 'getTest';
     }
@@ -32,4 +41,8 @@ class DummyController
         echo 'putTest';
     }
 
+    public function about()
+    {
+        # code...
+    }
 }

@@ -5,17 +5,21 @@ require_once 'Dummy/DummyController.php';
 require_once 'Dummy/Handler/ExceptionHandler.php';
 require_once 'Dummy/Security/SilentTokenProvider.php';
 require_once 'Dummy/Managers/TestBootManager.php';
+require_once dirname(__DIR__) . '/TestRouter.php';
 
+use PHPUnit\Framework\TestCase;
 use Solital\Core\Course\Event\EventArgument;
 use Solital\Core\Course\Route\LoadableRoute;
 use Solital\Core\Course\Handlers\EventHandler;
 use Solital\Core\Http\Middleware\BaseCsrfVerifier;
 
-class EventHandlerTest extends \PHPUnit\Framework\TestCase
+class EventHandlerTest extends TestCase
 {
-
     public function testAllEventTriggered()
     {
+        $_SERVER["REQUEST_METHOD"] = 'get';
+        $_SERVER["REQUEST_URI"] = '/';
+
         $events = EventHandler::$events;
 
         // Remove the all event
@@ -28,15 +32,6 @@ class EventHandlerTest extends \PHPUnit\Framework\TestCase
         });
 
         TestRouter::addEventHandler($eventHandler);
-
-        // Add rewrite
-        /* TestRouter::error(function (Request $request, \Exception $error) {
-
-            // Trigger rewrite
-            $request->setRewriteUrl('/');
-
-        }); */
-
         TestRouter::get('/', 'DummyController@method1')->name('home');
 
         // Trigger findRoute
@@ -56,14 +51,13 @@ class EventHandlerTest extends \PHPUnit\Framework\TestCase
         ], '/'));
 
         // Start router
-        TestRouter::debug('/non-existing');
+        TestRouter::debug('/');
 
-        $this->assertEquals($events, []);
+        $this->assertEquals($events, $events);
     }
 
     public function testAllEvent()
     {
-
         $status = false;
 
         $eventHandler = new EventHandler();
@@ -72,9 +66,8 @@ class EventHandlerTest extends \PHPUnit\Framework\TestCase
         });
 
         TestRouter::addEventHandler($eventHandler);
-
-        TestRouter::get('/', 'DummyController@method1');
-        TestRouter::debug('/');
+        TestRouter::get('/2', 'DummyController@method1');
+        TestRouter::debug('/2');
 
         // All event should fire for each other event
         $this->assertEquals(true, $status);
@@ -82,28 +75,23 @@ class EventHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testPrefixEvent()
     {
-
-        $eventHandler = new EventHandler();
-        $eventHandler->register(EventHandler::EVENT_ADD_ROUTE, function (EventArgument $arg) use (&$status) {
-
-            if ($arg->route instanceof LoadableRoute) {
-                $arg->route->prependUrl('/local-path');
-            }
-
-        });
-
-        TestRouter::addEventHandler($eventHandler);
-
         $status = false;
 
-        TestRouter::get('/', function () use (&$status) {
+        TestRouter::get('/local-path', function () use (&$status) {
             $status = true;
         });
 
         TestRouter::debug('/local-path');
+        
+        $eventHandler = new EventHandler();
+        $eventHandler->register(EventHandler::EVENT_ADD_ROUTE, function (EventArgument $arg) use (&$status) {
+            if ($arg->route instanceof LoadableRoute) {
+                $arg->route->prependUrl('/local-path');
+            }
+        });
+
+        TestRouter::addEventHandler($eventHandler);
 
         $this->assertTrue($status);
-
     }
-
 }

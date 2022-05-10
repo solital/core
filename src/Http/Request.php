@@ -5,12 +5,9 @@ declare(strict_types=1);
 namespace Solital\Core\Http;
 
 use Psr\Http\Message\RequestInterface;
-use Solital\Core\Http\Uri;
-use Solital\Core\Course\Course;
-use Solital\Core\Course\Route\RouteUrl;
-use Solital\Core\Http\Input\InputHandler;
-use Solital\Core\Http\Traits\RequestTrait;
-use Solital\Core\Course\Route\LoadableRouteInterface;
+use Solital\Core\Resource\Session;
+use Solital\Core\Http\{Uri, Input\InputHandler, Traits\RequestTrait};
+use Solital\Core\Course\{Course, Route\RouteUrl, Route\LoadableRouteInterface};
 
 class Request implements RequestInterface
 {
@@ -25,36 +22,42 @@ class Request implements RequestInterface
 
     /**
      * Server headers
+     * 
      * @var array
      */
     private array $headers = [];
 
     /**
      * Request host
+     * 
      * @var string
      */
-    protected $host;
+    protected ?string $host;
 
     /**
      * Current request url
+     * 
      * @var Uri
      */
-    protected $url;
+    protected Uri $url;
 
     /**
      * Current request url
-     * @var Uri
+     * 
+     * @var string
      */
-    protected $scheme;
+    protected string $scheme;
 
     /**
      * Input handler
+     * 
      * @var InputHandler
      */
-    protected $inputHandler;
+    protected InputHandler $inputHandler;
 
     /**
      * Defines if request has pending rewrite
+     * 
      * @var bool
      */
     protected bool $hasPendingRewrite = false;
@@ -62,13 +65,14 @@ class Request implements RequestInterface
     /**
      * @var LoadableRouteInterface|null
      */
-    protected $rewriteRoute;
+    protected ?LoadableRouteInterface $rewriteRoute = null;
 
     /**
      * Rewrite url
+     * 
      * @var string|null
      */
-    protected $rewriteUrl;
+    protected ?string $rewriteUrl = null;
 
     /**
      * @var array
@@ -110,7 +114,7 @@ class Request implements RequestInterface
 
         // Check if special IIS header exist, otherwise use default.
         if ($this->getHeader('unencoded-url', $this->getHeader('request-uri'))) {
-            $this->setUrl(new Uri($this->getHeader('unencoded-url', $this->getHeader('request-uri'))));
+            $this->setUrl(new Uri($this->getFirstHeader(['unencoded-url', 'request-uri'])));
         }
 
         $method_server = $this->getHeader('request-method');
@@ -206,19 +210,42 @@ class Request implements RequestInterface
 
     /**
      * Get id address
+     * If $safe is false, this function will detect Proxys. But the user can edit this header to whatever he wants!
+     * https://stackoverflow.com/questions/3003145/how-to-get-the-client-ip-address-in-php#comment-25086804
+     * @param bool $safeMode When enabled, only safe non-spoofable headers will be returned. Note this can cause issues when using proxy.
      * @return string|null
      */
-    public function getIp(): ?string
+    public function getIp(bool $safeMode = false): ?string
     {
-        if ($this->getHeader('http-cf-connecting-ip') !== null) {
-            return $this->getHeader('http-cf-connecting-ip');
+        $headers = ['remote-addr'];
+        if ($safeMode === false) {
+            $headers = array_merge($headers, [
+                'http-cf-connecting-ip',
+                'http-client-ip',
+                'http-x-forwarded-for',
+            ]);
         }
 
-        if ($this->getHeader('http-x-forwarded-for') !== null) {
-            return $this->getHeader('http-x-forwarded_for');
+        return $this->getFirstHeader($headers);
+    }
+
+    /**
+     * Will try to find first header from list of headers.
+     *
+     * @param array $headers
+     * @param mixed|null $defaultValue
+     * @return mixed|null
+     */
+    public function getFirstHeader(array $headers, $defaultValue = null)
+    {
+        foreach ($headers as $header) {
+            $header = $this->getHeader($header);
+            if ($header !== null) {
+                return $header;
+            }
         }
 
-        return $this->getHeader('remote-addr');
+        return $defaultValue;
     }
 
     /**
@@ -445,6 +472,54 @@ class Request implements RequestInterface
         $this->hasPendingRewrite = $boolean;
 
         return $this;
+    }
+
+    /**
+     * @param string $key
+     * @param int $limit = 5
+     * @param int $seconds = 60
+     * 
+     * @return bool
+     */
+    public static function limit(string $key, int $limit = 5, int $seconds = 60): bool
+    {
+        if (Session::has($key) && $_SESSION[$key]['time'] >= time() && $_SESSION[$key]['requests'] < $limit) {
+            Session::set($key, [
+                'time' => time() + $seconds,
+                'requests' => $_SESSION[$key]['requests'] + 1
+            ]);
+
+            return false;
+        }
+
+        if (Session::has($key) && $_SESSION[$key]['time'] >= time() && $_SESSION[$key]['requests'] >= $limit) {
+            return true;
+        }
+
+        Session::set($key, [
+            'time' => time() + $seconds,
+            'requests' => 1
+        ]);
+
+        return false;
+    }
+
+    /**
+     * request_repeat
+     *
+     * @param string $key
+     * @param string $value
+     * 
+     * @return bool
+     */
+    public static function repeat(string $key, string $value): bool
+    {
+        if (Session::has($key) && Session::get($key) == $value) {
+            return true;
+        }
+
+        Session::set($key, $value);
+        return false;
     }
 
     /**

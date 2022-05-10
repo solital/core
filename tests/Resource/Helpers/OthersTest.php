@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . "/../../../src/Resource/Helpers/helpers-others.php";
+require_once dirname(__DIR__, 3) . "/src/Resource/Helpers/others.php";
 
 use PHPUnit\Framework\TestCase;
 
@@ -33,5 +33,17 @@ class OthersTest extends TestCase
 
         $res = multi_array_value('John', $records);
         $this->assertIsArray($res);
+    }
+
+    public function testMappedImplode()
+    {
+        $records = [
+            'id' => 2135,
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+        ];
+
+        $res = mapped_implode(",", $records, "=");
+        $this->assertEquals("id=2135,first_name=John,last_name=Doe", $res);
     }
 }

@@ -10,13 +10,11 @@ class Message
      * @param string $index
      * @param string $msg
      * 
-     * @return null
+     * @return void
      */
-    public function new(string $index, string $msg)
+    public function new(string $index, string $msg): void
     {
-        Session::new($index, $msg);
-
-        return null;
+        Session::set($index, $msg);
     }
 
     /**

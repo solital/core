@@ -2,8 +2,6 @@
 
 namespace Solital\Core\Http\Input;
 
-use Solital\Core\Exceptions\InvalidArgumentException;
-
 class InputFile implements InputItemInterface
 {
     /**
@@ -63,7 +61,7 @@ class InputFile implements InputItemInterface
     public static function createFromArray(array $values): self
     {
         if (isset($values['index']) === false) {
-            throw new InvalidArgumentException('Index key is required');
+            throw new \InvalidArgumentException('Index key is required');
         }
 
         /* Easy way of ensuring that all indexes-are set and not filling the screen with isset() */

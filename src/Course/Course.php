@@ -2,48 +2,49 @@
 
 namespace Solital\Core\Course;
 
-use Solital\Core\Http\Uri;
-use Solital\Core\Http\Request;
-use Solital\Core\Course\Router;
-use Solital\Core\Http\Response;
-use Solital\Core\Course\Route\RouteUrl;
-use Solital\Core\Course\Route\RouteGroup;
-use ModernPHPException\ModernPHPException;
-use Solital\Core\Course\Route\RouteResource;
-use Solital\Core\Course\Route\RouteInterface;
-use Solital\Core\Course\Route\RouteController;
-use Solital\Core\Course\Route\RoutePartialGroup;
-use Solital\Core\Course\Route\GroupRouteInterface;
-use Solital\Core\Exceptions\MalformedUrlException;
-use Solital\Core\Http\Middleware\BaseCsrfVerifier;
-use Solital\Core\Course\RouterBootManagerInterface;
 use Solital\Core\Exceptions\InvalidArgumentException;
-use Solital\Core\Course\Handlers\EventHandlerInterface;
-use Solital\Core\Course\Route\PartialGroupRouteInterface;
-use Solital\Core\Course\Handlers\CallbackExceptionHandler;
+use Solital\Core\Http\{Uri, Request, Response, Middleware\BaseCsrfVerifier};
+
+use Solital\Core\Course\{
+    Router,
+    RouterBootManagerInterface,
+    Route\RouteUrl,
+    Route\RouteGroup,
+    Route\RouteResource,
+    Route\RouteInterface,
+    Route\RouteController,
+    Route\RoutePartialGroup,
+    Route\GroupRouteInterface,
+    Route\PartialGroupRouteInterface,
+    Handlers\EventHandlerInterface
+};
 
 class Course
 {
     /**
      * Default namespace added to all routes
+     * 
      * @var string|null
      */
     protected static $defaultNamespace;
 
     /**
      * The response object
+     * 
      * @var Response
      */
     protected static $response;
 
     /**
      * Router instance
+     * 
      * @var Router
      */
     protected static $router;
 
     /**
      * Default basepath added to all urls
+     * 
      * @var string|null
      */
     protected static $basePath;
@@ -58,76 +59,7 @@ class Course
      */
     public static function start(bool $send_console = false): void
     {
-        if ($_ENV['PRODUCTION_MODE'] == "true") {
-            (new ModernPHPException())->productionMode();
-        } else {
-            (new ModernPHPException())->start();
-        }
-
-        if (!defined('DB_CONFIG')) {
-            define('DB_CONFIG', [
-                'DRIVE' => $_ENV['DB_DRIVE'],
-                'HOST' => $_ENV['DB_HOST'],
-                'DBNAME' => $_ENV['DB_NAME'],
-                'USER' => $_ENV['DB_USER'],
-                'PASS' => $_ENV['DB_PASS'],
-                'SQLITE_DIR' => $_ENV['SQLITE_DIR']
-            ]);
-        }
-
         echo static::router()->start($send_console);
-    }
-
-    /**
-     * @return array
-     */
-    public static function startDebug(): array
-    {
-        $routerOutput = null;
-
-        try {
-            ob_start();
-            static::router()->setDebugEnabled(true)->start();
-            $routerOutput = ob_get_contents();
-            ob_end_clean();
-        } catch (\Exception $e) {
-        }
-
-        // Try to parse library version
-        $composerFile = \dirname(__DIR__, 3) . '/composer.lock';
-        $version = false;
-
-        if (is_file($composerFile) === true) {
-            $composerInfo = json_decode(file_get_contents($composerFile), true);
-
-            if (isset($composerInfo['packages']) === true && \is_array($composerInfo['packages']) === true) {
-                foreach ($composerInfo['packages'] as $package) {
-                    if (isset($package['name']) === true && strtolower($package['name']) === 'Solital/simple-router') {
-                        $version = $package['version'];
-                        break;
-                    }
-                }
-            }
-        }
-
-        $request = static::request();
-        $router = static::router();
-
-        return [
-            'url'             => $request->getUri(),
-            'method'          => $request->getMethod(),
-            'host'            => $request->getHost(),
-            'loaded_routes'   => $request->getLoadedRoutes(),
-            'all_routes'      => $router->getRoutes(),
-            'boot_managers'   => $router->getBootManagers(),
-            'csrf_verifier'   => $router->getCsrfVerifier(),
-            'log'             => $router->getDebugLog(),
-            'event_handlers'  => $router->getEventHandlers(),
-            'router_output'   => $routerOutput,
-            'library_version' => $version,
-            'php_version'     => PHP_VERSION,
-            'server_params'   => $request->getHeaders(),
-        ];
     }
 
     /**
@@ -377,6 +309,10 @@ class Course
             $route->setSettings($settings);
         }
 
+        if (!isset($_SERVER["REMOTE_ADDR"])) {
+            $_SERVER["REQUEST_URI"] = $url;
+        }
+
         return static::router()->addRoute($route);
     }
 
@@ -469,7 +405,6 @@ class Course
      * @param string|null $name
      * @param string|array|null $parameters
      * @param array|null $getParams
-     * 
      * @return Uri
      */
     public static function getUri(?string $name = null, $parameters = null, ?array $getParams = null): Uri
@@ -491,7 +426,7 @@ class Course
     /**
      * Get the request
      *
-     * @return \Solital\Http\Request
+     * @return Request
      */
     public static function request(): Request
     {
@@ -562,6 +497,7 @@ class Course
 
     /**
      * Get default namespace
+     * 
      * @return string|null
      */
     public static function getDefaultNamespace(): ?string

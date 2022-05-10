@@ -2,9 +2,7 @@
 
 namespace Solital\Core\Course\Event;
 
-use Psr\EventDispatcher\EventDispatcherInterface;
-use Psr\EventDispatcher\ListenerProviderInterface;
-use Psr\EventDispatcher\StoppableEventInterface;
+use Psr\EventDispatcher\{EventDispatcherInterface, ListenerProviderInterface, StoppableEventInterface};
 
 class EventDispatcher implements EventDispatcherInterface
 {

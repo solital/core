@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Solital\Core\Http\Traits;
 
-use Solital\Core\Http\Uri;
 use Psr\Http\Message\UriInterface;
-use Solital\Core\Exceptions\InvalidArgumentException;
+use Solital\Core\Http\Uri;
 
 trait RequestTrait
 {
@@ -57,8 +56,12 @@ trait RequestTrait
      *
      * @throws \InvalidArgumentException for any invalid value.
      */
-    private function initialize(string $method = null, $uri = null, $body = 'php://memory', array $headers = [])
-    {
+    private function initialize(
+        string $method = null,
+        mixed $uri = null,
+        mixed $body = 'php://memory',
+        array $headers = []
+    ) {
         $this->method = $this->sanitizeMethod($method);
         $this->setUriInstance($uri);
         $this->setStreamInstance($body);
@@ -97,7 +100,7 @@ trait RequestTrait
     public function withRequestTarget($requestTarget)
     {
         if (preg_match('#\s#', $requestTarget)) {
-            throw new InvalidArgumentException("Invalid request target provided. Must be a string without whitespace", 400);
+            throw new \InvalidArgumentException("Invalid request target provided. Must be a string without whitespace", 400);
         }
 
         $clone = clone $this;
@@ -145,13 +148,13 @@ trait RequestTrait
         }
 
         if (!is_string($method)) {
-            throw new InvalidArgumentException("Invalid HTTP method. Must be a string, received " . (is_object($method) ? get_class($method) : gettype($method)));
+            throw new \InvalidArgumentException("Invalid HTTP method. Must be a string, received " . (is_object($method) ? get_class($method) : gettype($method)));
         }
 
         $method = strtoupper($method);
 
         if (!in_array($method, self::$validMethods, true)) {
-            throw new InvalidArgumentException("Invalid HTTP method. Must be " . implode(', ', self::$validMethods));
+            throw new \InvalidArgumentException("Invalid HTTP method. Must be " . implode(', ', self::$validMethods));
         }
 
         return $method;
@@ -173,7 +176,7 @@ trait RequestTrait
         } elseif ($uri === null) {
             $this->uri = new Uri;
         } else {
-            throw new InvalidArgumentException("Invalid URI provided. Must be null, a string or a Psr\Http\Message\UriInterface instance");
+            throw new \InvalidArgumentException("Invalid URI provided. Must be null, a string or a Psr\Http\Message\UriInterface instance");
         }
     }
 

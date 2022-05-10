@@ -2,8 +2,8 @@
 
 namespace Solital\Core\Wolf;
 
-use MatthiasMullie\Minify\CSS;
-use MatthiasMullie\Minify\JS;
+use MatthiasMullie\Minify\{CSS, JS};
+use Solital\Core\Kernel\Application;
 
 trait WolfMinifyTrait
 {
@@ -90,7 +90,7 @@ trait WolfMinifyTrait
      */
     private static function getDirCss(): string
     {
-        self::$dir = SITE_ROOT . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . "assets" . DIRECTORY_SEPARATOR . "_css" . DIRECTORY_SEPARATOR;
+        self::$dir = Application::getRoot("resources/assets/_css/");
 
         return self::$dir;
     }
@@ -100,7 +100,7 @@ trait WolfMinifyTrait
      */
     private static function getDirJs(): string
     {
-        self::$dir = SITE_ROOT . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . "assets" . DIRECTORY_SEPARATOR . "_js" . DIRECTORY_SEPARATOR;
+        self::$dir = Application::getRoot("resources/assets/_js/");
 
         return self::$dir;
     }
@@ -110,7 +110,7 @@ trait WolfMinifyTrait
      */
     private static function getPublicDirCss(): string
     {
-        self::$dir_public = SITE_ROOT . DIRECTORY_SEPARATOR . "public"  . DIRECTORY_SEPARATOR . "assets" . DIRECTORY_SEPARATOR . "_css" . DIRECTORY_SEPARATOR;
+        self::$dir_public = Application::getRoot("public/assets/_css/");
 
         return self::$dir_public;
     }
@@ -120,7 +120,7 @@ trait WolfMinifyTrait
      */
     private static function getPublicDirJs(): string
     {
-        self::$dir_public = SITE_ROOT . DIRECTORY_SEPARATOR . "public"  . DIRECTORY_SEPARATOR . "assets" . DIRECTORY_SEPARATOR . "_js" . DIRECTORY_SEPARATOR;
+        self::$dir_public = Application::getRoot("public/assets/_js/");
 
         return self::$dir_public;
     }

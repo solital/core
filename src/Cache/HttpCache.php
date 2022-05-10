@@ -2,8 +2,8 @@
 
 namespace Solital\Core\Cache;
 
-use DateTime;
 use Solital\Core\Cache\Cache;
+use Solital\Core\Cache\Exception\InvalidArgumentException;
 
 class HttpCache extends Cache
 {
@@ -13,9 +13,22 @@ class HttpCache extends Cache
     private int $time;
 
     /**
+     * @var DateTime
+     */
+    private \DateTime $date_time;
+
+    /**
      * @var int
      */
     private int $code;
+
+    /**
+     * Construct
+     */
+    public function __construct()
+    {
+        $this->date_time = new \DateTime();
+    }
 
     /**
      * @param string $privacity
@@ -28,7 +41,7 @@ class HttpCache extends Cache
         $this->time = $max_age;
 
         if ($privacity != "public" && $privacity != "private") {
-            throw new \Exception("'$privacity' is invalid. Use 'public' or 'private'", 404);
+            throw new InvalidArgumentException("'$privacity' is invalid. Use 'public' or 'private'", 404);
 
             return $this;
         }
@@ -59,8 +72,7 @@ class HttpCache extends Cache
      */
     public function expires(): HttpCache
     {
-        $date = new DateTime();
-        $atual_time = $date->getTimestamp();
+        $atual_time = $this->date_time->getTimestamp();
 
         if (strtotime($this->time) < strtotime($atual_time)) {
             $this->code = 200;
@@ -81,8 +93,7 @@ class HttpCache extends Cache
      */
     public function lastModified(): HttpCache
     {
-        $date = new DateTime();
-        $atual_time = $date->getTimestamp();
+        $atual_time = $this->date_time->getTimestamp();
 
         if (strtotime($this->time) < strtotime($atual_time)) {
             $this->code = 200;
@@ -102,8 +113,7 @@ class HttpCache extends Cache
      */
     public function ifModifiedSince(): HttpCache
     {
-        $date = new DateTime();
-        $atual_time = $date->getTimestamp();
+        $atual_time = $this->date_time->getTimestamp();
 
         if (strtotime($this->time) < strtotime($atual_time)) {
             $this->code = 200;

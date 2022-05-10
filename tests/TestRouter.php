@@ -1,8 +1,9 @@
 <?php
 
-class TestRouter extends \Solital\Core\Course\Course
-{
+use Solital\Core\Course\Course;
 
+class TestRouter extends Course
+{
     public static function debugNoReset($testUrl, $testMethod = 'get')
     {
         $request = static::request();
@@ -17,13 +18,12 @@ class TestRouter extends \Solital\Core\Course\Course
     {
         try {
             static::debugNoReset($testUrl, $testMethod);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             static::router()->reset();
             throw $e;
         }
 
         static::router()->reset();
-
     }
 
     public static function debugOutput($testUrl, $testMethod = 'get')
@@ -39,5 +39,4 @@ class TestRouter extends \Solital\Core\Course\Course
         // Return response
         return $response;
     }
-
 }

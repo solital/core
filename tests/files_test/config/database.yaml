@@ -1,0 +1,9 @@
+enable_test: false
+
+db_test:
+  drive: mysql
+  host: localhost
+  name: db_test
+  user: root
+  pass: 
+  sqlite: 

@@ -6,7 +6,6 @@ namespace Solital\Core\Http\Traits;
 
 use Psr\Http\Message\StreamInterface;
 use Solital\Core\Http\Stream;
-use Solital\Core\Exceptions\InvalidArgumentException;
 
 trait MessageTrait
 {
@@ -45,9 +44,9 @@ trait MessageTrait
     /**
      * The stream instance.
      *
-     * @var \Psr\Http\Message\StreamInterface
+     * @var StreamInterface
      */
-    private $stream;
+    private StreamInterface $stream;
 
     /**
      * Disable magic setter to ensure immutability.
@@ -59,7 +58,7 @@ trait MessageTrait
      */
     public function __set($name, $value)
     {
-        throw new InvalidArgumentException("Cannot add new property $" . $name . " to instance of " . __CLASS__, 400);
+        throw new \InvalidArgumentException("Cannot add new property $" . $name . " to instance of " . __CLASS__, 400);
     }
 
     /**
@@ -107,7 +106,7 @@ trait MessageTrait
     private function validateProtocolVersion($version)
     {
         if (!is_string($version) || !in_array($version, self::$validProtocolVersions, true)) {
-            throw new InvalidArgumentException("Invalid HTTP protocol version. Must be " . implode(', ', self::$validProtocolVersions), 400);
+            throw new \InvalidArgumentException("Invalid HTTP protocol version. Must be " . implode(', ', self::$validProtocolVersions), 400);
         }
     }
 
@@ -150,7 +149,7 @@ trait MessageTrait
 
         $value = array_map(function ($value) {
             if (!is_string($value) && !is_numeric($value)) {
-                throw new InvalidArgumentException("Invalid header value type. Must be a string or numeric, received " . (is_object($value) ? get_class($value) : gettype($value)));
+                throw new \InvalidArgumentException("Invalid header value type. Must be a string or numeric, received " . (is_object($value) ? get_class($value) : gettype($value)));
             }
 
             $value = (string) $value;
@@ -159,7 +158,7 @@ trait MessageTrait
                 preg_match("#(?:(?:(?<!\r)\n)|(?:\r(?!\n))|(?:\r\n(?![ \t])))#", $value) ||
                 preg_match('/[^\x09\x0a\x0d\x20-\x7E\x80-\xFE]/', $value)
             ) {
-                throw new InvalidArgumentException($value . " is not a valid header name", 400);
+                throw new \InvalidArgumentException($value . " is not a valid header name", 400);
             }
 
             return $value;
@@ -178,13 +177,13 @@ trait MessageTrait
     private function validateHeaderName($name)
     {
         if (!is_string($name)) {
-            throw new InvalidArgumentException(
+            throw new \InvalidArgumentException(
                 "Invalid header name type. Must be a string, received " . (is_object($name) ? get_class($name) : gettype($name))
             );
         }
 
         if (!preg_match('/^[a-zA-Z0-9\'`#$%&*+.^_|~!-]+$/', $name)) {
-            throw new InvalidArgumentException($name . " is not a valid header name", 400);
+            throw new \InvalidArgumentException($name . " is not a valid header name", 400);
         }
     }
 
@@ -397,7 +396,7 @@ trait MessageTrait
         }
 
         if (!$stream instanceof StreamInterface && $stream !== null) {
-            throw new InvalidArgumentException("The stream must be a string stream identifier, stream resource or a Psr\Http\Message\StreamInterface implementation", 400);
+            throw new \InvalidArgumentException("The stream must be a string stream identifier, stream resource or a Psr\Http\Message\StreamInterface implementation", 400);
         }
 
         $this->stream = $stream;

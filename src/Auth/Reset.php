@@ -2,13 +2,11 @@
 
 namespace Solital\Core\Auth;
 
-use PDO;
-use Katrina\Connection\DB;
-use Solital\Core\Database\ORM;
+use Solital\Core\Mail\Mailer;
 use Solital\Core\Security\Hash;
-use Solital\Core\Resource\Mail\NativeMail;
-use Solital\Core\Resource\Mail\PHPMailerClass;
-use Solital\Core\Resource\Validation\Valid;
+use Solital\Core\Validation\Valid;
+use Katrina\Sql\KatrinaStatement;
+use Katrina\Connection\Connection;
 
 abstract class Reset
 {
@@ -23,9 +21,9 @@ abstract class Reset
     private string $column;
 
     /**
-     * @var PHPMailerClass
+     * @var Mailer
      */
-    private $mailer;
+    private Mailer $mailer;
 
     /**
      * @var string
@@ -43,11 +41,6 @@ abstract class Reset
     protected string $message_email = "";
 
     /**
-     * @var bool
-     */
-    protected bool $mailerExceptions = false;
-
-    /**
      * @var string
      */
     protected string $subject = "Forgot Password";
@@ -60,14 +53,19 @@ abstract class Reset
     /**
      * @var string
      */
-    protected string $name_sender = "User";
+    protected string $name_sender = "Solital Framework";
+
+    /**
+     * @var string
+     */
+    protected string $mail_sender;
 
     /**
      * Construct
      */
     public function __construct()
     {
-        $this->mailer = new PHPMailerClass($this->mailerExceptions);
+        $this->mailer = new Mailer();
     }
 
     /**
@@ -93,7 +91,8 @@ abstract class Reset
     public function forgotPass(string $email, string $uri): bool
     {
         $sql = "SELECT * FROM " . $this->table . " WHERE " . $this->column . " = '$email';";
-        $res = ORM::query($sql);
+
+        $res = KatrinaStatement::executeQuery($sql, false);
 
         if (!$res == false) {
             $res = $this->sendHash($email, $uri, $this->time_hash);
@@ -129,8 +128,8 @@ abstract class Reset
         $sql = "UPDATE $table SET $column_pass = ? WHERE $column_user = '$email'";
 
         try {
-            $stmt = DB::prepare($sql);
-            $stmt->bindValue(1, $value_hash, PDO::PARAM_STR);
+            $stmt = Connection::getInstance()->prepare($sql);
+            $stmt->bindValue(1, $value_hash, \PDO::PARAM_STR);
             $stmt->execute();
 
             return true;
@@ -145,11 +144,11 @@ abstract class Reset
      * @param string $email
      * @param string $time
      * 
-     * @return null|string
+     * @return string
      */
     private function generateDefaultLink(string $uri, string $email, string $time): ?string
     {
-        if ($this->link = "") {
+        if (empty($this->link)) {
             $hash = Hash::encrypt($email, $time);
             $this->link = $uri . $hash;
 
@@ -188,8 +187,8 @@ abstract class Reset
             <small>Sent from the solital framework</small>";
         }
 
-        $res = $this->mailer->add($_ENV['MAIL_SENDER'], $this->name_sender, $email, $this->name_recipient)
-            ->sendEmail($this->subject, $this->message);
+        $res = $this->mailer->add($this->mail_sender, $this->name_sender, $email, $this->name_recipient)
+            ->send($this->subject, $this->message_email);
 
         if ($this->mailer->error()) {
             echo $this->mailer->error();

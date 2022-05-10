@@ -3,9 +3,11 @@
 namespace Solital\Core\Course\Route;
 
 use Solital\Core\Http\Request;
-use Solital\Core\Course\Route\RouteInterface;
-use Solital\Core\Course\Route\LoadableRouteInterface;
-use Solital\Core\Course\Route\ControllerRouteInterface;
+use Solital\Core\Course\Route\{
+    RouteInterface,
+    LoadableRouteInterface,
+    ControllerRouteInterface
+};
 
 class RouteResource extends LoadableRoute implements ControllerRouteInterface
 {
@@ -43,15 +45,14 @@ class RouteResource extends LoadableRoute implements ControllerRouteInterface
     /**
      * @var mixed
      */
-    protected $controller;
+    protected mixed $controller;
 
     /**
      * @param mixed $url
      * @param mixed $controller
      */
-    public function __construct($url, $controller)
+    public function __construct(mixed $url, mixed $controller)
     {
-        #$this->setUrl($url);
         $this->controller = $controller;
         $this->setName(trim(str_replace('/', '.', $url), '/'));
     }
@@ -96,14 +97,25 @@ class RouteResource extends LoadableRoute implements ControllerRouteInterface
         return $this->url;
     }
 
-    protected function call($method)
+    /**
+     * @param string|null $method
+     * 
+     * @return bool
+     */
+    protected function call(?string $method): bool
     {
         $this->setCallback($this->controller . '@' . $method);
 
         return true;
     }
 
-    public function matchRoute($url, Request $request): bool
+    /**
+     * @param mixed $url
+     * @param Request $request
+     * 
+     * @return bool
+     */
+    public function matchRoute(mixed $url, Request $request): bool
     {
         if ($this->getGroup() !== null && $this->getGroup()->matchRoute($url, $request) === false) {
             return false;

@@ -3,8 +3,7 @@
 namespace Solital\Core\Course\Route;
 
 use Solital\Core\Http\Request;
-use Solital\Core\Course\Router;
-use Solital\Core\Course\Route\RouteInterface;
+use Solital\Core\Course\{Router, Route\RouteInterface};
 
 interface LoadableRouteInterface extends RouteInterface
 {

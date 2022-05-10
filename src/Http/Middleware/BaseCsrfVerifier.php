@@ -2,10 +2,7 @@
 
 namespace Solital\Core\Http\Middleware;
 
-use Solital\Core\Http\Request;
-use Solital\Core\Exceptions\TokenMismatchException;
-use Solital\Core\Http\Security\CookieTokenProvider;
-use Solital\Core\Http\Security\TokenProviderInterface;
+use Solital\Core\Http\{Request, Security\CookieTokenProvider, Security\TokenProviderInterface};
 
 class BaseCsrfVerifier implements MiddlewareInterface
 {
