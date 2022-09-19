@@ -15,12 +15,22 @@ class Application
 {
     use KernelTrait;
 
-    const SOLITAL_VERSION = "3.0.0";
+    const SOLITAL_VERSION = "3.0.1";
+    const SITE_DOC_DOMAIN = "http://solitalframework.rf.gd/";
 
     /**
      * This variable must be changed manually
      */
     const DEBUG = false;
+
+    /**
+     * The `connectionDatabaseDebug` method must be edited manually
+     */
+    const DEBUG_DATABASE = false;
+
+    /**
+     * This variable must be changed manually
+     */
     const MAILER_TEST_UNIT = false;
 
     /**
@@ -145,11 +155,15 @@ class Application
     }
 
     /**
-     * @return void
+     * @return mixed
      */
-    public static function connectionDatabase(): void
+    public static function connectionDatabase(): mixed
     {
-        $database_connection = Yaml::parseFile(self::getDirConfigFiles(5) . 'database.yaml');
+        if (self::DEBUG_DATABASE == true) {
+            return self::connectionDatabaseDebug();
+        } else {
+            $database_connection = Yaml::parseFile(self::getDirConfigFiles(5) . 'database.yaml');
+        }
 
         if ($database_connection['enable_test'] == true) {
             if (!defined('DB_CONFIG')) {
@@ -173,6 +187,25 @@ class Application
                     'SQLITE_DIR' => getenv('SQLITE_DIR')
                 ]);
             }
+        }
+
+        return __CLASS__;
+    }
+
+    /**
+     * @return void
+     */
+    private static function connectionDatabaseDebug(): void
+    {
+        if (!defined('DB_CONFIG')) {
+            define('DB_CONFIG', [
+                'DRIVE' => '',
+                'HOST' => '',
+                'DBNAME' => '',
+                'USER' => '',
+                'PASS' => '',
+                'SQLITE_DIR' => ''
+            ]);
         }
     }
 
@@ -415,7 +448,7 @@ class Application
 
         if (!session_id()) {
             if (!is_dir($session_dir)) {
-                \mkdir($session_dir);
+                (new HandleFiles)->create($session_dir);
             }
 
             session_save_path($session_dir);

@@ -39,7 +39,7 @@ class Version extends Command implements CommandInterface
         $this->line("Core " . $this->getVersion())->print()->break();
         $this->line("PHP " . $this->phpVersion())->print()->break();
         $this->line("Katrina " . $this->katrinaVersion())->print()->break(true);
-        $this->warning("Thank you for using Solital, you can see the full documentation at http://solitalframework.com/")->print()->break();
+        $this->warning("Thank you for using Solital, you can see the full documentation at " . Application::SITE_DOC_DOMAIN)->print()->break();
 
         return true;
     }

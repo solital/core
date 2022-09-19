@@ -1,5 +1,22 @@
 # Released Notes
 
+## v3.0.1 - (2022-09-19)
+
+### Changed
+
+- Changed timezone parameter in `Convertime` class
+
+### Fixed
+
+- Fixed bug where new sessions folder wasn't created
+- Fixed return in `initDB` method in `MigratorVersionProviderDB` class
+- Fixed debug in `Application` class
+- Fixed method in `MigrationNameDefault` template
+- Fixed documentation domain
+- Fixed cache template not loading
+
+--------------------------------------------------------------------------
+
 ## v3.0.0 - (2022-05-10)
 
 ### Added

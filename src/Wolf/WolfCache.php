@@ -96,10 +96,12 @@ class WolfCache
      */
     protected function loadCache(?string $view): ?string
     {
-        if (file_exists($view)) {
-            ob_start();
-            include_once $view;
-            return ob_get_clean();
+        if ($view != null || !empty($view)) {
+            if (file_exists($view)) {
+                ob_start();
+                include_once $view;
+                return ob_get_clean();
+            }
         }
 
         return null;

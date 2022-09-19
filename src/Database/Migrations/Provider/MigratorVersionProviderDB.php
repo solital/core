@@ -10,7 +10,7 @@ class MigratorVersionProviderDB extends Katrina
      * @var string|null
      */
     protected ?string $table = "migrations";
-    
+
     /**
      * @var bool
      */
@@ -34,8 +34,12 @@ class MigratorVersionProviderDB extends Katrina
                     ->varchar("name", 100)->notNull()
                     ->closeTable();
             }
-    
-            return $res;
+
+            if (!isset($res)) {
+                return $this;
+            } else {
+                return $res;
+            }
         }
 
         return $this;

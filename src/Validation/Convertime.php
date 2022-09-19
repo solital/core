@@ -2,6 +2,9 @@
 
 namespace Solital\Core\Validation;
 
+use Solital\Core\Kernel\Application;
+use Symfony\Component\Yaml\Yaml;
+
 class Convertime
 {
     /**
@@ -10,13 +13,21 @@ class Convertime
     private \DateTime $datetime;
 
     /**
-     * @param string $timezone
+     * @param string|null $timezone
      */
-    public function __construct($timezone = "America/Sao_Paulo")
+    public function __construct(?string $timezone = null)
     {
-        date_default_timezone_set($timezone);
+        $default_timezone = Yaml::parseFile(Application::getDirConfigFiles(5) . 'bootstrap.yaml');
+
+        if ($timezone == null || empty($timezone)) {
+            date_default_timezone_set($default_timezone['default_timezone']);
+        } else {
+            date_default_timezone_set($timezone);
+        }
+        
         $this->datetime = new \DateTime();
     }
+
     /**
      * @param string $date
      * @param string $format

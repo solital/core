@@ -13,7 +13,7 @@ class MigrationNameDefault extends Migration
     public function up()
     {
         Katrina::createTable("TableName")
-            ->int('id')->primary()->incremet()
+            ->int('id')->primary()->increment()
             // ...
             ->createdUpdateAt()
             ->closeTable();

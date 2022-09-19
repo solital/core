@@ -27,3 +27,5 @@ verify_domain:
 
 logs:
   enabled_log_files: true
+
+default_timezone: America/Fortaleza
