@@ -551,11 +551,16 @@ final class Cookie
 
     /**
      * @param string $index
+     * @param string|null $path
+     * 
      * @return bool
      */
-    public static function unset($index, $path = null): bool
+    public static function unset(string $index, string $path = null): bool
     {
-        setcookie($index, NULL, -1, $path);
+        if (self::exists($index)) {
+            setcookie($index, expires_or_options: time() - 3600, path: $path);
+        }
+        
         return true;
     }
 

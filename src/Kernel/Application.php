@@ -15,7 +15,7 @@ class Application
 {
     use KernelTrait;
 
-    const SOLITAL_VERSION = "3.0.1";
+    const SOLITAL_VERSION = "3.0.2";
     const SITE_DOC_DOMAIN = "http://solitalframework.rf.gd/";
 
     /**
@@ -49,11 +49,6 @@ class Application
     private static ModernPHPException $exception;
 
     /**
-     * @var array
-     */
-    private static array $exception_theme = [];
-
-    /**
      * @var HandleFiles
      */
     private static HandleFiles $handle;
@@ -82,25 +77,24 @@ class Application
     {
         if (self::DEBUG == false) {
             if (file_exists(self::getDirConfigFiles(5) . 'bootstrap.yaml')) {
-                $exception_theme = Yaml::parseFile(self::getDirConfigFiles(5) . 'bootstrap.yaml');
-
-                if ($exception_theme['exception_dark_theme'] == 'none') {
-                    self::$exception_theme = [
-                        'dark_mode' => null
-                    ];
-                } elseif ($exception_theme['exception_dark_theme'] == 'code') {
-                    self::$exception_theme = [
-                        'dark_mode' => 'code'
-                    ];
-                } elseif ($exception_theme['exception_dark_theme'] == 'all') {
-                    self::$exception_theme = [
-                        'dark_mode' => 'all'
-                    ];
-                }
+                $modern_php_exception = Yaml::parseFile(self::getDirConfigFiles(5) . 'bootstrap.yaml');
             }
         }
 
-        self::$exception = new ModernPHPException(self::$exception_theme);
+        if ($modern_php_exception['exception_json_return'] == true) {
+            $exception_type = "json";
+        } else {
+            $exception_type = "";
+        }
+
+        self::$exception = new ModernPHPException([
+            'type' => $exception_type,
+            'title' => '',
+            'dark_mode' => $modern_php_exception['exception_dark_theme'],
+            'production_mode' => getenv('PRODUCTION_MODE')
+        ]);
+        self::$exception->start();
+
         self::$handle = new HandleFiles();
     }
 
@@ -109,24 +103,10 @@ class Application
      */
     public static function init(): void
     {
-        self::exceptionHandlerInit();
+        self::getInstance();
         self::connectionDatabase();
         self::protectDomain();
         Course::start();
-    }
-
-    /**
-     * @return void
-     */
-    public static function exceptionHandlerInit(): void
-    {
-        self::getInstance();
-
-        if (getenv('PRODUCTION_MODE') == "true") {
-            self::$exception->productionMode();
-        } else {
-            self::$exception->start();
-        }
     }
 
     /**
@@ -134,24 +114,9 @@ class Application
      * 
      * @return void
      */
-    public static function exceptionHandler(\Exception $e, string $message = "", int $code = null): void
+    public static function exceptionHandler(\Exception $e): void
     {
-        self::getInstance();
-
-        ($message != "") ? self::$error_message = $message : self::$error_message = $e->getMessage();
-        ($code != null || !empty($code)) ? self::$error_code = $code : self::$error_code = $e->getCode();
-
-        if (!empty(getenv('PRODUCTION_MODE'))) {
-            if (getenv('PRODUCTION_MODE') == "true") {
-                self::$exception->productionMode();
-            } else {
-                self::$exception->start()
-                    ->errorHandler(self::$error_code, self::$error_message, $e->getFile(), $e->getLine());
-            }
-        } else {
-            self::$exception->start()
-                ->errorHandler(self::$error_code, self::$error_message, $e->getFile(), $e->getLine());
-        }
+        self::$exception->exceptionHandler($e);
     }
 
     /**

@@ -1,5 +1,20 @@
 # Released Notes
 
+## v3.0.2 - (2022-09-21)
+
+### Changed
+
+- Changed exceptions in `Router` and Wolf class for Modern PHP Exception version 2
+
+### Fixed
+
+- Fixed Modern PHP Exception in Console
+- Fixed Modern PHP Exception version 2
+- Fixed ENV variables in `Auth` class
+- Fixed `unset` in `Cookie` class
+
+--------------------------------------------------------------------------
+
 ## v3.0.1 - (2022-09-19)
 
 ### Changed

@@ -61,53 +61,51 @@ class Auth extends Reset
     protected static string $dashboard_url;
 
     /**
+     * @param string $redirect
      * @param string $index
      * 
-     * @return null
+     * @return void
      */
-    public static function isLogged(string $redirect = "", string $index = "")
+    public static function isLogged(string $redirect = "", string $index = ""): void
     {
         self::getEnv();
 
         if ($index == '') {
-            $index = $_ENV['INDEX_LOGIN'];
+            $index = getenv('INDEX_LOGIN');
         }
 
         if ($redirect == "") {
             $redirect = self::$dashboard_url;
         }
 
-        if (isset($_SESSION[$index])) {
+        if (Session::has($index)) {
             response()->redirect($redirect);
             exit;
         }
-
-        return null;
     }
 
     /**
+     * @param string $redirect
      * @param string $index
      * 
-     * @return null
+     * @return void
      */
-    public static function isNotLogged(string $redirect = "", string $index = "")
+    public static function isNotLogged(string $redirect = "", string $index = ""): void
     {
         self::getEnv();
 
         if ($index == '') {
-            $index = $_ENV['INDEX_LOGIN'];
+            $index = getenv('INDEX_LOGIN');
         }
 
         if ($redirect == "") {
             $redirect = self::$login_url;
         }
 
-        if (empty($_SESSION[$index])) {
+        if (empty(Session::get($index))) {
             response()->redirect($redirect);
             exit;
         }
-
-        return null;
     }
 
     /**
@@ -283,7 +281,7 @@ class Auth extends Reset
         self::getEnv();
 
         if ($index == '') {
-            $index = $_ENV['INDEX_LOGIN'];
+            $index = getenv('INDEX_LOGIN');
         }
 
         if ($redirect == "") {
