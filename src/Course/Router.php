@@ -2,7 +2,6 @@
 
 namespace Solital\Core\Course;
 
-use ModernPHPException\ModernPHPException;
 use Psr\Log\LogLevel;
 use Solital\Core\Http\{Uri, Request, Middleware\BaseCsrfVerifier};
 use Solital\Core\Course\Handlers\{EventHandler, EventHandlerInterface};
@@ -440,13 +439,11 @@ class Router
             );
 
             if ($rewriteUrl !== null) {
-                $this->checkProductionMode();
                 $this->redirectRoute();
 
                 $this->logger->warning("Route '" . $rewriteUrl . "' not found (rewrite from: '" . $this->request->getUri()->getPath() . "')");
                 throw new RuntimeException("Route '" . $rewriteUrl . "' not found (rewrite from: '" . $this->request->getUri()->getPath() . "')", 404);
             } else {
-                $this->checkProductionMode();
                 $this->redirectRoute();
 
                 $this->logger->warning("Route '" . $this->request->getUri()->getPath() . "' not found");
@@ -475,18 +472,6 @@ class Router
         if (self::$redirect == true) {
             response()->redirect(self::$url_redirect);
             exit;
-        }
-    }
-
-    /**
-     * @return void
-     */
-    public function checkProductionMode(): void
-    {
-        if (!empty($_ENV['PRODUCTION_MODE'])) {
-            if ($_ENV['PRODUCTION_MODE'] == "true") {
-                (new ModernPHPException())->productionMode();
-            }
         }
     }
 

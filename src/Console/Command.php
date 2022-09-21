@@ -2,6 +2,7 @@
 
 namespace Solital\Core\Console;
 
+use ModernPHPException\ModernPHPException;
 use Solital\Core\Console\{MessageTrait, DefaultCommandsTrait};
 
 class Command
@@ -9,8 +10,8 @@ class Command
     use DefaultCommandsTrait;
     use MessageTrait;
 
-    const VERSION = "3.0.1";
-    const DATE_VERSION = "Sep 19 2022";
+    const VERSION = "3.0.2";
+    const DATE_VERSION = "Sep 21 2022";
 
     /**
      * @var string
@@ -52,6 +53,8 @@ class Command
      */
     public function __construct($class)
     {
+        (new ModernPHPException)->start();
+        
         if ($class) {
             foreach ($class as $class) {
                 $instance = new $class();

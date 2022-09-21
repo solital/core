@@ -42,7 +42,7 @@ trait ExtendsTrait
             );
             $this->logger->critical("Template '" . basename($view) . "' not found");
 
-            Application::exceptionHandler($e, "Template '" . basename($view) . "' not found", 403);
+            Application::exceptionHandler($e);
         }
     }
 
