@@ -15,7 +15,7 @@ class Application
 {
     use KernelTrait;
 
-    const SOLITAL_VERSION = "3.0.2";
+    const SOLITAL_VERSION = "3.0.3";
     const SITE_DOC_DOMAIN = "http://solitalframework.rf.gd/";
 
     /**
@@ -75,22 +75,25 @@ class Application
      */
     private static function getInstance(): void
     {
+        $exception_type = "";
+        $exception_theme = null;
+        
         if (self::DEBUG == false) {
             if (file_exists(self::getDirConfigFiles(5) . 'bootstrap.yaml')) {
                 $modern_php_exception = Yaml::parseFile(self::getDirConfigFiles(5) . 'bootstrap.yaml');
-            }
-        }
 
-        if ($modern_php_exception['exception_json_return'] == true) {
-            $exception_type = "json";
-        } else {
-            $exception_type = "";
+                if ($modern_php_exception['exception_json_return'] == true) {
+                    $exception_type = "json";
+                }
+    
+                $exception_theme = $modern_php_exception['exception_dark_theme'];
+            }
         }
 
         self::$exception = new ModernPHPException([
             'type' => $exception_type,
             'title' => '',
-            'dark_mode' => $modern_php_exception['exception_dark_theme'],
+            'dark_mode' => $exception_theme,
             'production_mode' => getenv('PRODUCTION_MODE')
         ]);
         self::$exception->start();
@@ -196,7 +199,7 @@ class Application
 
             return constant('SITE_ROOT') . DIRECTORY_SEPARATOR . $dir;
         } else {
-            throw new \Exception("SITE_ROOT constant not defined");
+            throw new ApplicationException("SITE_ROOT constant not defined");
         }
     }
 
@@ -225,7 +228,7 @@ class Application
             $dir = str_replace('/', DIRECTORY_SEPARATOR, $dir);
             return $dir_app . $dir;
         } else {
-            throw new \Exception("SITE_ROOT constant not defined");
+            throw new ApplicationException("SITE_ROOT constant not defined");
         }
     }
 

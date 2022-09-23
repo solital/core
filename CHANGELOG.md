@@ -1,5 +1,20 @@
 # Released Notes
 
+## v3.0.3 - (2022-09-23)
+
+### Changed
+
+- Changed `Password` class for PHP Secure Password version 2.0
+- Changed Logger directory
+- Changed Container directory
+
+### Fixed
+
+- Fixed composer.json
+- Fixed ApplicationException in `Application` class
+
+--------------------------------------------------------------------------
+
 ## v3.0.2 - (2022-09-21)
 
 ### Changed
