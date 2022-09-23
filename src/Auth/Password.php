@@ -69,14 +69,20 @@ class Password
      */
     public function create(string $password, bool $info = false): mixed
     {
-        return $this->password->createHash($password, $info);
+        if ($info == true) {
+            return $this->password->createHash($password)->getHashInfo();
+        } elseif ($info == false) {
+            return $this->password->createHash($password)->getHash();
+        }
     }
 
     /**
      * @param string $password
-     * @param mixed $hash
+     * @param string $hash
+     * 
+     * @return mixed
      */
-    public function verify(string $password, $hash)
+    public function verify(string $password, string $hash): mixed
     {
         return $this->password->verifyHash($password, $hash);
     }
@@ -84,8 +90,10 @@ class Password
     /**
      * @param string $password
      * @param string $hash
+     * 
+     * @return mixed
      */
-    public function needsRehash(string $password, string $hash)
+    public function needsRehash(string $password, string $hash): mixed
     {
         return $this->password->needsRehash($password, $hash);
     }
