@@ -15,7 +15,7 @@ class Application
 {
     use KernelTrait;
 
-    const SOLITAL_VERSION = "3.0.3";
+    const SOLITAL_VERSION = "3.0.4";
     const SITE_DOC_DOMAIN = "http://solitalframework.rf.gd/";
 
     /**
@@ -82,11 +82,15 @@ class Application
             if (file_exists(self::getDirConfigFiles(5) . 'bootstrap.yaml')) {
                 $modern_php_exception = Yaml::parseFile(self::getDirConfigFiles(5) . 'bootstrap.yaml');
 
-                if ($modern_php_exception['exception_json_return'] == true) {
-                    $exception_type = "json";
+                if (array_key_exists('exception_json_return', $modern_php_exception)) {
+                    if ($modern_php_exception['exception_json_return'] == true) {
+                        $exception_type = "json";
+                    }
                 }
-    
-                $exception_theme = $modern_php_exception['exception_dark_theme'];
+
+                if (array_key_exists('exception_dark_theme', $modern_php_exception)) {
+                    $exception_theme = $modern_php_exception['exception_dark_theme'];
+                }
             }
         }
 
