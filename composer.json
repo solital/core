@@ -1,7 +1,6 @@
 {
     "name": "solital/core",
     "description": "Official core of Solital framework",
-    "version": "3.0.0",
     "license": "MIT",
     "homepage": "http://solitalframework/",
     "require": {
