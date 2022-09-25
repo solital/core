@@ -1,5 +1,14 @@
 # Released Notes
 
+## v3.0.4 - (2022-09-25)
+
+### Fixed
+
+- Fixed version in `composer.json`
+- Fixed `exception_json_return` key of Modern PHP Exception array in `Application` class
+
+--------------------------------------------------------------------------
+
 ## v3.0.3 - (2022-09-23)
 
 ### Changed
