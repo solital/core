@@ -8,11 +8,6 @@ use Psr\Log\LogLevel;
 use Psr\Log\InvalidArgumentException;
 use Solital\Core\Logger\Processor\ProcessorAwareTrait;
 
-/**
- * Log message prototype
- *
- * @package Solital\Core\Logger
- */
 class LogEntry implements LogEntryInterface
 {
     use LogLevelTrait;

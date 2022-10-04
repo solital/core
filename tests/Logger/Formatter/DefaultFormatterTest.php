@@ -42,8 +42,9 @@ class DefaultFormatterTest extends TestCase
         $m = new LogEntry('test {wow}', ['__channel' => 'PHOOLE', 'wow' => 'bingo']);
         $s = $this->obj->format($m);
         $this->assertEquals(
-            '[PHOOLE] INFO: test bingo',
+            date('Y-m-d H:i:s') .' [phoole] [info]: test bingo',
             trim($s)
         );
+        #var_dump(trim($s));exit;
     }
 }

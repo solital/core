@@ -10,9 +10,6 @@ use Solital\Core\Logger\Entry\LogEntryInterface;
 use Solital\Core\Logger\Handler\HandlerAbstract;
 use Solital\Core\Logger\Formatter\FormatterInterface;
 
-/**
- * @package Solital\Core\Logger
- */
 class StreamHandler extends HandlerAbstract
 {
     /**

@@ -6,11 +6,6 @@ namespace Solital\Core\Logger\Processor;
 
 use Solital\Core\Logger\Entry\LogEntryInterface;
 
-/**
- * VerifyCallableTrait
- *
- * @package Solital\Core\Logger
- */
 trait VerifyCallableTrait
 {
     /**

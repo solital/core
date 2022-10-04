@@ -560,7 +560,7 @@ final class Cookie
         if (self::exists($index)) {
             setcookie($index, expires_or_options: time() - 3600, path: $path);
         }
-        
+
         return true;
     }
 

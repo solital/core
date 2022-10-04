@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @generated class generated using Vinci Console
+ */
 namespace Solital\Components\Controller;
 
 use Solital\Core\Http\Controller\Controller;

@@ -11,11 +11,6 @@ use Solital\Core\Logger\Entry\LogEntryInterface;
 use Solital\Core\Logger\Handler\HandlerAwareTrait;
 use Solital\Core\Logger\Handler\HandlerAwareInterface;
 
-/**
- * Logger
- *
- * @package Solital\Core\Logger
- */
 class Logger implements LoggerInterface, HandlerAwareInterface
 {
     use LoggerTrait;

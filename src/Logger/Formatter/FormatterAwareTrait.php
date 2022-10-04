@@ -4,12 +4,6 @@ declare(strict_types=1);
 
 namespace Solital\Core\Logger\Formatter;
 
-/**
- * FormatterAwareTrait
- *
- * @package   Solital\Core\Logger
- * @interface FormatterAwareInterface
- */
 trait FormatterAwareTrait
 {
     /**

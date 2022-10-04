@@ -4,13 +4,8 @@ declare(strict_types=1);
 
 namespace Solital\Core\Logger\Processor;
 
-use Phoole\Base\Queue\UniquePriorityQueue;
+use Solital\Core\Logger\Queue\UniquePriorityQueue;
 
-/**
- * ProcessorAwareTrait
- *
- * @package Solital\Core\Logger
- */
 trait ProcessorAwareTrait
 {
     use VerifyCallableTrait;

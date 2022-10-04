@@ -4,11 +4,6 @@ declare(strict_types=1);
 
 namespace Solital\Core\Logger\Processor;
 
-/**
- * ProcessorAwareInterface
- *
- * @package Solital\Core\Logger
- */
 interface ProcessorAwareInterface
 {
     /**

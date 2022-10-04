@@ -6,26 +6,6 @@ namespace Solital\Core\Logger\Entry;
 
 use Solital\Core\Logger\Processor\MemoryProcessor;
 
-/**
- * A log entry with predefined message template to log memory usage
- *
- * ```php
- * // initiate log with app id
- * $log = new Logger('MyApp');
- *
- * // add handler to this MemoryInfo
- * $log->addHandler(
- *     LogLevel::INFO,
- *     new LogfileHandler('system.log'),
- *     MemoryInfo::class
- * );
- *
- * // use it
- * $log->info(new MemoryInfo());
- * ```
- *
- * @package Solital\Core\Logger
- */
 class MemoryInfo extends LogEntry
 {
     /**

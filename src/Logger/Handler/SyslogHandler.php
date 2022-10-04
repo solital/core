@@ -8,11 +8,6 @@ use Psr\Log\LogLevel;
 use Solital\Core\Logger\Entry\LogEntryInterface;
 use Solital\Core\Logger\Formatter\FormatterInterface;
 
-/**
- * log to syslog on UNIX type system
- *
- * @package Solital\Core\Logger
- */
 class SyslogHandler extends HandlerAbstract
 {
     /**

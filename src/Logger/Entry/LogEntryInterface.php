@@ -7,11 +7,6 @@ namespace Solital\Core\Logger\Entry;
 use Psr\Log\InvalidArgumentException;
 use Solital\Core\Logger\Processor\ProcessorAwareInterface;
 
-/**
- * Log message
- *
- * @package Solital\Core\Logger
- */
 interface LogEntryInterface extends ProcessorAwareInterface
 {
     /**

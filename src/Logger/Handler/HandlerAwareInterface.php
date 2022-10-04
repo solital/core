@@ -6,11 +6,6 @@ namespace Solital\Core\Logger\Handler;
 
 use Solital\Core\Logger\Entry\LogEntryInterface;
 
-/**
- * HandlerAwareInterface
- *
- * @package Solital\Core\Logger
- */
 interface HandlerAwareInterface
 {
     /**

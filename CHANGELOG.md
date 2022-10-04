@@ -1,5 +1,39 @@
 # Released Notes
 
+## v3.1.0 - (2022-10-03)
+
+### Added
+
+- Added command to create routes
+- Added annotations in templates
+- Added restrict IP in Middleware
+- Added `IpRestrictAccessException` exception
+- Added Collection for arrays
+- Added feature to manipulate strings
+- Added Queue in Logger
+- Added dark mode for `welcome.php`
+- Added new helpers
+
+### Fixed
+
+- Fixed session helper
+- Fixed expiration time when deleting a cookie
+- Fixed Logger tests
+- Fixed timezone in init
+
+### Changed
+
+- Changed annotations in Logger
+- Changed composer.json
+- Changed vinci.example file
+
+### Removed
+
+- Removed `gmstrftime` function in `HttpCache`
+- Removed `phoole/base` package
+
+--------------------------------------------------------------------------
+
 ## v3.0.4 - (2022-09-25)
 
 ### Fixed

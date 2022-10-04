@@ -7,11 +7,6 @@ namespace Solital\Core\Logger\Formatter;
 use Psr\Log\LogLevel;
 use Solital\Core\Logger\Entry\LogEntryInterface;
 
-/**
- * ANSI Color formatter
- *
- * @package Solital\Core\Logger
- */
 class AnsiFormatter extends DefaultFormatter
 {
     /**

@@ -2,7 +2,9 @@
 
 use Respect\Validation\Validator;
 use Solital\Core\Resource\Session;
+use Solital\Core\Resource\Str\Str;
 use Solital\Core\Cache\{Cache, Psr6\CacheItemPool};
+use Solital\Core\Resource\Collection\ArrayCollection;
 
 /**
  * Remove all get param
@@ -78,20 +80,27 @@ function get_url(string $uri = null): string
 /**
  * @param string $index
  * @param mixed $value
- * @param string|null $key
+ * @param mixed $key
  * @param bool $delete
  * 
  * @return mixed
  */
-function session(string $index, $value = null, ?string $key = null, bool $delete = false)
-{
+function session(
+    string $key,
+    mixed $value = null,
+    mixed $defaultValue = null,
+    bool $delete = false,
+    bool $take = false
+): mixed {
     if ($value != null) {
-        return Session::set($index, $value, $key);
+        return Session::set($key, $value);
     } elseif ($delete == true) {
-        return Session::delete($index, $key);
+        return Session::delete($key);
+    } elseif ($take == true) {
+        return Session::take($key, $defaultValue);
     }
 
-    return Session::get($index, $key);
+    return Session::get($key, $defaultValue);
 }
 
 /**
@@ -148,4 +157,24 @@ function mapped_implode(string $glue, array $array, string $symbol = '='): strin
             array_values($array)
         )
     );
+}
+
+/**
+ * @param mixed $value
+ * 
+ * @return ArrayCollection
+ */
+function collection(mixed $value = null): ArrayCollection
+{
+    return new ArrayCollection($value);
+}
+
+/**
+ * @param string $string
+ * 
+ * @return Str
+ */
+function str(string $string): Str
+{
+    return new Str($string);
 }
