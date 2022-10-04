@@ -10,12 +10,13 @@ use Solital\Core\Kernel\KernelTrait;
 use Solital\Core\FileSystem\HandleFiles;
 use Solital\Core\Resource\Session;
 use Solital\Core\Exceptions\ApplicationException;
+use Solital\Core\Validation\Convertime;
 
 class Application
 {
     use KernelTrait;
 
-    const SOLITAL_VERSION = "3.0.4";
+    const SOLITAL_VERSION = "3.1.0";
     const SITE_DOC_DOMAIN = "http://solitalframework.rf.gd/";
 
     /**
@@ -54,20 +55,19 @@ class Application
     private static HandleFiles $handle;
 
     /**
-     * @var string
-     */
-    private static string $dir_config_file;
-
-    /**
      * @param int $dir_number
      * 
      * @return string
      */
     public static function getDirConfigFiles(int $dir_number): string
     {
-        self::$dir_config_file = dirname(__DIR__, $dir_number) . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR;
+        if (self::DEBUG == true) {
+            $dir_config_file = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Kernel' . DIRECTORY_SEPARATOR . 'Console' . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR;
+        } else {
+            $dir_config_file = dirname(__DIR__, $dir_number) . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR;
+        }
 
-        return self::$dir_config_file;
+        return $dir_config_file;
     }
 
     /**
@@ -77,7 +77,7 @@ class Application
     {
         $exception_type = "";
         $exception_theme = null;
-        
+
         if (self::DEBUG == false) {
             if (file_exists(self::getDirConfigFiles(5) . 'bootstrap.yaml')) {
                 $modern_php_exception = Yaml::parseFile(self::getDirConfigFiles(5) . 'bootstrap.yaml');
@@ -110,6 +110,7 @@ class Application
      */
     public static function init(): void
     {
+        (new Convertime());
         self::getInstance();
         self::connectionDatabase();
         self::protectDomain();
@@ -435,6 +436,7 @@ class Application
     {
         $config = true;
         $message = [];
+        $theme_dark = null;
 
         if (
             empty(getenv('DB_DRIVE')) ||
@@ -452,9 +454,16 @@ class Application
             $message[] = "<span class='alert'>OpenSSL error:</span> FIRST_SECRET and SECOND_SECRET variables don't have a defined value";
         }
 
+        if (date('H') >= 18) {
+            $theme_dark = 'dark';
+        } else {
+            $theme_dark = '';
+        }
+
         return [
             'status' => $config,
-            'message' => $message
+            'message' => $message,
+            'theme_dark' => $theme_dark
         ];
     }
 }

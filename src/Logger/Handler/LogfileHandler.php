@@ -8,11 +8,6 @@ use Solital\Core\FileSystem\HandleFiles;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Logger\Formatter\FormatterInterface;
 
-/**
- * log to a file
- *
- * @package Solital\Core\Logger
- */
 class LogfileHandler extends StreamHandler
 {
     /**

@@ -6,11 +6,6 @@ namespace Solital\Core\Logger\Formatter;
 
 use Solital\Core\Logger\Entry\LogEntryInterface;
 
-/**
- * FormatterInterface
- *
- * @package Solital\Core\Logger
- */
 interface FormatterInterface
 {
     /**

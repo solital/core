@@ -6,11 +6,6 @@ namespace Solital\Core\Logger\Handler;
 
 use Solital\Core\Logger\Entry\LogEntryInterface;
 
-/**
- * echo log message to STDOUT
- *
- * @package Solital\Core\Logger
- */
 class EchoHandler extends HandlerAbstract
 {
     /**

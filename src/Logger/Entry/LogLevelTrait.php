@@ -6,9 +6,6 @@ namespace Solital\Core\Logger\Entry;
 
 use Psr\Log\LogLevel;
 
-/**
- * @package Solital\Core\Logger
- */
 trait LogLevelTrait
 {
     /**

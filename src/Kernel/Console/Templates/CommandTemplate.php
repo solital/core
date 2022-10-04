@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @generated class generated using Vinci Console
+ */
 namespace Solital\Console\Command;
 
 use Solital\Core\Console\{Command, MessageTrait};

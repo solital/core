@@ -36,7 +36,7 @@ class Version extends Command implements CommandInterface
     public function handle(object $arguments, object $options): mixed
     {
         $this->info("Solital framework - Fast, easy and practical")->print()->break(true);
-        $this->line("Core " . $this->getVersion())->print()->break();
+        $this->line("Core " . $this->solitalVersion())->print()->break();
         $this->line("PHP " . $this->phpVersion())->print()->break();
         $this->line("Katrina " . $this->katrinaVersion())->print()->break(true);
         $this->warning("Thank you for using Solital, you can see the full documentation at " . Application::SITE_DOC_DOMAIN)->print()->break();

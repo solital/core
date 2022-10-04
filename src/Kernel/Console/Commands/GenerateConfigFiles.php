@@ -2,10 +2,12 @@
 
 namespace Solital\Core\Kernel\Console\Commands;
 
-use Solital\Core\Console\Command;
+use Solital\Core\Console\{
+    Interface\CommandInterface,
+    Command
+};
 use Solital\Core\Kernel\Application;
 use Solital\Core\FileSystem\HandleFiles;
-use Solital\Core\Console\Interface\CommandInterface;
 
 class GenerateConfigFiles extends Command implements CommandInterface
 {
@@ -35,16 +37,7 @@ class GenerateConfigFiles extends Command implements CommandInterface
         $config_app_dir = Application::getRootApp('config/', Application::DEBUG);
         $config_core_dir = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Config';
 
-        $handle_files = new HandleFiles();
-        $files = $handle_files->folder($config_core_dir)->files();
-        $handle_files->create($config_app_dir);
-
-        foreach ($files as $file) {
-            $file_name = pathinfo($file);
-            $file_name = $file_name['basename'];
-            $handle_files->copy($file, $config_app_dir . $file_name);
-        }
-
+        $this->copyFiles($config_core_dir, $config_app_dir);
         $this->queueFiles();
         $this->commandFiles();
         $this->success('Configuration files copied successfully!')->print()->break();
@@ -60,15 +53,7 @@ class GenerateConfigFiles extends Command implements CommandInterface
         $dir_queue = Application::getRootApp('Queue/', Application::DEBUG);
         $config_core_dir = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Templates' . DIRECTORY_SEPARATOR . "Queue";
 
-        $handle_files = new HandleFiles();
-        $files = $handle_files->folder($config_core_dir)->files();
-        $handle_files->create($dir_queue);
-
-        foreach ($files as $file) {
-            $file_name = pathinfo($file);
-            $file_name = $file_name['basename'];
-            $handle_files->copy($file, $dir_queue . $file_name);
-        }
+        $this->copyFiles($config_core_dir, $dir_queue);
 
         return $this;
     }
@@ -81,16 +66,27 @@ class GenerateConfigFiles extends Command implements CommandInterface
         $dir_queue = Application::getRootApp('Console/', Application::DEBUG);
         $config_core_dir = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Templates' . DIRECTORY_SEPARATOR . "Commands";
 
+        $this->copyFiles($config_core_dir, $dir_queue);
+
+        return $this;
+    }
+
+    /**
+     * @param string $config_core_dir
+     * @param string $template_dir
+     * 
+     * @return void
+     */
+    private function copyFiles(string $config_core_dir, string $template_dir): void
+    {
         $handle_files = new HandleFiles();
         $files = $handle_files->folder($config_core_dir)->files();
-        $handle_files->create($dir_queue);
+        $handle_files->create($template_dir);
 
         foreach ($files as $file) {
             $file_name = pathinfo($file);
             $file_name = $file_name['basename'];
-            $handle_files->copy($file, $dir_queue . $file_name);
+            $handle_files->copy($file, $template_dir . $file_name);
         }
-
-        return $this;
     }
 }

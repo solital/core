@@ -2,6 +2,7 @@
 
 namespace Solital\Core\Http\Middleware;
 
+use Solital\Core\Exceptions\IpRestrictAccessException;
 use Solital\Core\Http\Request;
 
 abstract class IpRestrictAccess implements MiddlewareInterface
@@ -18,12 +19,12 @@ abstract class IpRestrictAccess implements MiddlewareInterface
 
     /**
      * @param Request $request
-     * @throws HttpException
+     * @throws IpRestrictAccessException
      */
     public function handle(Request $request): void
     {
         if ($this->validate((string)$request->getIp()) === false) {
-            throw new \Exception("Restricted ip. Access to " . $request->getIp() . " has been blocked", 403);
+            throw new IpRestrictAccessException("Restricted ip. Access to " . $request->getIp() . " has been blocked", 403);
         }
     }
 

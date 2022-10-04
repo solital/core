@@ -12,15 +12,24 @@ trait HelpersTrait
      * @param string $component_template
      * @param string $component_dir
      * @param string $argument_name
+     * @param array|null $replace 
      * 
      * @return bool
      */
-    public function createComponent(string $component_template, string $component_dir, string $argument_name): bool
+    public function createComponent(string $component_template, string $component_dir, string $argument_name, ?array $replace = null): bool
     {
         $output_template = file_get_contents($component_template);
 
         if (str_contains($output_template, 'NameDefault')) {
             $output_template = str_replace('NameDefault', $argument_name, $output_template);
+        }
+
+        if ($replace != null) {
+            foreach ($replace as $key => $replace_text) {
+                if (str_contains($output_template, $key) && $key != null) {
+                    $output_template = str_replace($key, $replace_text, $output_template);
+                }
+            }
         }
 
         $file_exists = $component_dir . $argument_name . ".php";

@@ -10,11 +10,6 @@ use Solital\Core\Logger\Formatter\FormatterInterface;
 use Solital\Core\Logger\Formatter\FormatterAwareTrait;
 use Solital\Core\Logger\Formatter\FormatterAwareInterface;
 
-/**
- * HandlerAbstract
- *
- * @package Solital\Core\Logger
- */
 abstract class HandlerAbstract implements FormatterAwareInterface
 {
     use FormatterAwareTrait;

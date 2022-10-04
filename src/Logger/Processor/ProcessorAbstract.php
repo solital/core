@@ -6,11 +6,6 @@ namespace Solital\Core\Logger\Processor;
 
 use Solital\Core\Logger\Entry\LogEntryInterface;
 
-/**
- * ProcessorAbstract
- *
- * @package Solital\Core\Logger
- */
 abstract class ProcessorAbstract
 {
     /**

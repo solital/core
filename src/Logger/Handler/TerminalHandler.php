@@ -8,11 +8,6 @@ use Solital\Core\Logger\Formatter\AnsiFormatter;
 use Solital\Core\Logger\Entry\LogEntryInterface;
 use Solital\Core\Logger\Formatter\FormatterInterface;
 
-/**
- * log to a terminal
- *
- * @package Solital\Core\Logger
- */
 class TerminalHandler extends StreamHandler
 {
     /**

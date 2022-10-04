@@ -139,7 +139,7 @@ class HttpCache extends Cache
 
         if (array_key_exists('HTTP_IF_NONE_MATCH', $_SERVER) && $_SERVER['HTTP_IF_NONE_MATCH'] == $hash) {
             header('HTTP/1.1 304 Not Modified');
-            header('Date: ' . gmstrftime('%a, %d %b %Y %T %Z', $_SERVER['REQUEST_TIME']));
+            header('Date: ' . date('D, d M Y H:i:s', $_SERVER['REQUEST_TIME']));
             header('Cache-Control: ');
             header('Pragma: ');
             header('Expires: ');
