@@ -2,7 +2,7 @@
 
 use PHPUnit\Framework\TestCase;
 use Solital\Core\Console\Command;
-use Solital\Core\Test\ExtendCommands\{ExtendedCommandsTest, OtherExtendComandTest};
+use Solital\Core\Console\tests\ExtendCommands\{ExtendedCommandsTest, OtherExtendComandTest};
 
 class VinciTest extends TestCase
 {

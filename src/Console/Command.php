@@ -3,6 +3,7 @@
 namespace Solital\Core\Console;
 
 use ModernPHPException\ModernPHPException;
+use Solital\Core\Console\CommandException;
 use Solital\Core\Console\{MessageTrait, DefaultCommandsTrait};
 
 class Command
@@ -10,8 +11,9 @@ class Command
     use DefaultCommandsTrait;
     use MessageTrait;
 
-    const VERSION = "3.0.2";
-    const DATE_VERSION = "Sep 21 2022";
+    const VERSION = "3.1.0";
+    const DATE_VERSION = "Oct 15 2022";
+    const SITE_DOC = "http://solitalframework.rf.gd/docs/3.x/vinci-console/";
 
     /**
      * @var string
@@ -46,7 +48,22 @@ class Command
     /**
      * @var array
      */
+    private array $all_arguments = [];
+
+    /**
+     * @var array
+     */
     protected array $command_class = [];
+
+    /**
+     * @var array
+     */
+    private array $verify_commands = [];
+
+    /**
+     * @var mixed
+     */
+    private mixed $instance;
 
     /**
      * @param array $class
@@ -54,7 +71,7 @@ class Command
     public function __construct($class)
     {
         (new ModernPHPException)->start();
-        
+
         if ($class) {
             foreach ($class as $class) {
                 $instance = new $class();
@@ -86,17 +103,23 @@ class Command
                     $args = $instance->getAllArguments();
                     $cmd = $instance->getCommand();
 
-                    if (count($args) == count($this->arguments) && !empty($this->arguments)) {
-                        $all_arguments = array_combine($args, $this->arguments);
-                    } else {
-                        $all_arguments = $this->arguments;
-                    }
+                    $this->repeatedCommands($cmd, get_class($instance));
 
                     if ($cmd == $this->command) {
-                        return $instance->handle((object)$all_arguments, (object)$this->options);
+                        $this->instance = $instance;
+
+                        if (count($args) == count($this->arguments) && !empty($this->arguments)) {
+                            $this->all_arguments = array_combine($args, $this->arguments);
+                        } else {
+                            $this->all_arguments = $this->arguments;
+                        }
                     }
                 }
             }
+        }
+
+        if (isset($this->instance)) {
+            return $this->instance->handle((object)$this->all_arguments, (object)$this->options);
         }
 
         $this->error("Command not found")->print()->break()->exit();
@@ -184,6 +207,24 @@ class Command
     private function getCommandClass(): array
     {
         return $this->command_class;
+    }
+
+    /**
+     * @param string $cmd
+     * @param string $instance
+     * 
+     * @return void
+     * @throws CommandException
+     */
+    private function repeatedCommands(string $cmd, string $instance): void
+    {
+        array_push($this->verify_commands, $cmd);
+        $res = array_unique(array_diff_assoc($this->verify_commands, array_unique($this->verify_commands)));
+
+        if (!empty($res)) {
+            $command = implode(",", $res);
+            throw new CommandException("Duplicate command: '" . $command . "' in " . $instance . " class");
+        }
     }
 
     /**

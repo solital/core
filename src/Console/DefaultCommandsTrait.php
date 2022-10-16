@@ -3,7 +3,6 @@
 namespace Solital\Core\Console;
 
 use Solital\Core\Console\MessageTrait;
-use Solital\Core\Kernel\Application;
 
 trait DefaultCommandsTrait
 {
@@ -136,6 +135,6 @@ trait DefaultCommandsTrait
 
         echo $about . $version . $date . PHP_EOL . PHP_EOL;
         $this->line("PHP Version (" . PHP_VERSION . ")")->print()->break();
-        $this->line("By Solital Framework. Access " . Application::SITE_DOC_DOMAIN)->print()->break();
+        $this->line("By Solital Framework. Access " . Command::SITE_DOC)->print()->break();
     }
 }

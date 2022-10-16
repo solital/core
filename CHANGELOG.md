@@ -1,5 +1,21 @@
 # Released Notes
 
+## v3.1.1 - (2022-10-16)
+
+### Fixed
+
+- Fixed minify on Wolf
+- Fixed pagination conflict with tags in Wolf
+- Fixed `ArrayAccess` interface in `ArrayCollection` class
+- Fixed repeated commands in Vinci
+
+### Changed
+
+- Changed cache in Wolf
+- Changed packages in composer.json
+
+--------------------------------------------------------------------------
+
 ## v3.1.0 - (2022-10-03)
 
 ### Added

@@ -25,6 +25,36 @@ class WolfCache
     protected ?string $time = null;
 
     /**
+     * @param array $config
+     * 
+     * @return self
+     */
+    public function setCache(array $config): self
+    {
+        if ($config['wolf_cache']['enabled'] == true) {
+            switch ($config['wolf_cache']['time']) {
+                case 'minute':
+                    $this->forOneMinute();
+                    break;
+
+                case 'hour':
+                    $this->forOneHour();
+                    break;
+
+                case 'day':
+                    $this->forOneDay();
+                    break;
+
+                case 'week':
+                    $this->forOneWeek();
+                    break;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * @return self
      */
     public static function cache(): self

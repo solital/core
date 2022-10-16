@@ -18,24 +18,29 @@ trait WolfMinifyTrait
     private static string $dir_public;
 
     /**
-     * @var bool
-     */
-    protected static bool $minify_mode = false;
-
-    /**
+     * @param array $config
+     * 
      * @return self
      */
-    public static function minify(bool $mode = true): self
+    public function setMinify(array $config): self
     {
-        self::$minify_mode = $mode;
+        if ($config['wolf_minify'] != false) {
+            if ($config['wolf_minify'] == 'style') {
+                $this->style();
+            } elseif ($config['wolf_minify'] == 'script') {
+                $this->script();
+            } elseif ($config['wolf_minify'] == 'all') {
+                $this->all();
+            }
+        }
 
-        return new static();
+        return $this;
     }
 
     /**
      * @return bool
      */
-    public function style(): bool
+    protected function style(): bool
     {
         $minCSS = new CSS();
         $cssDir = scandir(self::getDirCss());
@@ -56,7 +61,7 @@ trait WolfMinifyTrait
     /**
      * @return bool
      */
-    public function script(): bool
+    protected function script(): bool
     {
         $minJS = new JS();
         $jsDir = scandir(self::getDirJs());
@@ -77,7 +82,7 @@ trait WolfMinifyTrait
     /**
      * @return bool
      */
-    public function all(): bool
+    protected function all(): bool
     {
         $this->style();
         $this->script();
