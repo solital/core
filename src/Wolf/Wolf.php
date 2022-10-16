@@ -5,6 +5,7 @@ namespace Solital\Core\Wolf;
 use Symfony\Component\Yaml\Yaml;
 use Solital\Core\Logger\Logger;
 use Solital\Core\Kernel\Application;
+use Solital\Core\Resource\Collection\ArrayCollection;
 use Solital\Core\Wolf\{WolfCache, WolfMinifyTrait};
 use Solital\Core\Wolf\Functions\{AssetsTrait, ExtendsTrait};
 
@@ -38,6 +39,11 @@ class Wolf extends WolfCache
      * @var array
      */
     protected static array $allArgs = [];
+
+    /**
+     * @var mixed
+     */
+    private static mixed $original_args;
 
     /**
      * @var Logger
@@ -85,31 +91,12 @@ class Wolf extends WolfCache
     public function loadView(string $view, array $args = null): mixed
     {
         $view = str_replace(".", DIRECTORY_SEPARATOR, $view);
-
         $config = Yaml::parseFile(Application::getDirConfigFiles(5) . '/bootstrap.yaml');
 
         $this->setArgs($args);
         $this->setView($view);
-
-        if ($config['wolf_cache']['enabled'] == true) {
-            switch ($config['wolf_cache']['time']) {
-                case 'minute':
-                    $this->forOneMinute();
-                    break;
-
-                case 'hour':
-                    $this->forOneHour();
-                    break;
-
-                case 'day':
-                    $this->forOneDay();
-                    break;
-
-                case 'week':
-                    $this->forOneWeek();
-                    break;
-            }
-        }
+        $this->setCache($config);
+        $this->setMinify($config);
 
         return $this->render();
     }
@@ -125,6 +112,7 @@ class Wolf extends WolfCache
             $this->args = $args;
             self::$allArgs = $args;
             $this->args = $this->htmlspecialcharsRecursive($this->args);
+            $this->args = (new ArrayCollection(self::$allArgs))->merge($this->args)->all();
         }
 
         return $this;
@@ -172,18 +160,26 @@ class Wolf extends WolfCache
     }
 
     /**
-     * @param mixed $input
+     * @param mixed $args
      * 
      * @return mixed
      */
-    private function htmlspecialcharsRecursive(mixed $input): mixed
+    private function htmlspecialcharsRecursive(mixed $args): mixed
     {
-        if (is_array($input)) {
-            return array_map(array($this, 'htmlspecialcharsRecursive'), $input);
-        } else if (is_scalar($input)) {
-            return htmlspecialchars($input, ENT_COMPAT | ENT_HTML401, 'UTF-8', false);
+        foreach ($this->getAllowIndex() as $key => $value) {
+            if (is_array($args)) {
+                if (array_key_exists($key, $args)) {
+                    unset($args[$key]);
+                }
+            }
+        }
+
+        if (is_array($args)) {
+            return array_map(array($this, 'htmlspecialcharsRecursive'), $args);
+        } else if (is_scalar($args)) {
+            return htmlspecialchars($args, ENT_COMPAT | ENT_HTML401, 'UTF-8', false);
         } else {
-            return $input;
+            return $args;
         }
     }
 }

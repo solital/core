@@ -1826,9 +1826,9 @@ class ArrayCollection implements \ArrayAccess, Arrayable, \Countable, \IteratorA
     /**
      * Convert the object into something JSON serializable.
      *
-     * @return array
+     * @return mixed
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return array_map(function ($value) {
             if ($value instanceof \JsonSerializable) {
@@ -1943,12 +1943,12 @@ class ArrayCollection implements \ArrayAccess, Arrayable, \Countable, \IteratorA
     /**
      * Get an item at a given offset.
      *
-     * @param  mixed  $key
+     * @param  mixed  $offset
      * @return mixed
      */
-    public function offsetGet($key)
+    public function offsetGet(mixed $offset): mixed
     {
-        return $this->items[$key];
+        return $this->items[$offset];
     }
 
     /**

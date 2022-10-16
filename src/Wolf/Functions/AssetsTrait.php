@@ -5,6 +5,11 @@ namespace Solital\Core\Wolf\Functions;
 trait AssetsTrait
 {
     /**
+     * @var array
+     */
+    protected static array $allow_tags = [];
+
+    /**
      * @param string $asset
      * 
      * @return string
@@ -42,5 +47,25 @@ trait AssetsTrait
     public function img(string $asset): string
     {
         return $this->main_url . 'assets/_img/' . $asset;
+    }
+
+    /**
+     * @param array $tags
+     * 
+     * @return void
+     */
+    public function setAllowIndex(array $tags): void
+    {
+        foreach ($tags as $value) {
+            self::$allow_tags[$value] = $value;
+        }
+    }
+
+    /**
+     * @return array
+     */
+    protected function getAllowIndex(): array
+    {
+        return self::$allow_tags;
     }
 }

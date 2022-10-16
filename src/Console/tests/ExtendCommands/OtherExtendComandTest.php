@@ -10,7 +10,7 @@ class OtherExtendComandTest implements ExtendCommandsInterface
      * @var array
      */
     protected array $command_class = [
-        \Solital\Core\Test\MyCommandsTest::class
+        \Solital\Core\Console\tests\MyCommandsTest::class
     ];
 
     public function getCommandClass(): array

@@ -2,7 +2,7 @@
 
 namespace Solital\Core\Console\ProgressBar;
 
-class Manager
+class ProgressBar
 {
     /**
      * Default format for the progress bar
@@ -24,7 +24,6 @@ class Manager
     protected array $replacementRules = [];
 
     /**
-     * @param Registry $registry
      * @param int $current
      * @param int $max
      * @param int $width
@@ -32,11 +31,11 @@ class Manager
      * @param string $remainingBarElementCharacter
      * @param string $currentPositionCharacter
      */
-    public function __construct(Registry $registry, int $current, int $max, int $width = 80, string $doneBarElementCharacter = '=', string $remainingBarElementCharacter = '-', string $currentPositionCharacter = '>')
+    public function __construct(int $current, int $max, int $width = 80, string $doneBarElementCharacter = '=', string $remainingBarElementCharacter = '-', string $currentPositionCharacter = '>')
     {
         $advancement    = [$current => time()];
 
-        $this->registry = $registry;
+        $this->registry = new Registry();
         $this->registry->setValue('current', $current);
         $this->registry->setValue('max', $max);
         $this->registry->setValue('advancement', $advancement);
