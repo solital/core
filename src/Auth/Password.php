@@ -2,7 +2,6 @@
 
 namespace Solital\Core\Auth;
 
-use Symfony\Component\Yaml\Yaml;
 use Solital\Core\Kernel\Application;
 use SecurePassword\{SecurePassword, HashAlgorithm};
 
@@ -103,7 +102,7 @@ class Password
      */
     private function setConfig(): Password
     {
-        $config = Yaml::parseFile(Application::getDirConfigFiles(5) . 'auth.yaml');
+        $config = Application::getYamlVariables(5, 'auth.yaml');
         $algo = $config['password']['algorithm'];
 
         if ($algo == 'default') {

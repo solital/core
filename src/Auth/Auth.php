@@ -2,7 +2,6 @@
 
 namespace Solital\Core\Auth;
 
-use Symfony\Component\Yaml\Yaml;
 use Solital\Core\Auth\Reset;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Resource\{Cookie, Session};
@@ -150,30 +149,19 @@ class Auth extends Reset
     /**
      * Authenticates the user in the system
      * 
-     * @return mixed
+     * @return bool
      */
-    public function register(string $redirect = "")
+    public function register(string $redirect = ""): bool
     {
         self::getEnv();
 
-        switch (self::$type) {
-            case 'login':
-                return $this->registerLogin($redirect);
+        $register = match (self::$type) {
+            'login' => $this->registerLogin($redirect),
+            'forgot' => $this->registerForgot(),
+            'change' => $this->registerChange()
+        };
 
-                break;
-
-            case 'forgot':
-                return $this->registerForgot();
-
-                break;
-
-            case 'change':
-                return $this->registerChange();
-
-                break;
-        }
-
-        return $this;
+        return $register;
     }
 
     /**
@@ -398,7 +386,7 @@ class Auth extends Reset
      */
     private static function getEnv(): void
     {
-        $config = Yaml::parseFile(Application::getDirConfigFiles(5) . 'auth.yaml');
+        $config = Application::getYamlVariables(5, 'auth.yaml');
         self::$dashboard_url = $config['auth']['auth_dashboard_url'];
         self::$login_url = $config['auth']['auth_login_url'];
     }

@@ -2,7 +2,6 @@
 
 namespace Solital\Core\Mail;
 
-use Symfony\Component\Yaml\Yaml;
 use PHPMailer\PHPMailer\PHPMailer;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Mail\QueueMail;
@@ -44,7 +43,7 @@ class Mailer extends QueueMail
         if (Application::MAILER_TEST_UNIT == true) {
             $this->connectUnitTest();
         } else {
-            $config = Yaml::parseFile(Application::getDirConfigFiles(5) . '/bootstrap.yaml');
+            $config = Application::getYamlVariables(5, 'bootstrap.yaml');
 
             if ($config['mail_test']['mail_test_enable'] == true) {
                 $this->connectionTest();
@@ -149,7 +148,7 @@ class Mailer extends QueueMail
      */
     private function connection(): Mailer
     {
-        $config = Yaml::parseFile(Application::getDirConfigFiles(5) . '/bootstrap.yaml');
+        $config = Application::getYamlVariables(5, 'bootstrap.yaml');
 
         $this->mail = new PHPMailer($config['mail_exceptions']);
         $this->mail->SMTPDebug = (int)getenv('MAIL_DEBUG');
@@ -170,7 +169,7 @@ class Mailer extends QueueMail
      */
     private function connectionTest(): Mailer
     {
-        $config = Yaml::parseFile(Application::getDirConfigFiles(5) . '/bootstrap.yaml');
+        $config = Application::getYamlVariables(5, 'bootstrap.yaml');
 
         $this->mail = new PHPMailer($config['mail_exceptions']);
         $this->mail->SMTPDebug = (int)$config['mail_test']['mail_debug'];

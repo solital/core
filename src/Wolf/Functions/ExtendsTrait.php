@@ -26,9 +26,9 @@ trait ExtendsTrait
                 include_once $view_in_temp;
 
                 if ($this->time != null) {
-                    $res = ob_get_contents();
+                    $result = ob_get_contents();
                     ob_flush();
-                    file_put_contents($this->file_cache, $res);
+                    file_put_contents($this->file_cache, $result);
                 }
 
                 return ob_get_clean();

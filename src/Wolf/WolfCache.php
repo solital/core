@@ -2,10 +2,11 @@
 
 namespace Solital\Core\Wolf;
 
+use Solital\Core\FileSystem\HandleFiles;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Wolf\Functions\ExtendsTrait;
 
-class WolfCache
+abstract class WolfCache
 {
     use ExtendsTrait;
 
@@ -32,34 +33,15 @@ class WolfCache
     public function setCache(array $config): self
     {
         if ($config['wolf_cache']['enabled'] == true) {
-            switch ($config['wolf_cache']['time']) {
-                case 'minute':
-                    $this->forOneMinute();
-                    break;
-
-                case 'hour':
-                    $this->forOneHour();
-                    break;
-
-                case 'day':
-                    $this->forOneDay();
-                    break;
-
-                case 'week':
-                    $this->forOneWeek();
-                    break;
-            }
+            match ($config['wolf_cache']['time']) {
+                'minute' => $this->forOneMinute(),
+                'hour' => $this->forOneHour(),
+                'day' => $this->forOneDay(),
+                'week' => $this->forOneWeek()
+            };
         }
 
         return $this;
-    }
-
-    /**
-     * @return self
-     */
-    public static function cache(): self
-    {
-        return new static;
     }
 
     /**
@@ -74,7 +56,7 @@ class WolfCache
         }
 
         if (!is_dir($this->cache_dir)) {
-            \mkdir($this->cache_dir);
+            (new HandleFiles)->create($this->cache_dir);
         }
 
         return $this->cache_dir;
@@ -85,7 +67,7 @@ class WolfCache
      * 
      * @return null|string
      */
-    protected function generateCache(string $view): ?string
+    protected function generateCacheNameFile(string $view): ?string
     {
         if (!empty($this->time) || $this->time != null) {
             $this->file_cache = $this->getFolderCache() . basename($view, ".php") . "-" . date('Ymd') . "-" . $this->time . ".cache.php";
@@ -93,30 +75,6 @@ class WolfCache
         }
 
         return null;
-    }
-
-    /**
-     * @param string $view
-     * 
-     * @return bool
-     */
-    public function makeCache(string $view): bool
-    {
-        $dir_view = Application::getRoot("/resources/view");
-        $cache_template = $this->generateCache($view);
-
-        if (file_exists($cache_template)) {
-            include_once $cache_template;
-            exit;
-        }
-
-        $cache_template = file_get_contents($dir_view . $view . ".php");
-        $cache_template = str_replace(["{{", "}}"], ["<?=", "?>"], $cache_template);
-        $cache_template = str_replace(["{%", "%}"], ["<?php", "?>"], $cache_template);
-
-        file_put_contents($this->file_cache, $cache_template);
-
-        return true;
     }
 
     /**

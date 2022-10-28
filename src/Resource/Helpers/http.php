@@ -1,9 +1,8 @@
 <?php
 
-use Symfony\Component\Yaml\Yaml;
 use Solital\Core\Resource\Session;
 use Solital\Core\Course\Course as Course;
-use Solital\Core\Http\{Uri, Request, Response, ServerRequest};
+use Solital\Core\Http\{Uri, Request, Response};
 use Solital\Core\Kernel\Application;
 
 /**
@@ -125,6 +124,6 @@ function request_repeat(string $key, string $value): bool
  */
 function middleware(string $value): string
 {
-    $config = Yaml::parseFile(Application::getDirConfigFiles(5) . '/middleware.yaml');
+    $config = Application::getYamlVariables(5, 'middleware.yaml');
     return $config['middleware'][$value];
 }

@@ -60,19 +60,4 @@ class WolfTest extends TestCase
 
         $this->assertTrue($result);
     }
-
-    public function testWolfCacheClass()
-    {
-        $result = false;
-        #WolfCache::cache()->forOneMinute()->makeCache('welcome');
-
-        $dir_view = Application::getRootTest("view/");
-        $file_name = "contact-20220325-12.cache.php";
-
-        if (file_exists($dir_view . "cache" . DIRECTORY_SEPARATOR . $file_name)) {
-            $result = true;
-        }
-
-        $this->assertTrue($result);
-    }
 }
