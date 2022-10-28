@@ -4,7 +4,6 @@ namespace Solital\Core\Security;
 
 use Katrina\Katrina;
 use Respect\Validation\Validator;
-use Symfony\Component\Yaml\Yaml;
 use Solital\Core\Mail\Mailer;
 use Solital\Core\Auth\Password;
 use Solital\Core\Resource\Session;
@@ -17,11 +16,6 @@ class Guardian
      * @var string
      */
     private string $table;
-
-    /**
-     * @var string
-     */
-    private static string $domain;
 
     /**
      * @var Password
@@ -130,7 +124,7 @@ class Guardian
      */
     public static function validateDomain(): self
     {
-        $config = Yaml::parseFile(Application::getDirConfigFiles(5) . '/bootstrap.yaml');
+        $config = Application::getYamlVariables(5, 'bootstrap.yaml');
 
         if ($config['verify_domain']['enable_verification'] == true) {
             self::checkEnvMail();

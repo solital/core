@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Solital\Core\Logger\Handler;
 
-use Symfony\Component\Yaml\Yaml;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Logger\Entry\LogEntryInterface;
 use Solital\Core\Logger\Handler\HandlerAbstract;
@@ -23,7 +22,7 @@ class StreamHandler extends HandlerAbstract
      */
     public function __construct(mixed $stream, ?FormatterInterface $formatter = null)
     {
-        $config = Yaml::parseFile(Application::getDirConfigFiles(5) . 'bootstrap.yaml');
+        $config = Application::getYamlVariables(5, 'bootstrap.yaml');
 
         if ($config['logs']['enabled_log_files'] == true) {
             $this->stream = $this->openStream($stream);

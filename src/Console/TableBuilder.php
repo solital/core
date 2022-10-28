@@ -81,6 +81,10 @@ class TableBuilder
 
         foreach ($tableData as $rowData) {
             foreach ($rowData as $column => $data) {
+                if ($data == null || empty($data)) {
+                    $data = '-';
+                }
+
                 // Set the column width using the largest length be that from the data or the column header name
                 $columnWidths[$column] = max($columnWidths[$column] ?? strlen($column), strlen($data));
             }
@@ -150,6 +154,9 @@ class TableBuilder
         $rowString = '';
 
         foreach ($rowData as $column => $data) {
+            if ($data == null || empty($data)) {
+                $data = '-';
+            }
             // This accounts for headers not having the corresponding column keys as the data itself is the column key
             $rowWidth = $columnSize[$column] ?? $columnSize[$data];
             $rowString .= '| ' . str_pad($data, $rowWidth, ' ', $padType) . ' ';
@@ -159,6 +166,7 @@ class TableBuilder
             // If two columns have the same data, this prevents incorrectly adding the '|'
             $rowString .= end($headers) === $column ? '|' : '';
         }
+
         return $rowString;
     }
 

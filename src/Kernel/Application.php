@@ -2,21 +2,21 @@
 
 namespace Solital\Core\Kernel;
 
-use Symfony\Component\Yaml\Yaml;
 use ModernPHPException\ModernPHPException;
+use Symfony\Component\Yaml\Yaml;
 use Solital\Core\Course\Course;
-use Solital\Core\Security\Guardian;
-use Solital\Core\Kernel\KernelTrait;
-use Solital\Core\FileSystem\HandleFiles;
-use Solital\Core\Resource\Session;
 use Solital\Core\Exceptions\ApplicationException;
+use Solital\Core\FileSystem\HandleFiles;
+use Solital\Core\Kernel\KernelTrait;
+use Solital\Core\Resource\Session;
+use Solital\Core\Security\Guardian;
 use Solital\Core\Validation\Convertime;
 
 class Application
 {
     use KernelTrait;
 
-    const SOLITAL_VERSION = "3.1.1";
+    const SOLITAL_VERSION = "3.2.0";
     const SITE_DOC_DOMAIN = "http://solitalframework.rf.gd/";
 
     /**
@@ -71,6 +71,17 @@ class Application
     }
 
     /**
+     * @param int $dir_number
+     * @param string $yaml_file
+     * 
+     * @return mixed
+     */
+    public static function getYamlVariables(int $dir_number, string $yaml_file): mixed
+    {
+        return Yaml::parseFile(self::getDirConfigFiles($dir_number) . $yaml_file);
+    }
+
+    /**
      * @return void
      */
     private static function getInstance(): void
@@ -80,7 +91,7 @@ class Application
 
         if (self::DEBUG == false) {
             if (file_exists(self::getDirConfigFiles(5) . 'bootstrap.yaml')) {
-                $modern_php_exception = Yaml::parseFile(self::getDirConfigFiles(5) . 'bootstrap.yaml');
+                $modern_php_exception = self::getYamlVariables(5, 'bootstrap.yaml');
 
                 if (array_key_exists('exception_json_return', $modern_php_exception)) {
                     if ($modern_php_exception['exception_json_return'] == true) {
@@ -135,7 +146,7 @@ class Application
         if (self::DEBUG_DATABASE == true) {
             return self::connectionDatabaseDebug();
         } else {
-            $database_connection = Yaml::parseFile(self::getDirConfigFiles(5) . 'database.yaml');
+            $database_connection = self::getYamlVariables(5, 'database.yaml');
         }
 
         if ($database_connection['enable_test'] == true) {
@@ -332,7 +343,7 @@ class Application
         }
 
         if (count($scanned_dir) > 250) {
-            throw new ApplicationException('Too many files attempted to load via autoload');
+            throw new \Exception('Too many files attempted to load via autoload');
         }
 
         foreach ($scanned_dir as $item) {
@@ -391,12 +402,12 @@ class Application
 
                 // Don't include negative sized files
                 if ($filesize < 0) {
-                    throw new ApplicationException('File size is negative, not autoloading');
+                    throw new \Exception('File size is negative, not autoloading');
                 }
 
                 // Don't include files that are greater than 300kb
                 if ($filesize > 300000) {
-                    throw new ApplicationException('File size is greater than 300kb, not autoloading');
+                    throw new \Exception('File size is greater than 300kb, not autoloading');
                 }
 
                 require_once($real_path);

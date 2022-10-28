@@ -2,7 +2,6 @@
 
 namespace Solital\Core\Wolf;
 
-use Symfony\Component\Yaml\Yaml;
 use Solital\Core\Logger\Logger;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Resource\Collection\ArrayCollection;
@@ -91,7 +90,7 @@ class Wolf extends WolfCache
     public function loadView(string $view, array $args = null): mixed
     {
         $view = str_replace(".", DIRECTORY_SEPARATOR, $view);
-        $config = Yaml::parseFile(Application::getDirConfigFiles(5) . '/bootstrap.yaml');
+        $config = Application::getYamlVariables(5, 'bootstrap.yaml');
 
         $this->setArgs($args);
         $this->setView($view);
@@ -128,7 +127,6 @@ class Wolf extends WolfCache
 
     /**
      * @param string $view
-     * @param array|null $data
      * 
      * @return Wolf
      */
@@ -148,7 +146,7 @@ class Wolf extends WolfCache
      */
     public function render(): string
     {
-        $cache_template = $this->generateCache($this->view);
+        $cache_template = $this->generateCacheNameFile($this->view);
         $cache_template = $this->loadCache($cache_template);
 
         if (!empty($cache_template) || $cache_template != null) {

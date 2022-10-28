@@ -1,5 +1,25 @@
 # Released Notes
 
+## v3.2.0 - (2022-11-28)
+
+### Added
+
+- Added return data from database using Vinci Console
+- Added new trait: `HttpControllerTrait`
+- Added `removeParamsUrl`, `getRequestParams`, `redirect`, `requestLimit` and `requestRepeat` methods
+- Added global method to return yaml values
+- Added Solution in `ApplicationException`
+
+### Changed
+
+- Changed `switch` declaration by `match` function in `Auth` class
+
+### Removed
+
+- Removed `ContainerException` and `ContainerNotFoundException` in Exception folder
+
+--------------------------------------------------------------------------
+
 ## v3.1.1 - (2022-10-16)
 
 ### Fixed
