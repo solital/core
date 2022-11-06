@@ -7,7 +7,7 @@ use Solital\Core\Kernel\Application;
 use Solital\Core\Resource\{Cookie, Session};
 use Solital\Core\Security\{Hash, Guardian};
 
-class Auth extends Reset
+final class Auth extends Reset
 {
     /**
      * @var string

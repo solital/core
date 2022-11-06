@@ -55,9 +55,7 @@ class HandleCache extends Command implements CommandInterface
         }
 
         $dir = constant('SITE_ROOT') . DIRECTORY_SEPARATOR . "app" . DIRECTORY_SEPARATOR . "Storage" . DIRECTORY_SEPARATOR . "session" . DIRECTORY_SEPARATOR;
-
         $this->eraseFiles($dir);
-
         $this->success("Sessions was cleared successfully!")->print()->break();
 
         return true;
@@ -79,16 +77,20 @@ class HandleCache extends Command implements CommandInterface
 
         foreach ($dir_cache as $folder) {
             $dir = constant('SITE_ROOT') . DIRECTORY_SEPARATOR . "app" . DIRECTORY_SEPARATOR . "Storage" . DIRECTORY_SEPARATOR . "cache" . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR;
-
-            $this->eraseFiles($dir);            
+            $this->eraseFiles($dir);
         }
 
         $this->success("Cache was cleared successfully!")->print()->break();
-        
+
         return true;
     }
 
-    public function eraseFiles(string $dir)
+    /**
+     * @param string $dir
+     * 
+     * @return void
+     */
+    private function eraseFiles(string $dir): void
     {
         if (!is_dir($dir)) {
             \mkdir($dir);

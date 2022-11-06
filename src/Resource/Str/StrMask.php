@@ -2,7 +2,7 @@
 
 namespace Solital\Core\Resource\Str;
 
-class StrMask
+final class StrMask
 {
     /**
      * List of available patterns

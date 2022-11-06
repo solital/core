@@ -2,10 +2,13 @@
 
 namespace Solital\Core\FileSystem;
 
-use Solital\Core\FileSystem\HandleFolders;
+use Solital\Core\FileSystem\Exception\HandleFilesException;
+use Solital\Core\FileSystem\HandleFoldersTrait;
 
-class HandleFiles extends HandleFolders
+class HandleFiles
 {
+    use HandleFoldersTrait;
+
     /**
      * @var string
      */
@@ -31,7 +34,7 @@ class HandleFiles extends HandleFolders
 
             return $this->files;
         } else {
-            throw new \Exception("Folder '" . $this->folder . "' not found", 404);
+            throw new HandleFilesException("Folder '" . $this->folder . "' not found", 404);
         }
     }
 

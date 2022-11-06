@@ -1,6 +1,16 @@
 # Released Notes
 
-## v3.2.0 - (2022-11-28)
+## v3.2.1 - (2022-11-06)
+
+### Fixed
+
+- Fixed final class
+- Fixed `HandleFiles` class
+- Fixed `HandleCache` command
+
+--------------------------------------------------------------------------
+
+## v3.2.0 - (2022-10-28)
 
 ### Added
 

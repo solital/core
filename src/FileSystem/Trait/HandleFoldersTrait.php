@@ -2,7 +2,7 @@
 
 namespace Solital\Core\FileSystem;
 
-abstract class HandleFolders
+trait HandleFoldersTrait
 {
     /**
      * @var string
@@ -39,7 +39,7 @@ abstract class HandleFolders
     {
         $handle_files_obj = new HandleFiles();
         $handle_files_obj2 = clone $handle_files_obj;
-        
+
         $this->files = $handle_files_obj2->folder($dir)->files();
 
         if (is_dir($dir)) {

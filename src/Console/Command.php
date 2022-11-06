@@ -11,8 +11,8 @@ class Command
     use DefaultCommandsTrait;
     use MessageTrait;
 
-    const VERSION = "3.1.0";
-    const DATE_VERSION = "Oct 15 2022";
+    const VERSION = "3.1.1";
+    const DATE_VERSION = "Oct 28 2022";
     const SITE_DOC = "http://solitalframework.rf.gd/docs/3.x/vinci-console/";
 
     /**

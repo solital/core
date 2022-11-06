@@ -8,7 +8,13 @@ use Solital\Core\Resource\Collection\Helper\Jsonable;
 use Solital\Core\Resource\Collection\Helper\Arrayable;
 use Solital\Core\Resource\Collection\Traits\Macroable;
 
-class ArrayCollection implements \ArrayAccess, Arrayable, \Countable, \IteratorAggregate, Jsonable, \JsonSerializable
+final class ArrayCollection implements
+    \ArrayAccess,
+    Arrayable,
+    \Countable,
+    \IteratorAggregate,
+    Jsonable,
+    \JsonSerializable
 {
     use Macroable;
 

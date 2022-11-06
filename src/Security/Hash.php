@@ -4,7 +4,7 @@ namespace Solital\Core\Security;
 
 use Solital\Core\Exceptions\NotFoundException;
 
-class Hash
+final class Hash
 {
     /**
      * @var string
