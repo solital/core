@@ -4,7 +4,7 @@ namespace Solital\Core\Resource;
 
 use Solital\Core\Resource\Session;
 
-class Message
+final class Message
 {
     /**
      * @param string $index

@@ -4,7 +4,7 @@ namespace Solital\Core\Resource\Str;
 
 use Solital\Core\Exceptions\StrException;
 
-class Str
+final class Str
 {
     const DEFAULT_CHUNK_END = "\r\n";
     const DEFAULT_CHUNK_LENGTH = 76;
