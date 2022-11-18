@@ -5,6 +5,7 @@ namespace Solital\Core\Kernel\Console\Commands;
 use Solital\Core\Console\Command;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Console\Interface\CommandInterface;
+use Solital\Core\FileSystem\HandleFiles;
 
 class HandleCache extends Command implements CommandInterface
 {
@@ -93,7 +94,7 @@ class HandleCache extends Command implements CommandInterface
     private function eraseFiles(string $dir): void
     {
         if (!is_dir($dir)) {
-            \mkdir($dir);
+            (new HandleFiles)->create($dir);
         }
 
         $directory = dir($dir);

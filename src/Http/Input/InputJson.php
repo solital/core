@@ -2,6 +2,9 @@
 
 namespace Solital\Core\Http\Input;
 
+/**
+ * @deprecated Use Solital\Core\Resource\JSON
+ */
 class InputJson
 {
     /**

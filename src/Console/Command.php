@@ -11,8 +11,8 @@ class Command
     use DefaultCommandsTrait;
     use MessageTrait;
 
-    const VERSION = "3.1.1";
-    const DATE_VERSION = "Oct 28 2022";
+    const VERSION = "3.2.0";
+    const DATE_VERSION = "Nov XX 2022";
     const SITE_DOC = "http://solitalframework.rf.gd/docs/3.x/vinci-console/";
 
     /**
@@ -66,6 +66,11 @@ class Command
     private mixed $instance;
 
     /**
+     * @var array
+     */
+    protected array $type_commands = [];
+
+    /**
      * @param array $class
      */
     public function __construct($class)
@@ -76,6 +81,7 @@ class Command
             foreach ($class as $class) {
                 $instance = new $class();
                 $this->command_class[] = $instance->getCommandClass();
+                $this->type_commands[] = $instance->getTypeCommands();
             }
         }
     }
@@ -94,11 +100,11 @@ class Command
         $this->filter($this->arguments);
         $this->verifyDefaultCommand($this->command, $this->arguments);
 
-        $res = $this->getCommandClass();
+        $command_class = $this->getCommandClass();
 
-        foreach ($res as $res) {
-            if (isset($res)) {
-                foreach ($res as $class) {
+        foreach ($command_class as $command_class) {
+            if (isset($command_class)) {
+                foreach ($command_class as $class) {
                     $instance = new $class(null);
                     $args = $instance->getAllArguments();
                     $cmd = $instance->getCommand();
@@ -123,32 +129,16 @@ class Command
         }
 
         $this->error("Command not found")->print()->break()->exit();
-    }
 
-    /**
-     * @param string $param
-     * 
-     * @return string
-     */
-    public function getOption(string $param): string
-    {
-        return $this->options[$param];
-    }
-
-    /**
-     * @param array $param
-     * 
-     * @return string
-     */
-    public function getOptions(): array
-    {
-        return $this->options;
+        return $this;
     }
 
     /**
      * Get the value of description
+     * 
+     * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -207,6 +197,14 @@ class Command
     private function getCommandClass(): array
     {
         return $this->command_class;
+    }
+
+    /**
+     * @return array
+     */
+    private function getTypeCommands(): array
+    {
+        return $this->type_commands;
     }
 
     /**

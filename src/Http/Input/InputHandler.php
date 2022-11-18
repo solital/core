@@ -28,6 +28,7 @@ class InputHandler
 
     /**
      * Input constructor.
+     * 
      * @param Request $request
      */
     public function __construct(Request $request)
@@ -38,6 +39,8 @@ class InputHandler
 
     /**
      * Parse input values
+     * 
+     * @return void
      *
      */
     public function parseInputs(): void
@@ -200,9 +203,10 @@ class InputHandler
      *
      * @param string $index
      * @param array ...$methods
+     * 
      * @return InputItemInterface|array|null
      */
-    public function find(string $index, ...$methods)
+    public function find(string $index, ...$methods): mixed
     {
         $element = null;
 
@@ -227,9 +231,10 @@ class InputHandler
      * @param string $index
      * @param string|null $defaultValue
      * @param array ...$methods
+     * 
      * @return string|array
      */
-    public function value(string $index, ?string $defaultValue = null, ...$methods)
+    public function value(string $index, ?string $defaultValue = null, ...$methods): mixed
     {
         $input = $this->find($index, ...$methods);
 
@@ -253,6 +258,7 @@ class InputHandler
      *
      * @param string $index
      * @param array ...$methods
+     * 
      * @return bool
      */
     public function exists(string $index, ...$methods): bool
@@ -265,9 +271,10 @@ class InputHandler
      *
      * @param string $index
      * @param string|null $defaultValue
+     * 
      * @return InputItem|array|string|null
      */
-    public function post(string $index, ?string $defaultValue = null)
+    public function post(string $index, ?string $defaultValue = null): mixed
     {
         return $this->post[$index] ?? $defaultValue;
     }
@@ -277,9 +284,10 @@ class InputHandler
      *
      * @param string $index
      * @param string|null $defaultValue
+     * 
      * @return InputFile|array|string|null
      */
-    public function file(string $index, ?string $defaultValue = null)
+    public function file(string $index, ?string $defaultValue = null): mixed
     {
         return $this->file[$index] ?? $defaultValue;
     }
@@ -289,9 +297,10 @@ class InputHandler
      *
      * @param string $index
      * @param string|null $defaultValue
+     * 
      * @return InputItem|array|string|null
      */
-    public function get(string $index, ?string $defaultValue = null)
+    public function get(string $index, ?string $defaultValue = null): mixed
     {
         return $this->get[$index] ?? $defaultValue;
     }
@@ -299,6 +308,7 @@ class InputHandler
     /**
      * Get all get/post items
      * @param array $filter Only take items in filter
+     * 
      * @return array
      */
     public function all(array $filter = []): array
@@ -362,6 +372,7 @@ class InputHandler
      * Add GET parameter
      *
      * @param string $key
+     * 
      * @param InputItem $item
      */
     public function addGet(string $key, InputItem $item): void
@@ -373,6 +384,7 @@ class InputHandler
      * Add POST parameter
      *
      * @param string $key
+     * 
      * @param InputItem $item
      */
     public function addPost(string $key, InputItem $item): void
@@ -384,6 +396,7 @@ class InputHandler
      * Add FILE parameter
      *
      * @param string $key
+     * 
      * @param InputFile $item
      */
     public function addFile(string $key, InputFile $item): void

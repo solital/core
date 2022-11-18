@@ -24,7 +24,7 @@ class ForgotController extends Controller
     {
         return view('auth.forgot-form', [
             'title' => 'Forgot Password',
-            'msg' => $this->message->get('forgot')
+            'msg' => message('forgot')
         ]);
     }
 
@@ -33,10 +33,10 @@ class ForgotController extends Controller
      */
     public function forgotPost(): void
     {
-        $email = input()->post('email')->getValue();
+        $email = $this->getRequestParams()->post('email')->getValue();
 
         if (Request::repeat('email.forgot', $email)) {
-            $this->message->new('forgot', 'You have tried this email before!');
+            message('forgot', 'You have tried this email before!');
             response()->redirect(url('forgot'));
         }
 
@@ -47,7 +47,7 @@ class ForgotController extends Controller
             ->register();
 
         if ($res == true) {
-            $this->message->new('forgot', 'Link sent to your email!');
+            message('forgot', 'Link sent to your email!');
             response()->redirect(url('forgot'));
         }
     }
@@ -68,10 +68,10 @@ class ForgotController extends Controller
                 'title' => 'Change Password',
                 'email' => $email,
                 'hash' => $hash,
-                'msg' => $this->message->get('forgot')
+                'msg' => message('forgot')
             ]);
         } else {
-            $this->message->new('login', 'The informed link has already expired!');
+            message('login', 'The informed link has already expired!');
             response()->redirect(url('auth'));
         }
     }
@@ -87,11 +87,11 @@ class ForgotController extends Controller
         $email = Hash::decrypt($hash)->value();
 
         if ($res == true) {
-            $pass = input()->post('inputPass')->getValue();
-            $confPass = input()->post('inputConfPass')->getValue();
+            $pass = $this->getRequestParams()->post('inputPass')->getValue();
+            $confPass = $this->getRequestParams()->post('inputConfPass')->getValue();
 
             if ($pass != $confPass) {
-                $this->message->new('forgot', 'The fields do not match!');
+                message('forgot', 'The fields do not match!');
                 response()->redirect(url('change', ['hash' => $hash]));
             } else {
                 Auth::change('auth_users')
@@ -99,7 +99,7 @@ class ForgotController extends Controller
                     ->values($email, $pass)
                     ->register();
 
-                $this->message->new('login', 'Password changed successfully!');
+                message('login', 'Password changed successfully!');
                 response()->redirect(url('auth'));
             }
         } else {

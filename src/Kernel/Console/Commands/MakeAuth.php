@@ -23,7 +23,7 @@ class MakeAuth extends Command implements CommandInterface
     /**
      * @var string
      */
-    protected string $description = "Create Login and 'Forgot Password' structures";
+    protected string $description = "Create 'Login' and 'Forgot Password' structures";
 
     /**
      * @var string

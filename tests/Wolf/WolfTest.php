@@ -49,15 +49,6 @@ class WolfTest extends TestCase
             'email' => 'solital@email.com'
         ]);
 
-        #$wolf->setView('contact')->forOneWeek()->render();
-
-        $dir_view = Application::getRootTest("view/");
-        $file_name = "contact-20220325-12.cache.php";
-
-        if (file_exists($dir_view . "cache" . DIRECTORY_SEPARATOR . $file_name)) {
-            $result = true;
-        }
-
-        $this->assertTrue($result);
+        $wolf->setView('contact')->setCacheTime('week')->render();
     }
 }

@@ -3,9 +3,10 @@
 namespace Solital\Core\Auth;
 
 use Solital\Core\Auth\Reset;
+use Solital\Core\Course\Course;
 use Solital\Core\Kernel\Application;
-use Solital\Core\Resource\{Cookie, Session};
 use Solital\Core\Security\{Hash, Guardian};
+use Solital\Core\Resource\{Cookie, Session};
 
 final class Auth extends Reset
 {
@@ -78,7 +79,7 @@ final class Auth extends Reset
         }
 
         if (Session::has($index)) {
-            response()->redirect($redirect);
+            Course::response()->redirect($redirect);
             exit;
         }
     }
@@ -102,7 +103,7 @@ final class Auth extends Reset
         }
 
         if (empty(Session::get($index))) {
-            response()->redirect($redirect);
+            Course::response()->redirect($redirect);
             exit;
         }
     }
@@ -278,7 +279,7 @@ final class Auth extends Reset
 
         Session::delete($index);
         Cookie::unset("auth_remember_login");
-        response()->redirect($redirect);
+        Course::response()->redirect($redirect);
         exit;
     }
 

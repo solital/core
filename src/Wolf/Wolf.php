@@ -5,11 +5,12 @@ namespace Solital\Core\Wolf;
 use Solital\Core\Logger\Logger;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Resource\Collection\ArrayCollection;
-use Solital\Core\Wolf\{WolfCache, WolfMinifyTrait};
+use Solital\Core\Wolf\{WolfCacheTrait, WolfMinifyTrait};
 use Solital\Core\Wolf\Functions\{AssetsTrait, ExtendsTrait};
 
-class Wolf extends WolfCache
+class Wolf
 {
+    use WolfCacheTrait;
     use WolfMinifyTrait;
     use AssetsTrait;
     use ExtendsTrait;
@@ -45,11 +46,6 @@ class Wolf extends WolfCache
     private static mixed $original_args;
 
     /**
-     * @var Logger
-     */
-    protected Logger $logger;
-
-    /**
      * Construct
      */
     public function __construct()
@@ -61,8 +57,6 @@ class Wolf extends WolfCache
             $this->main_url = '//' . $_SERVER['HTTP_HOST'] . "/";
             $this->dir_view = Application::getRoot("/resources/view");
         }
-
-        $this->logger = new Logger('wolf');
     }
 
     /**
@@ -94,7 +88,7 @@ class Wolf extends WolfCache
 
         $this->setArgs($args);
         $this->setView($view);
-        $this->setCache($config);
+        $this->setCacheTime($config);
         $this->setMinify($config);
 
         return $this->render();

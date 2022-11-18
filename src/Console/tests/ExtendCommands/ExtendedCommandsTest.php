@@ -6,9 +6,6 @@ use Solital\Core\Console\Interface\ExtendCommandsInterface;
 
 class ExtendedCommandsTest implements ExtendCommandsInterface
 {
-    /**
-     * @var array
-     */
     protected array $command_class = [
         \Solital\Core\Console\tests\CustomCommandsTest::class,
         \Solital\Core\Console\tests\CustomTest::class
@@ -17,5 +14,10 @@ class ExtendedCommandsTest implements ExtendCommandsInterface
     public function getCommandClass(): array
     {
         return $this->command_class;
+    }
+
+    public function getTypeCommands(): string
+    {
+        return "Extended Commands Test";
     }
 }

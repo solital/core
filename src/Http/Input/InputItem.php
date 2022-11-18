@@ -21,6 +21,10 @@ class InputItem implements InputItemInterface
      */
     public $value;
 
+    /**
+     * @param string $index
+     * @param string|null $value
+     */
     public function __construct(string $index, ?string $value = null)
     {
         $this->index = $index;

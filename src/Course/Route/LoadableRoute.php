@@ -4,30 +4,36 @@ namespace Solital\Core\Course\Route;
 
 use Solital\Core\Http\Request;
 use Solital\Core\Exceptions\NotFoundHttpException;
-use Solital\Core\Course\{Router, Route\Route, Route\LoadableRouteInterface};
+use Solital\Core\Course\Router;
+use Solital\Core\Course\Route\{
+    Route,
+    LoadableRouteInterface
+};
 
 abstract class LoadableRoute extends Route implements LoadableRouteInterface
 {
     /**
      * @var string
      */
-    public $url;
+    public string $url = '';
 
     /**
      * @var string
      */
-    protected $name;
+    protected string $name = '';
 
     /**
      * @var mixed
      */
-    protected $regex;
+    protected mixed $regex = null;
 
     /**
      * Loads and renders middlewares-classes
      *
      * @param Request $request
      * @param Router $router
+     * 
+     * @return void
      * @throws NotFoundHttpException
      */
 
@@ -38,7 +44,7 @@ abstract class LoadableRoute extends Route implements LoadableRouteInterface
             $class = $router->getClassLoader()->loadClass(array_shift($middleware));
 
             if (!method_exists($class, 'handle')) {
-                throw new \Exception("'handle' method not found in namespace " . $this->getMiddlewares()[0], 404);
+                throw new NotFoundHttpException("'handle' method not found in namespace " . $this->getMiddlewares()[0], 404);
             }
 
             call_user_func_array([$class, 'handle'], $middleware);
@@ -66,6 +72,7 @@ abstract class LoadableRoute extends Route implements LoadableRouteInterface
      * Set url
      *
      * @param string $url
+     * 
      * @return static
      */
     public function setUri(string $url): LoadableRouteInterface
@@ -88,6 +95,7 @@ abstract class LoadableRoute extends Route implements LoadableRouteInterface
      * Prepend url
      *
      * @param string $url
+     * 
      * @return LoadableRouteInterface
      */
     public function prependUrl(string $url): LoadableRouteInterface
@@ -95,6 +103,9 @@ abstract class LoadableRoute extends Route implements LoadableRouteInterface
         return $this->setUri(rtrim($url, '/') . $this->url);
     }
 
+    /**
+     * @return string
+     */
     public function getUri(): string
     {
         return $this->url;
@@ -107,6 +118,7 @@ abstract class LoadableRoute extends Route implements LoadableRouteInterface
      * @param string|null $method
      * @param string|array|null $parameters
      * @param string|null $name
+     * 
      * @return string
      */
     public function findUrl(?string $method = null, $parameters = null, ?string $name = null): string
@@ -169,10 +181,15 @@ abstract class LoadableRoute extends Route implements LoadableRouteInterface
      * Check if route has given name.
      *
      * @param string $name
+     * 
      * @return bool
      */
     public function hasName(string $name): bool
     {
+        if (is_null($this->name)) {
+            $this->name = '';
+        }
+
         return strtolower($this->name) === strtolower($name);
     }
 
@@ -180,6 +197,7 @@ abstract class LoadableRoute extends Route implements LoadableRouteInterface
      * Add regular expression match for the entire route.
      *
      * @param string $regex
+     * 
      * @return static
      */
     public function setMatch($regex): LoadableRouteInterface
@@ -205,6 +223,7 @@ abstract class LoadableRoute extends Route implements LoadableRouteInterface
      *
      * @see LoadableRoute::setName()
      * @param string|array $name
+     * 
      * @return static
      */
     public function name($name): LoadableRouteInterface
@@ -216,6 +235,7 @@ abstract class LoadableRoute extends Route implements LoadableRouteInterface
      * Sets the router name, which makes it easier to obtain the url or router at a later point.
      *
      * @param string $name
+     * 
      * @return static
      */
     public function setName(string $name): LoadableRouteInterface
@@ -230,6 +250,7 @@ abstract class LoadableRoute extends Route implements LoadableRouteInterface
      *
      * @param array $values
      * @param bool $merge
+     * 
      * @return static
      */
     public function setSettings(array $values, bool $merge = false): RouteInterface

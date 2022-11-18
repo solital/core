@@ -58,5 +58,7 @@ class AuthDatabase extends Katrina
         } else {
             return $users;
         }
+
+        return $this;
     }
 }

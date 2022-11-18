@@ -17,4 +17,9 @@ class OtherExtendComandTest implements ExtendCommandsInterface
     {
         return $this->command_class;
     }
+
+    public function getTypeCommands(): string
+    {
+        return "Other Extend Commands Test";
+    }
 }

@@ -5,18 +5,20 @@ namespace Solital\Core\Kernel;
 use ModernPHPException\ModernPHPException;
 use Symfony\Component\Yaml\Yaml;
 use Solital\Core\Course\Course;
-use Solital\Core\Exceptions\ApplicationException;
-use Solital\Core\FileSystem\HandleFiles;
-use Solital\Core\Kernel\KernelTrait;
+use Solital\Core\Logger\Logger;
 use Solital\Core\Resource\Session;
 use Solital\Core\Security\Guardian;
+use Solital\Core\Kernel\KernelTrait;
 use Solital\Core\Validation\Convertime;
+use Solital\Core\FileSystem\HandleFiles;
+use Solital\Core\Logger\Handler\LogfileHandler;
+use Solital\Core\Exceptions\ApplicationException;
 
 class Application
 {
     use KernelTrait;
 
-    const SOLITAL_VERSION = "3.2.0";
+    const SOLITAL_VERSION = "3.3.0";
     const SITE_DOC_DOMAIN = "http://solitalframework.rf.gd/";
 
     /**
@@ -173,7 +175,7 @@ class Application
             }
         }
 
-        return __CLASS__;
+        return null;
     }
 
     /**
@@ -476,5 +478,26 @@ class Application
             'message' => $message,
             'theme_dark' => $theme_dark
         ];
+    }
+
+    /**
+     * @param string $log_level
+     * @param string $log_file
+     * @param string $message
+     * 
+     * @return void
+     */
+    public static function logFile(
+        string $channel,
+        string $log_level,
+        string $log_file,
+        string $message
+    ): void {
+        $logger = new Logger($channel);
+        $logger->addHandler(
+            $log_level,
+            new LogfileHandler($log_file),
+        );
+        $logger->critical($message);
     }
 }

@@ -90,23 +90,36 @@ trait DefaultCommandsTrait
      */
     private function list(string $command, array $arguments = []): void
     {
-        $res = $this->getCommandClass();
+        $all = [
+            'cmd' => [],
+            'type' => []
+        ];
 
-        foreach ($res as $res) {
-            if (isset($res)) {
-                foreach ($res as $class) {
-                    $value = new $class(null);
-                    $all_cmd = $value->getCommand();
-                    $all_description = $value->getDescription();
-                    $all_commands[$all_cmd] = $all_description;
-                }
-            }
+        $command_class = $this->getCommandClass();
+        $type_commands = $this->getTypeCommands();
+
+        foreach ($command_class as $cmd) {
+            $all['cmd'][] = $cmd;
         }
 
-        ksort($all_commands);
+        foreach ($type_commands as $type) {
+            $all['type'][] = $type;
+        }
 
-        foreach ($all_commands as $key => $values) {
-            $this->all_commands[$key] = $values;
+        foreach ($all['cmd'] as $key => $cmd_class) {
+            if (isset($cmd_class)) {
+                foreach ($cmd_class as $class) {
+                    $command_class = new $class(null);
+
+                    $reflection = new \ReflectionClass($command_class);
+                    $class_commands = $reflection->getMethod('getCommand')->invoke($command_class);
+                    $class_description = $reflection->getMethod('getDescription')->invoke($command_class);
+
+                    $all_commands[$key][$class_commands] = $class_description;
+
+                    ksort($all_commands[$key]);
+                }
+            }
         }
 
         $console = $this->line("Vinci Console ")->getMessage();
@@ -117,8 +130,13 @@ trait DefaultCommandsTrait
         $this->warning("Usage:")->print()->break();
         $this->line("command <argument>", true)->print()->break(true);
 
-        $this->warning("All commands")->print()->break();
-        TableBuilder::formattedArray($this->all_commands, margin: true);
+        for ($i = 0; $i < count($all['cmd']); $i++) {
+            $this->warning($all['type'][$i])->print()->break();
+
+            if (isset($all_commands[$i])) {
+                TableBuilder::formattedArray($all_commands[$i], margin: true);
+            }
+        }
     }
 
     /**
@@ -135,6 +153,7 @@ trait DefaultCommandsTrait
 
         echo $about . $version . $date . PHP_EOL . PHP_EOL;
         $this->line("PHP Version (" . PHP_VERSION . ")")->print()->break();
-        $this->line("By Solital Framework. Access " . Command::SITE_DOC)->print()->break();
+        $this->line("By Solital Framework. Access ")->print();
+        $this->warning(Command::SITE_DOC)->print()->break();
     }
 }

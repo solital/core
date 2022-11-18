@@ -1,7 +1,9 @@
 <?php
+
 /**
  * @generated class generated using Vinci Console
  */
+
 namespace Solital\Components\Model;
 
 use Katrina\Katrina;
