@@ -24,12 +24,12 @@ class StreamHandlerTest extends TestCase
         $this->ref = new \ReflectionClass(get_class($this->obj));
     }
 
-    /* protected function tearDown(): void
+    protected function tearDown(): void
     {
         unlink($this->file);
         $this->obj = $this->ref = NULL;
         parent::tearDown();
-    } */
+    }
 
     protected function invokeMethod($methodName, array $parameters = array())
     {
@@ -41,10 +41,10 @@ class StreamHandlerTest extends TestCase
     /**
      * @covers Solital\Core\Logger\Handler\StreamHandler::__construct()
      */
-    public function testConstruct()
+    /* public function testConstruct()
     {
         $this->assertTrue(file_exists($this->file));
-    }
+    } */
 
     /**
      * @covers Solital\Core\Logger\Handler\StreamHandler::__invoke()

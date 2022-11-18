@@ -5,7 +5,7 @@ use Solital\Core\Resource\JsonSerializable;
 
 class JsonSerializableTest extends TestCase
 {
-    public function testJson()
+    public function testJsonSerializable()
     {
         $res = json_encode(new JsonSerializable(['foo' => 'bar']));
         $this->assertJson($res);

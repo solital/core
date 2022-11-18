@@ -2,8 +2,8 @@
 
 namespace Solital\Core\FileSystem;
 
+use Solital\Core\FileSystem\Trait\HandleFoldersTrait;
 use Solital\Core\FileSystem\Exception\HandleFilesException;
-use Solital\Core\FileSystem\HandleFoldersTrait;
 
 class HandleFiles
 {

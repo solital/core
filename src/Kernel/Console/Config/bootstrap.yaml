@@ -26,6 +26,8 @@ verify_domain:
   recipient_name: 
 
 logs:
-  enabled_log_files: true
+  enabled_log_files: false
 
 default_timezone: America/Fortaleza
+
+json_exception: false

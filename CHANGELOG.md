@@ -1,5 +1,31 @@
 # Released Notes
 
+## v3.3.0 - (2022-11-18)
+
+### Added 
+
+- Added new `JSON` class
+- Added exception in JSON
+- Added `logFile` static method in `Application` class
+- Added `NotFoundHttpException` class
+- Added phpstan verification
+
+### Fixed
+
+- Fixed comments
+- Fixed Wolf Cache Time
+- Fixed Command `HandleCache`
+- Fixed `jsonSerialize` return type
+- Fixed class inside Auth folder
+
+### Changed
+
+- Changed `encodeJSON` and `decodeJSON` helpers
+- Changed `InputJson` class as deprecated
+- Changed `WolfCache` to Trait
+
+--------------------------------------------------------------------------
+
 ## v3.2.1 - (2022-11-06)
 
 ### Fixed

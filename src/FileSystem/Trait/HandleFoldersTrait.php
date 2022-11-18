@@ -1,6 +1,8 @@
 <?php
 
-namespace Solital\Core\FileSystem;
+namespace Solital\Core\FileSystem\Trait;
+
+use Solital\Core\FileSystem\HandleFiles;
 
 trait HandleFoldersTrait
 {

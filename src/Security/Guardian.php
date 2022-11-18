@@ -3,9 +3,10 @@
 namespace Solital\Core\Security;
 
 use Katrina\Katrina;
-use Respect\Validation\Validator;
 use Solital\Core\Mail\Mailer;
 use Solital\Core\Auth\Password;
+use Solital\Core\Course\Course;
+use Respect\Validation\Validator;
 use Solital\Core\Resource\Session;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Exceptions\InvalidArgumentException;
@@ -112,7 +113,7 @@ class Guardian
 
         self::verifyConstants();
         Session::set($index, $session);
-        response()->redirect($redirect);
+        Course::response()->redirect($redirect);
         exit;
     }
 

@@ -1,5 +1,18 @@
 # Released Notes
 
+## v3.2.0 - (2022-11-xx)
+
+### Added
+
+- Added ordering by type of commands
+- Added `getTypeCommands` method in `ExtendCommandsInterface`
+
+### Changed
+
+- Changed `ExtendCommandsInterface` interface
+
+--------------------------------------------------------------------------
+
 ## v3.1.1 - (2022-10-28)
 
 ### Fixed

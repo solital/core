@@ -22,9 +22,9 @@ class ImmutableException extends \Exception implements ContainerExceptionInterfa
 	public function __construct($id, $message = null)
 	{
 		if ($message) {
-			return parent::__construct($message);
+			parent::__construct($message);
 		}
 
-		return parent::__construct('Cannot mutate "' . $id . '" after it has been resolved or is resolving');
+		parent::__construct('Cannot mutate "' . $id . '" after it has been resolved or is resolving');
 	}
 }

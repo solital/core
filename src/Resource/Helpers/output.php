@@ -1,7 +1,7 @@
 <?php
 
+use Solital\Core\Resource\JSON;
 use Solital\Core\Resource\Message;
-use Solital\Core\Http\Input\InputJson;
 use Symfony\Component\VarExporter\VarExporter;
 use Symfony\Component\VarDumper\{Cloner\VarCloner, Dumper\CliDumper, Dumper\AbstractDumper};
 
@@ -71,12 +71,11 @@ function export($value): void
  * @param mixed $value
  * @param int $constants
  * 
- * @return json
+ * @return string
  */
-function encodeJSON($value, int $constants = JSON_UNESCAPED_UNICODE)
+function encodeJSON($value, int $constants = JSON_UNESCAPED_UNICODE): string
 {
-    $json = (new InputJson($constants))->encode($value);
-    return $json;
+    return (new JSON($constants))->encode($value);
 }
 
 /**
@@ -85,10 +84,9 @@ function encodeJSON($value, int $constants = JSON_UNESCAPED_UNICODE)
  * 
  * @return object|array
  */
-function decodeJSON($value, bool $toArray = false)
+function decodeJSON($value, bool $toArray = false): mixed
 {
-    $json = (new InputJson())->decode($value, $toArray);
-    return $json;
+    return (new JSON())->decode($value, $toArray);
 }
 
 /**

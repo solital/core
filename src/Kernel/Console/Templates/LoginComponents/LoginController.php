@@ -25,7 +25,7 @@ class LoginController extends Controller
 
         return view('auth.auth-form', [
             'title' => 'Login',
-            'msg' => $this->message->get('login')
+            'msg' => message('login')
         ]);
     }
 
@@ -35,7 +35,7 @@ class LoginController extends Controller
     public function authPost(): void
     {
         if (Request::limit('email.login', 3)) {
-            $this->message->new('login', 'You have already made 3 login attempts! Please wait 60 seconds and try again.');
+            message('login', 'You have already made 3 login attempts! Please wait 60 seconds and try again.');
             response()->redirect(url('auth'));
         }
 
@@ -45,7 +45,7 @@ class LoginController extends Controller
             ->register();
 
         if ($res == false) {
-            $this->message->new('login', 'Invalid username and/or password!');
+            message('login', 'Invalid username and/or password!');
             response()->redirect(url('auth'));
         }
     }
@@ -67,7 +67,7 @@ class LoginController extends Controller
      */
     public function exit(): void
     {
-        $this->message->new('login', 'Logoff successfully!');
+        message('login', 'Logoff successfully!');
         Auth::logoff();
     }
 }

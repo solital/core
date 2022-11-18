@@ -11,7 +11,6 @@ class TableBuilder
      *
      * @param array|array[]|object[] $tableData Array of arrays/objects representing the table rows and corresponding data
      * @param array|string[] $headers Array of table header strings
-     * @return array|string[] List of rendered table row strings
      */
     public function getTableRows(array $tableData, array $headers)
     {

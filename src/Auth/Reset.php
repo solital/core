@@ -2,11 +2,12 @@
 
 namespace Solital\Core\Auth;
 
-use Solital\Core\Mail\Mailer;
-use Solital\Core\Security\Hash;
-use Solital\Core\Validation\Valid;
 use Katrina\Sql\KatrinaStatement;
 use Katrina\Connection\Connection;
+use Solital\Core\Mail\Mailer;
+use Solital\Core\Auth\Password;
+use Solital\Core\Security\Hash;
+use Solital\Core\Validation\Valid;
 
 abstract class Reset
 {
@@ -123,7 +124,7 @@ abstract class Reset
         string $email,
         string $value
     ): ?bool {
-        $value_hash = pass_hash($value);
+        $value_hash = (new Password())->create($value);
 
         $sql = "UPDATE $table SET $column_pass = ? WHERE $column_user = '$email'";
 

@@ -73,6 +73,8 @@ class Password
         } elseif ($info == false) {
             return $this->password->createHash($password)->getHash();
         }
+
+        return $this;
     }
 
     /**

@@ -10,5 +10,4 @@ interface MiddlewareInterface
      * @param Request $request
      */
     public function handle(Request $request): void;
-
 }

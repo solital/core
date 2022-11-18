@@ -36,12 +36,12 @@ trait ExtendsTrait
                 throw new WolfException("Template " . basename($view) . " not found");
             }
         } catch (WolfException $e) {
-            $this->logger->addHandler(
+            Application::logFile(
+                'wolf',
                 LogLevel::CRITICAL,
-                new LogfileHandler('template'),
+                'template',
+                "Template '" . basename($view) . "' not found"
             );
-            $this->logger->critical("Template '" . basename($view) . "' not found");
-
             Application::exceptionHandler($e);
         }
     }

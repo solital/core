@@ -6,7 +6,7 @@ use Solital\Core\FileSystem\HandleFiles;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Wolf\Functions\ExtendsTrait;
 
-abstract class WolfCache
+trait WolfCacheTrait
 {
     use ExtendsTrait;
 
@@ -26,14 +26,23 @@ abstract class WolfCache
     protected ?string $time = null;
 
     /**
-     * @param array $config
+     * @param mixed $time
      * 
      * @return self
      */
-    public function setCache(array $config): self
+    public function setCacheTime(mixed $time): self
     {
-        if ($config['wolf_cache']['enabled'] == true) {
-            match ($config['wolf_cache']['time']) {
+        if (is_array($time)) {
+            if ($time['wolf_cache']['enabled'] == true) {
+                match ($time['wolf_cache']['time']) {
+                    'minute' => $this->forOneMinute(),
+                    'hour' => $this->forOneHour(),
+                    'day' => $this->forOneDay(),
+                    'week' => $this->forOneWeek()
+                };
+            }
+        } elseif (is_string($time)) {
+            match ($time) {
                 'minute' => $this->forOneMinute(),
                 'hour' => $this->forOneHour(),
                 'day' => $this->forOneDay(),
@@ -96,9 +105,9 @@ abstract class WolfCache
     }
 
     /**
-     * @return WolfCache
+     * @return self
      */
-    public function forOneMinute(): WolfCache
+    public function forOneMinute(): self
     {
         $this->time = date('Hi');
 
@@ -106,9 +115,9 @@ abstract class WolfCache
     }
 
     /**
-     * @return WolfCache
+     * @return self
      */
-    public function forOneHour(): WolfCache
+    public function forOneHour(): self
     {
         $this->time = date('H');
 
@@ -116,9 +125,9 @@ abstract class WolfCache
     }
 
     /**
-     * @return WolfCache
+     * @return self
      */
-    public function forOneDay(): WolfCache
+    public function forOneDay(): self
     {
         $this->time = date('N');
 
@@ -126,9 +135,9 @@ abstract class WolfCache
     }
 
     /**
-     * @return WolfCache
+     * @return self
      */
-    public function forOneWeek(): WolfCache
+    public function forOneWeek(): self
     {
         $this->time = date('W');
 
