@@ -1,14 +1,11 @@
 <?php
 
-namespace Solital\Core\Course\Event;
+namespace Solital\Core\Course\Event\Psr14;
 
 use Fig\EventDispatcher\ParameterDeriverTrait;
 use Psr\EventDispatcher\ListenerProviderInterface;
 use SplPriorityQueue;
 
-/**
- * @deprecated Use Solital\Core\Course\Event\Psr14\ListenerProvider
- */
 class ListenerProvider implements ListenerProviderInterface
 {
     use ParameterDeriverTrait;
@@ -40,9 +37,9 @@ class ListenerProvider implements ListenerProviderInterface
      * @param callable $listener
      * @param int $priority
      * 
-     * @return self
+     * @return ListenerProvider
      */
-    public function addListener(callable $listener, int $priority = 0): self
+    public function addListener(callable $listener, int $priority = 0): ListenerProvider
     {
         $type = $this->getParameterType($listener);
         $this->listeners[] = [

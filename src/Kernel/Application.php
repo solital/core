@@ -18,7 +18,7 @@ class Application
 {
     use KernelTrait;
 
-    const SOLITAL_VERSION = "3.3.0";
+    const SOLITAL_VERSION = "3.3.1";
     const SITE_DOC_DOMAIN = "http://solitalframework.rf.gd/";
 
     /**
