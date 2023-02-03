@@ -1,18 +1,19 @@
 <?php
 
-namespace Solital\Core\Course\Event;
+namespace Solital\Core\Course\Event\Psr14;
 
-use Psr\EventDispatcher\{EventDispatcherInterface, ListenerProviderInterface, StoppableEventInterface};
+use Psr\EventDispatcher\{
+    EventDispatcherInterface,
+    ListenerProviderInterface,
+    StoppableEventInterface
+};
 
-/**
- * @deprecated Use Solital\Core\Course\Event\Psr14\EventDispatcher
- */
 class EventDispatcher implements EventDispatcherInterface
 {
     /**
      * @var ListenerProviderInterface $provider
      */
-    private $provider;
+    private ListenerProviderInterface $provider;
 
     /**
      * @param ListenerProviderInterface $provider

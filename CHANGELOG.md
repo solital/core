@@ -1,5 +1,17 @@
 # Released Notes
 
+## v3.3.1 - (2023-02-03)
+
+### Added 
+
+- Added `convertime` helper
+
+### Changed
+
+- Changed Psr-14 namespace
+
+--------------------------------------------------------------------------
+
 ## v3.3.0 - (2022-11-18)
 
 ### Added 

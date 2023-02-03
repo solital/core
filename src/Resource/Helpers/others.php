@@ -3,8 +3,8 @@
 use Respect\Validation\Validator;
 use Solital\Core\Resource\Session;
 use Solital\Core\Resource\Str\Str;
-use Solital\Core\Cache\{Cache, Psr6\CacheItemPool};
 use Solital\Core\Resource\Collection\ArrayCollection;
+use Solital\Core\Validation\Convertime;
 
 /**
  * Remove all get param
@@ -177,4 +177,14 @@ function collection(mixed $value = null): ArrayCollection
 function str(string $string): Str
 {
     return new Str($string);
+}
+
+/**
+ * @param string|null $timezone
+ * 
+ * @return Convertime
+ */
+function convertime(?string $timezone = null): Convertime
+{
+    return new Convertime($timezone);
 }

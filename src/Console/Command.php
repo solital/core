@@ -11,8 +11,8 @@ class Command
     use DefaultCommandsTrait;
     use MessageTrait;
 
-    const VERSION = "3.2.0";
-    const DATE_VERSION = "Nov XX 2022";
+    const VERSION = "3.2.1";
+    const DATE_VERSION = "Feb 03 2022";
     const SITE_DOC = "http://solitalframework.rf.gd/docs/3.x/vinci-console/";
 
     /**
@@ -71,6 +71,11 @@ class Command
     protected array $type_commands = [];
 
     /**
+     * @var array
+     */
+    private array $not_found_class = [];
+
+    /**
      * @param array $class
      */
     public function __construct($class)
@@ -105,24 +110,30 @@ class Command
         foreach ($command_class as $command_class) {
             if (isset($command_class)) {
                 foreach ($command_class as $class) {
-                    $instance = new $class(null);
-                    $args = $instance->getAllArguments();
-                    $cmd = $instance->getCommand();
+                    if (!class_exists($class)) {
+                        array_push($this->not_found_class, $class);
+                    } else {
+                        $instance = new $class(null);
+                        $args = $instance->getAllArguments();
+                        $cmd = $instance->getCommand();
 
-                    $this->repeatedCommands($cmd, get_class($instance));
+                        $this->repeatedCommands($cmd, get_class($instance));
 
-                    if ($cmd == $this->command) {
-                        $this->instance = $instance;
+                        if ($cmd == $this->command) {
+                            $this->instance = $instance;
 
-                        if (count($args) == count($this->arguments) && !empty($this->arguments)) {
-                            $this->all_arguments = array_combine($args, $this->arguments);
-                        } else {
-                            $this->all_arguments = $this->arguments;
+                            if (count($args) == count($this->arguments) && !empty($this->arguments)) {
+                                $this->all_arguments = array_combine($args, $this->arguments);
+                            } else {
+                                $this->all_arguments = $this->arguments;
+                            }
                         }
                     }
                 }
             }
         }
+
+        $this->notFoundClass();
 
         if (isset($this->instance)) {
             return $this->instance->handle((object)$this->all_arguments, (object)$this->options);
@@ -273,5 +284,20 @@ class Command
         }
 
         return null;
+    }
+
+    /**
+     * @return Command
+     */
+    private function notFoundClass(): Command
+    {
+        if (!empty($this->not_found_class)) {
+            foreach ($this->not_found_class as $not_found_class) {
+                $this->warning("WARNING! Class not found: ")->print();
+                $this->warning($not_found_class)->print()->break();
+            }
+        }
+
+        return $this;
     }
 }

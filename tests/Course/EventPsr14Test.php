@@ -2,8 +2,8 @@
 
 use PHPUnit\Framework\TestCase;
 use Solital\Test\Course\Dummy\UserTest;
-use Solital\Core\Course\Event\EventDispatcher;
-use Solital\Core\Course\Event\ListenerProvider;
+use Solital\Core\Course\Event\Psr14\EventDispatcher;
+use Solital\Core\Course\Event\Psr14\ListenerProvider;
 
 class EventPsr14Test extends TestCase
 {
