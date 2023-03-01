@@ -1,5 +1,14 @@
 # Released Notes
 
+## v3.3.2 - (2023-03-01)
+
+### Fixed
+
+- Fixed rollback in migrations
+- Fixed `str_replace` function in `Loadable Route` class
+
+--------------------------------------------------------------------------
+
 ## v3.3.1 - (2023-02-03)
 
 ### Added 

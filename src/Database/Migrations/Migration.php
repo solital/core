@@ -209,7 +209,7 @@ class Migration
 
                 if ($instance != null) {
                     if (isset($options->rollback)) {
-                        $this->provider->delete("name = '" . $migrate_name . "'");
+                        $this->provider->delete("name", $migrate_name);
 
                         $instance->down();
                     } else {
@@ -240,7 +240,7 @@ class Migration
             $this->warning("Rollback migration: " . $migrations_db->name)->print()->break();
 
             $instance = $this->instantiateMigration($migrations_db->name);
-            $this->provider->delete("name = '" . $migrations_db->name . "'");
+            $this->provider->delete("name", $migrations_db->name);
 
             $instance->down();
 
@@ -279,7 +279,7 @@ class Migration
             $instance = $this->instantiateMigration(basename($migration_file));
 
             if (isset($options->rollback)) {
-                $this->provider->delete("name = '" . basename($migration_file) . "'");
+                $this->provider->delete("name", basename($migration_file));
 
                 $instance->down();
             } else {
