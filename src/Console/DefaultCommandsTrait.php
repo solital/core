@@ -23,12 +23,12 @@ trait DefaultCommandsTrait
      * 
      * @return void
      */
-    public function verifyDefaultCommand(string $command, array $arguments = []): void
+    public function verifyDefaultCommand(string $command, array $arguments = [], object $options = null): void
     {
         foreach ($this->default_commands as $method => $class) {
             if (strcmp($command, $method) === 0) {
                 if (method_exists(__TRAIT__, $command)) {
-                    $this->$method($command, $arguments);
+                    $this->$method($command, $arguments, $options);
                     exit;
                 }
             }
@@ -83,12 +83,9 @@ trait DefaultCommandsTrait
     }
 
     /**
-     * @param string $command
-     * @param array $arguments
-     * 
      * @return void
      */
-    private function list(string $command, array $arguments = []): void
+    private function list(): void
     {
         $all = [
             'cmd' => [],
@@ -140,12 +137,9 @@ trait DefaultCommandsTrait
     }
 
     /**
-     * @param string $command
-     * @param array $arguments
-     * 
      * @return void
      */
-    private function about(string $command, array $arguments = []): void
+    private function about(): void
     {
         $about = $this->line("Vinci Console ")->getMessage();
         $version = $this->success(self::getVersion())->getMessage();

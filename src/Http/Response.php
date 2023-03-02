@@ -39,6 +39,11 @@ class Response implements ResponseInterface
     protected Request $request;
 
     /**
+     * @var array
+     */
+    private array $messages = [];
+
+    /**
      * Status codes and reason phrases
      *
      * @var array
@@ -245,7 +250,7 @@ class Response implements ResponseInterface
     /**
      * @return string Reason phrase; must return an empty string if none present.
      */
-    public function getReasonPhrase(): string
+    public function getReasonPhrase(): ?string
     {
         if ($this->reasonPhrase) {
             return $this->reasonPhrase;
@@ -254,6 +259,8 @@ class Response implements ResponseInterface
         if (isset($this->messages[$this->statusCode])) {
             return $this->messages[$this->statusCode];
         }
+
+        return null;
     }
 
     /**

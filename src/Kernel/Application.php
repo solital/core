@@ -18,24 +18,6 @@ class Application
 {
     use KernelTrait;
 
-    const SOLITAL_VERSION = "3.3.1";
-    const SITE_DOC_DOMAIN = "http://solitalframework.rf.gd/";
-
-    /**
-     * This variable must be changed manually
-     */
-    const DEBUG = false;
-
-    /**
-     * The `connectionDatabaseDebug` method must be edited manually
-     */
-    const DEBUG_DATABASE = false;
-
-    /**
-     * This variable must be changed manually
-     */
-    const MAILER_TEST_UNIT = false;
-
     /**
      * @var string
      */
@@ -143,7 +125,7 @@ class Application
     /**
      * @return mixed
      */
-    public static function connectionDatabase(): mixed
+    public static function connectionDatabase()
     {
         if (self::DEBUG_DATABASE == true) {
             return self::connectionDatabaseDebug();
@@ -179,9 +161,9 @@ class Application
     }
 
     /**
-     * @return void
+     * @return mixed
      */
-    private static function connectionDatabaseDebug(): void
+    private static function connectionDatabaseDebug()
     {
         if (!defined('DB_CONFIG')) {
             define('DB_CONFIG', [
@@ -193,6 +175,8 @@ class Application
                 'SQLITE_DIR' => ''
             ]);
         }
+
+        return null;
     }
 
     /**
@@ -206,67 +190,77 @@ class Application
         self::getInstance();
 
         if ($cli_test == true) {
-            return self::getRootTest($dir);
-        }
-
-        if (defined('SITE_ROOT')) {
-            if ($dir != "" || !empty($dir)) {
-                $dir = str_replace('/', DIRECTORY_SEPARATOR, $dir);
-                $dir = $dir . DIRECTORY_SEPARATOR;
-            }
-
-            return constant('SITE_ROOT') . DIRECTORY_SEPARATOR . $dir;
-        } else {
-            throw new ApplicationException("SITE_ROOT constant not defined");
-        }
-    }
-
-    /**
-     * @param string $dir
-     * @param bool $cli_test
-     * 
-     * @return string
-     * @throws Exception
-     */
-    public static function getRootApp(string $dir, ?bool $cli_test = false): string
-    {
-        self::getInstance();
-
-        if ($cli_test == true) {
-            return self::getRootTest($dir);
-        }
-
-        if (defined('SITE_ROOT')) {
-            $dir_app = constant('SITE_ROOT') . DIRECTORY_SEPARATOR . "app" . DIRECTORY_SEPARATOR;
-
-            if (!is_dir($dir_app . $dir)) {
-                self::$handle->create($dir_app . $dir);
-            }
-
             $dir = str_replace('/', DIRECTORY_SEPARATOR, $dir);
-            return $dir_app . $dir;
+            return "tests" . DIRECTORY_SEPARATOR . "files_test" . DIRECTORY_SEPARATOR . $dir;
         } else {
-            throw new ApplicationException("SITE_ROOT constant not defined");
+            if (defined('SITE_ROOT')) {
+                if ($dir != "" || !empty($dir)) {
+                    $dir = str_replace('/', DIRECTORY_SEPARATOR, $dir);
+                    $dir = $dir . DIRECTORY_SEPARATOR;
+                }
+
+                return constant('SITE_ROOT') . DIRECTORY_SEPARATOR . $dir;
+            } else {
+                throw new ApplicationException("SITE_ROOT constant not defined");
+            }
         }
     }
 
     /**
      * @param string $dir
+     * @param bool|null $cli_test
+     * @param bool|null $create_app_folder
      * 
      * @return string
+     * @throws ApplicationException
      */
-    public static function getRootTest(string $dir = ""): string
+    public static function getRootApp(string $dir, ?bool $create_app_folder = true): string
     {
         self::getInstance();
 
-        $dir = str_replace('/', DIRECTORY_SEPARATOR, $dir);
-        $dir = "tests" . DIRECTORY_SEPARATOR . "files_test" . DIRECTORY_SEPARATOR . $dir;
-
-        if (!is_dir($dir)) {
-            self::$handle->create($dir);
+        if (self::DEBUG == true) {
+            $dir = str_replace('/', DIRECTORY_SEPARATOR, $dir);
+            $dir_app = "tests" . DIRECTORY_SEPARATOR . "files_test" . DIRECTORY_SEPARATOR;
+        } else {
+            if (defined('SITE_ROOT')) {
+                $dir = str_replace('/', DIRECTORY_SEPARATOR, $dir);
+                $dir_app = constant('SITE_ROOT') . DIRECTORY_SEPARATOR . "app" . DIRECTORY_SEPARATOR;
+            } else {
+                throw new ApplicationException("SITE_ROOT constant not defined");
+            }
         }
 
-        return $dir;
+        if ($create_app_folder == true) {
+            self::createAppFolder($dir_app . $dir);
+        }
+
+        return $dir_app . $dir;
+    }
+
+    /**
+     * createAppFolder
+     *
+     * @param  mixed $directory
+     * @return void
+     */
+    public static function createAppFolder(string $directory)
+    {
+        if (!is_dir($directory)) {
+            self::$handle->create($directory);
+        }
+    }
+
+    /**
+     * removeAppFolder
+     * 
+     * @param  mixed $directory
+     * @return void
+     */
+    public static function removeAppFolder(string $directory)
+    {
+        if (is_dir($directory)) {
+            self::$handle->remove($directory, false);
+        }
     }
 
     /**

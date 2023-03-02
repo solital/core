@@ -4,10 +4,10 @@ namespace Solital\Core\Kernel\Console\Commands;
 
 use Solital\Core\Console\Command;
 use Solital\Core\Kernel\Application;
-use Solital\Core\Console\InputOutput;
 use Solital\Core\Kernel\Console\HelpersTrait;
-use Solital\Core\FileSystem\HandleFiles;
 use Solital\Core\Console\Interface\CommandInterface;
+use Nette\PhpGenerator\{ClassType, Method, PhpNamespace};
+use Solital\Core\Http\Middleware\BaseMiddlewareInterface;
 
 class MakeMiddleware extends Command implements CommandInterface
 {
@@ -36,37 +36,20 @@ class MakeMiddleware extends Command implements CommandInterface
      */
     public function handle(object $arguments, object $options): mixed
     {
-        $component_dir = Application::getRootApp('Middleware/', Application::DEBUG);
-        $component_template = Application::getConsoleComponent('MiddlewareTemplate.php');
+        $middleware_dir = Application::getRootApp('Middleware/', Application::DEBUG);
 
         if (isset($options->remove)) {
-            $this->remove($component_dir, $arguments->middleware_name);
-        } else {
-            $this->create($component_dir, $component_template, $arguments->middleware_name);
+            $this->removeComponent($middleware_dir, $arguments->middleware_name . ".php");
         }
 
-        return $this;
-    }
+        $data = $this->codeGenerated($arguments->middleware_name);
 
-    /**
-     * @param string $component_dir
-     * @param string $component_template
-     * @param string $arguments
-     * 
-     * @return bool
-     */
-    private function create(string $component_dir, string $component_template, string $arguments): bool
-    {
-        $output_template = file_get_contents($component_template);
+        $res = $this->createComponent($data, [
+            'component_name' => $arguments->middleware_name,
+            'directory' => $middleware_dir
+        ]);
 
-        if (str_contains($output_template, 'NameDefault')) {
-            $output_template = str_replace('NameDefault', $arguments, $output_template);
-        }
-
-        $file_exists = $component_dir . $arguments . ".php";
-
-        if (!file_exists($file_exists)) {
-            file_put_contents($component_dir . $arguments . ".php", $output_template);
+        if ($res == true) {
             $this->success("Middleware successfully created!")->print()->break();
 
             return true;
@@ -75,29 +58,31 @@ class MakeMiddleware extends Command implements CommandInterface
 
             return false;
         }
+
+        return $this;
     }
 
     /**
-     * @param string $dir
-     * @param string $component
-     * 
-     * @return void
+     * @param  mixed $controller_name
+     * @return string
      */
-    private function remove(string $dir, string $component): void
+    private function codeGenerated(string $controller_name): string
     {
-        $input_output = new InputOutput();
-        $handle_files = new HandleFiles();
+        $handle_method = (new Method('handle'))
+            ->setPublic()
+            ->setBody("// ...")
+            ->setReturnType('void')
+            ->addComment("@return void");
 
-        $input_output->confirmDialog("Are you sure you want to delete this components? (this process cannot be undone)? ", "Y", "N", false);
+        $class = (new ClassType($controller_name))
+            ->addImplement(BaseMiddlewareInterface::class)
+            ->addMember($handle_method)
+            ->addComment("@generated class generated using Vinci Console");
 
-        $input_output->confirm(function () use ($dir, $component, $handle_files) {
-            $handle_files->folder($dir)->fileExists($component . ".php", true);
+        $data = (new PhpNamespace("Solital\Middleware"))
+            ->add($class)
+            ->addUse(BaseMiddlewareInterface::class);
 
-            $this->success("Middleware successfully removed!")->print()->break();
-        });
-
-        $input_output->refuse(function () {
-            $this->line("Abort!")->print()->break()->exit();
-        });
+        return $data;
     }
 }

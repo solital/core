@@ -3,7 +3,7 @@
 namespace Solital\Core\Course;
 
 use Psr\Log\LogLevel;
-use Solital\Core\Http\{Uri, Request, Middleware\BaseCsrfVerifier};
+use Solital\Core\Http\{Uri, Request, Middleware\BaseCsrfVerifier, Response};
 use Solital\Core\Course\Handlers\{EventHandler, EventHandlerInterface};
 use Solital\Core\Course\ClassLoader\{ClassLoader, ClassLoaderInterface};
 use Solital\Core\Exceptions\{InvalidArgumentException, ExceptionHandlerInterface, RuntimeException};
@@ -470,7 +470,7 @@ class Router
     private function redirectRoute(): void
     {
         if (self::$redirect == true) {
-            response()->redirect(self::$url_redirect);
+            Course::response()->redirect(self::$url_redirect);
             exit;
         }
     }

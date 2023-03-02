@@ -33,7 +33,7 @@ abstract class CacheDir
     public static function setCacheDir($cache_dir)
     {
         if ($cache_dir == true) {
-            return self::$cache_dir = Application::getRootTest();
+            return self::$cache_dir = Application::getRootApp("Storage/cache/");
         }
 
         if (empty($cache_dir)) {

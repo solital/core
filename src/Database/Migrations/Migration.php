@@ -13,6 +13,8 @@ use Solital\Core\Database\Migrations\{
     Exception\MigrationException
 };
 
+use Nette\PhpGenerator\{ClassType, Method, Parameter, PhpNamespace, Property};
+
 class Migration
 {
     use HandleMigrationTrait;
@@ -137,7 +139,7 @@ class Migration
         $file_name = strtolower($file_name);
         $file_path = $this->getMigrationsDirectory() . DIRECTORY_SEPARATOR . $file_name;
 
-        $this->generateMigrationClass($migration_explode, $file_path, $file_name, $dts);
+        $this->generateMigrationClass($migration_explode, $file_path, $file_name);
 
         $file_name = $this->warning($file_name)->getMessage();
         $file_path = $this->success($file_path)->getMessage();
@@ -158,34 +160,57 @@ class Migration
     private function generateMigrationClass(
         array $migration_explode,
         string $file_path,
-        string $file_name,
-        string $dts
+        string $file_name
     ): void {
 
-        if (in_array("create", $migration_explode)) {
-            $migration_file_template = "TableMigrationTemplate";
-        } else {
-            $migration_file_template = "MigrationTemplate";
-        }
+        $migration_explode = explode("_", $file_name);
+        $migration_date = $migration_explode[0] . $migration_explode[1];
 
-        $template = Application::getConsoleComponent("Migrations/{$migration_file_template}.php");
+        if (in_array("create", $migration_explode)) {
+
+            if (isset($migration_explode[3])) {
+                $table_name = str_replace(".php", "", $migration_explode[3]);
+            } else {
+                $table_name = "table_name";
+            }
+
+            $up_body = "Katrina::createTable('" . $table_name . "')
+    ->int('id')->primary()->increment()
+    // ...
+    ->createdUpdateAt()
+    ->closeTable();";
+            $down_body = "Katrina::dropTable('" . $table_name . "');";
+        } else {
+            $up_body = "// ...";
+            $down_body = "// ...";
+        }
 
         if (file_exists($file_path)) {
             $this->error("Migration '{$file_name}' already exists. Aborting!")->print()->break()->exit();
         }
 
-        $output_template = file_get_contents($template);
+        $up_method = (new Method('up'))
+            ->setPublic()
+            ->setBody($up_body)
+            ->addComment("Run migration" . "\n\n@return mixed");
 
-        if (str_contains($output_template, "NameDefault")) {
-            $migration_name = str_replace("_", "", $dts);
-            $output_template = str_replace("NameDefault", $migration_name, $output_template);
+        $down_method = (new Method('down'))
+            ->setPublic()
+            ->setBody($down_body)
+            ->addComment("Roolback migration" . "\n\n@return mixed");
 
-            if (str_contains($output_template, "TableName")) {
-                $output_template = str_replace("TableName", $migration_explode[2], $output_template);
-            }
-        }
+        $class = (new ClassType('Migration' . $migration_date))
+            ->setExtends(Migration::class)
+            ->addMember($up_method)
+            ->addMember($down_method)
+            ->addComment("@generated class generated using Vinci Console");
 
-        file_put_contents($file_path, $output_template);
+        $data = (new PhpNamespace("Solital\Console\Command"))
+            ->add($class)
+            ->addUse(Katrina::class)
+            ->addUse(Migration::class);
+
+        file_put_contents($file_path, "<?php \n\n" . $data);
     }
 
     /**

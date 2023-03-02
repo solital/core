@@ -9,33 +9,17 @@ use Solital\Core\FileSystem\HandleFiles;
 trait HelpersTrait
 {
     /**
-     * @param string $component_template
-     * @param string $component_dir
-     * @param string $argument_name
-     * @param array|null $replace 
+     * @param string $component_name
+     * @param array $config
      * 
      * @return bool
      */
-    public function createComponent(string $component_template, string $component_dir, string $argument_name, ?array $replace = null): bool
+    public function createComponent(string $data, array $config): bool
     {
-        $output_template = file_get_contents($component_template);
-
-        if (str_contains($output_template, 'NameDefault')) {
-            $output_template = str_replace('NameDefault', $argument_name, $output_template);
-        }
-
-        if ($replace != null) {
-            foreach ($replace as $key => $replace_text) {
-                if (str_contains($output_template, $key) && $key != null) {
-                    $output_template = str_replace($key, $replace_text, $output_template);
-                }
-            }
-        }
-
-        $file_exists = $component_dir . $argument_name . ".php";
+        $file_exists = $config['directory'] . $config['component_name'] . ".php";
 
         if (!file_exists($file_exists)) {
-            file_put_contents($component_dir . $argument_name . ".php", $output_template);
+            file_put_contents($config['directory'] . $config['component_name'] . '.php', "<?php \n\n" . $data);
             return true;
         } else {
             return false;
@@ -98,33 +82,36 @@ trait HelpersTrait
      */
     public function removeAuthComponent(array $components): void
     {
-        $input_output = new InputOutput();
+        $exists = [];
 
-        $input_output->confirmDialog("Are you sure you want to delete this components? (this process cannot be undone)? ", "Y", "N", false);
-        $input_output->confirm(function () use ($components) {
-            foreach ($components as $file) {
-                if (is_file($file)) {
-                    unlink($file);
-                } else {
-                    return false;
-                }
+        foreach ($components as $file) {
+            if (!file_exists($file)) {
+                $exists[] = "";
+            } else {
+                $exists[] = $file;
             }
+        }
 
-            $this->success("Components successfully removed!")->print()->break();
-        });
+        if (empty($exists)) {
+            $this->success("No component found")->print()->break()->exit();
+        } else {
+            $input_output = new InputOutput();
+            $input_output->confirmDialog("Are you sure you want to delete this components? (this process cannot be undone)? ", "Y", "N", false);
+            $input_output->confirm(function () use ($components) {
+                foreach ($components as $file) {
+                    if (is_file($file)) {
+                        unlink($file);
+                    } else {
+                        return false;
+                    }
+                }
 
-        $input_output->refuse(function () {
-            $this->line("Abort!")->print()->break()->exit();
-        });
-    }
+                $this->success("Components successfully removed!")->print()->break();
+            });
 
-    /**
-     * @return void
-     */
-    public function getAuthFolders(): void
-    {
-        $this->controller_dir = Application::getRootApp('Components/Controller/Auth/', Application::DEBUG);
-        $this->route_dir = Application::getRoot('routers/', Application::DEBUG);
-        $this->view_dir = Application::getRoot('resources/view/auth/', Application::DEBUG);
+            $input_output->refuse(function () {
+                $this->line("Abort!")->print()->break()->exit();
+            });
+        }
     }
 }

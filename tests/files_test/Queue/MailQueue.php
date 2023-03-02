@@ -1,12 +1,15 @@
-<?php
+<?php 
 
-use Solital\Core\Resource\Mail\Mailer;
-
+/**
+ * @generated class generated using Vinci Console
+ */
 class MailQueue
 {
-    public function dispatch()
-    {
-        echo get_class() . PHP_EOL;
-        #(new Mailer)->sendQueue();
-    }
+	/**
+	 * Send queue email
+	 */
+	public function dispatch()
+	{
+		(new Solital\Core\Mail\Mailer)->sendQueue();
+	}
 }

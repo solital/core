@@ -7,6 +7,8 @@ use Solital\Core\Mail\ConnectDatabase;
 
 abstract class QueueMail
 {
+    use PropertyMailTrait;
+    
     /**
      * queue
      *

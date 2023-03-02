@@ -4,7 +4,7 @@ namespace Solital\Core\Course\Handlers;
 
 use Solital\Core\Course\{Router, Event\EventArgument};
 
-class DebugEventHandler implements EventHandler
+class DebugEventHandler implements EventHandlerInterface
 {
     /**
      * Debug callback
@@ -25,7 +25,7 @@ class DebugEventHandler implements EventHandler
      * @param string|null $name Filter events by name.
      * @return array
      */
-    public function getEvents(?string $name): array
+    public function getEvents(?string $name, ...$names): array
     {
         return [
             $name => [

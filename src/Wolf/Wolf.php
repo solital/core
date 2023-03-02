@@ -51,8 +51,8 @@ class Wolf
     public function __construct()
     {
         if (Application::isCli() == true) {
-            $this->main_url = Application::getRootTest("view/assets/");
-            $this->dir_view = Application::getRootTest("view/");
+            $this->main_url = Application::getRootApp("view/assets/");
+            $this->dir_view = Application::getRootApp("view/");
         } else {
             $this->main_url = '//' . $_SERVER['HTTP_HOST'] . "/";
             $this->dir_view = Application::getRoot("/resources/view");

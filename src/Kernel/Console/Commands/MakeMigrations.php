@@ -63,7 +63,7 @@ class MakeMigrations extends Command implements CommandInterface
 
             return true;
         } catch (\Exception $e) {
-            $this->error("Error running migration: " . $e->getMessage())->print()->break();
+            $this->error("Error: " . $e->getMessage())->print()->break();
 
             return false;
         }

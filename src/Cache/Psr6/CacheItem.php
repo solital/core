@@ -4,6 +4,7 @@ namespace Solital\Core\Cache\Psr6;
 
 use Psr\Cache\CacheItemInterface;
 
+/** @phpstan-consistent-constructor */
 class CacheItem implements CacheItemInterface
 {
     /**
@@ -48,7 +49,7 @@ class CacheItem implements CacheItemInterface
     /**
      * @param mixed $key
      * 
-     * @return static
+     * @return void
      */
     public function setKey($key)
     {
