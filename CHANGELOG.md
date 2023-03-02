@@ -1,11 +1,31 @@
 # Released Notes
 
+## v3.4.0 - (2023-03-02)
+
+### Added
+
+- Added PHP code generator for templates
+- Added `createAppFolder` and `removeAppFolder` methods
+
+### Changed
+
+- Changed Constants for Trait `Kerneltrait`
+- Changed `getRootApp` method: the method no longer creates folders automatically
+
+### Removed
+
+- Removed deprecated templates
+- Removed templates in classes: `Migrations`, `Seeds` and `Queue`
+- Removed `getRootTest` method in `Application` class
+
+--------------------------------------------------------------------------
+
 ## v3.3.2 - (2023-03-01)
 
 ### Fixed
 
 - Fixed rollback in migrations
-- Fixed `str_replace` function in `Loadable Route` class
+- Fixed `str_replace` function in `LoadableRoute` class
 
 --------------------------------------------------------------------------
 

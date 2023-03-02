@@ -2,6 +2,7 @@
 
 namespace Solital\Core\Http\Input;
 
+/** @phpstan-consistent-constructor */
 class InputFile implements InputItemInterface
 {
     /**

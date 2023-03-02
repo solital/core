@@ -2,6 +2,7 @@
 
 namespace Solital\Core\Resource;
 
+/** @phpstan-consistent-constructor */
 final class Cookie
 {
     /** 

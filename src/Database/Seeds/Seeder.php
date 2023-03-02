@@ -6,6 +6,7 @@ use Solital\Core\Console\MessageTrait;
 use Solital\Core\Database\Seeds\Exception\SeedsException;
 use Solital\Core\Kernel\Application;
 use Solital\Core\FileSystem\HandleFiles;
+use Nette\PhpGenerator\{ClassType, Method};
 
 class Seeder
 {
@@ -37,7 +38,18 @@ class Seeder
      */
     public function create(string $seed_name): Seeder
     {
-        $template = Application::getConsoleComponent("Seeds/SeederTemplate.php");
+        #$template = Application::getConsoleComponent("Seeds/SeederTemplate.php");
+
+        $run_method = (new Method('run'))
+            ->setPublic()
+            ->setBody("// ...")
+            ->addComment("Run a Seed");
+
+        $data = (new ClassType($seed_name))
+            ->setExtends(Seeder::class)
+            ->addMember($run_method)
+            ->addComment("@generated class generated using Vinci Console");
+
         $seed_file_name = $this->seeds_dir . $seed_name . ".php";
 
         if (file_exists($seed_file_name)) {
@@ -45,13 +57,7 @@ class Seeder
         }
 
         try {
-            $output_template = file_get_contents($template);
-
-            if (str_contains($output_template, "NameDefault")) {
-                $output_template = str_replace("NameDefault", $seed_name, $output_template);
-            }
-
-            file_put_contents($seed_file_name, $output_template);
+            file_put_contents($seed_file_name, "<?php\n\n" . $data);
 
             $this->success("Seeder created successfully!")->print()->break();
         } catch (SeedsException $e) {
@@ -86,10 +92,10 @@ class Seeder
             } else {
                 foreach ($seeder as $seeder) {
                     $this->warning("Running seeder: " . $seeder)->print()->break();
-    
+
                     $instance = $this->initiateSeeder($seeder);
                     $instance->run();
-    
+
                     $this->success("Seeder executed: " . $seeder)->print()->break();
                 }
             }

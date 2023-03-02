@@ -3,6 +3,7 @@
 namespace Solital\Core\Http\Input;
 
 use Solital\Core\Http\Request;
+use Solital\Core\Resource\JSON;
 
 class InputHandler
 {
@@ -349,11 +350,9 @@ class InputHandler
     /**
      * @return string
      */
-    public function getAllJson()
+    public function getAllJson(): string
     {
-        $json = encodeJSON($_GET);
-
-        return $json;
+        return (new JSON())->encode($_GET);
     }
 
     /**

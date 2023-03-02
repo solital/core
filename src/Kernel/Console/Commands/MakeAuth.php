@@ -145,6 +145,7 @@ class MakeAuth extends Command implements CommandInterface
         string $header_template,
         string $footer_template
     ): void {
+        Application::createAppFolder($this->controller_dir);
         $this->createAuthComponents($this->controller_dir, $login_template_controller, 'LoginController.php');
         $this->createAuthComponents($this->route_dir, $login_template_route, 'login.php');
         $this->createAuthComponents($this->view_dir, $login_template_dashboard, 'auth-dashboard.php');
@@ -174,6 +175,7 @@ class MakeAuth extends Command implements CommandInterface
         string $header_template,
         string $footer_template
     ): void {
+        Application::createAppFolder($this->controller_dir);
         $this->createAuthComponents($this->controller_dir, $forgot_template_controller, 'ForgotController.php');
         $this->createAuthComponents($this->route_dir, $forgot_template_route, 'forgot.php');
         $this->createAuthComponents($this->view_dir, $forgot_template_form, 'forgot-form.php');
@@ -203,5 +205,15 @@ class MakeAuth extends Command implements CommandInterface
         }
 
         return $this;
+    }
+
+    /**
+     * @return void
+     */
+    public function getAuthFolders(): void
+    {
+        $this->controller_dir = Application::getRootApp('Components/Controller/Auth/', Application::DEBUG, false);
+        $this->route_dir = Application::getRoot('routers/', Application::DEBUG);
+        $this->view_dir = Application::getRoot('resources/view/auth/', Application::DEBUG);
     }
 }

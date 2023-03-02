@@ -36,7 +36,7 @@ class MakeRouter extends Command implements CommandInterface
     {
         $router_dir = Application::getRootApp('routers/', Application::DEBUG);
         $router_template = Application::getConsoleComponent('RouterName.php');
-        $comment = null;
+        $comment = "";
 
         if (empty($arguments->router_name)) {
             $this->error("Error: You need to define a name for your route")->print()->break();
@@ -48,21 +48,46 @@ class MakeRouter extends Command implements CommandInterface
             $comment = "- " . $options->comment;
         }
 
-        $res = $this->createComponent($router_template, $router_dir, $arguments->router_name, [
+        $this->generateComponent($router_template, $router_dir, $arguments->router_name, [
             'CommentDefault' => $comment,
             'SolitalVersion' => Application::SOLITAL_VERSION
         ]);
 
-        if ($res == true) {
-            $this->success("Router successfully created!")->print()->break();
+        return $this;
+    }
+    
+    /**
+     * generateComponent
+     *
+     * @param  mixed $component_template
+     * @param  mixed $component_dir
+     * @param  mixed $argument_name
+     * @param  mixed $replace
+     * @return void
+     */
+    public function generateComponent(string $component_template, string $component_dir, string $argument_name, ?array $replace = null): void
+    {
+        $output_template = file_get_contents($component_template);
 
-            return true;
-        } else {
-            $this->error("Error: Router already exists!")->print()->break();
-
-            return false;
+        if (str_contains($output_template, 'NameDefault')) {
+            $output_template = str_replace('NameDefault', $argument_name, $output_template);
         }
 
-        return $this;
+        if ($replace != null) {
+            foreach ($replace as $key => $replace_text) {
+                if (str_contains($output_template, $key) && $key != "") {
+                    $output_template = str_replace($key, $replace_text, $output_template);
+                }
+            }
+        }
+
+        $file_exists = $component_dir . $argument_name . ".php";
+
+        if (!file_exists($file_exists)) {
+            file_put_contents($component_dir . $argument_name . ".php", $output_template);
+            $this->success("Router successfully created!")->print()->break();
+        } else {
+            $this->error("Error: Router already exists!")->print()->break();
+        }
     }
 }

@@ -3,13 +3,15 @@
 namespace Solital\Core\Kernel\Console\Commands;
 
 use Solital\Core\Kernel\Application;
-use Solital\Core\Console\InputOutput;
 use Solital\Core\Console\Command;
-use Solital\Core\FileSystem\HandleFiles;
 use Solital\Core\Console\Interface\CommandInterface;
+use Solital\Core\Kernel\Console\HelpersTrait;
+use Nette\PhpGenerator\{ClassType, Method, Parameter, PhpNamespace, Property};
 
 class MakeCommand extends Command implements CommandInterface
 {
+    use HelpersTrait;
+
     /**
      * @var string
      */
@@ -33,37 +35,20 @@ class MakeCommand extends Command implements CommandInterface
      */
     public function handle(object $arguments, object $options): mixed
     {
-        $component_dir = Application::getRootApp('Console/Command/', Application::DEBUG);
-        $component_template = Application::getConsoleComponent('CommandTemplate.php');
+        $command_dir = Application::getRootApp('Console/Command/', Application::DEBUG);
 
         if (isset($options->remove)) {
-            $this->remove($component_dir, $arguments->command_name);
-        } else {
-            $this->create($component_dir, $component_template, $arguments->command_name);
+            $this->removeComponent($command_dir, $arguments->command_name . ".php");
         }
 
-        return $this;
-    }
+        $data = $this->codeGenerated($arguments->command_name);
 
-    /**
-     * @param string $component_dir
-     * @param string $component_template
-     * @param string $arguments
-     * 
-     * @return bool
-     */
-    private function create(string $component_dir, string $component_template, string $arguments): bool
-    {
-        $output_template = file_get_contents($component_template);
+        $res = $this->createComponent($data, [
+            'component_name' => $arguments->command_name,
+            'directory' => $command_dir
+        ]);
 
-        if (str_contains($output_template, 'NameDefault')) {
-            $output_template = str_replace('NameDefault', $arguments, $output_template);
-        }
-
-        $file_exists = $component_dir . $arguments . ".php";
-
-        if (!file_exists($file_exists)) {
-            file_put_contents($file_exists, $output_template);
+        if ($res == true) {
             $this->success("Command successfully created!")->print()->break();
 
             return true;
@@ -72,31 +57,58 @@ class MakeCommand extends Command implements CommandInterface
 
             return false;
         }
+
+        return $this;
     }
 
     /**
-     * @param string $dir
-     * @param string $component
-     * 
-     * @return MakeCommand
+     * @param  mixed $controller_name
+     * @return string
      */
-    private function remove(string $dir, string $component): MakeCommand
+    private function codeGenerated(string $controller_name): string
     {
-        $input_output = new InputOutput();
-        $handle_files = new HandleFiles();
+        $command_property = (new Property('command'))
+            ->setType('string')
+            ->setValue("")
+            ->setProtected()
+            ->addComment("\n@var string\n");
 
-        $input_output->confirmDialog("Are you sure you want to delete this components? (this process cannot be undone)? ", "Y", "N", false);
+        $arguments_property = (new Property('arguments'))
+            ->setType('array')
+            ->setValue([])
+            ->setProtected()
+            ->addComment("\n@var array\n");
 
-        $input_output->confirm(function () use ($dir, $component, $handle_files) {
-            $handle_files->folder($dir)->fileExists($component . ".php", true);
+        $description_property = (new Property('description'))
+            ->setType('string')
+            ->setValue("")
+            ->setProtected()
+            ->addComment("\n@var string\n");
 
-            $this->success("Command successfully removed!")->print()->break();
-        });
+        $handle_method = (new Method('handle'))
+            ->setPublic()
+            ->setBody('return $this;')
+            ->setReturnType('mixed')
+            ->setParameters([
+                (new Parameter('argumments'))->setType('object'),
+                (new Parameter('options'))->setType('object')
+            ])
+            ->addComment("@param object " . '$arguments' . "\n@param object " . '$options' . "\n@return mixed");
 
-        $input_output->refuse(function () {
-            $this->line("Abort!")->print()->break()->exit();
-        });
+        $class = (new ClassType($controller_name))
+            ->setExtends(Command::class)
+            ->addImplement(CommandInterface::class)
+            ->addMember($command_property)
+            ->addMember($arguments_property)
+            ->addMember($description_property)
+            ->addMember($handle_method)
+            ->addComment("@generated class generated using Vinci Console");
 
-        return $this;
+        $data = (new PhpNamespace("Solital\Console\Command"))
+            ->add($class)
+            ->addUse(Command::class)
+            ->addUse(CommandInterface::class);
+
+        return $data;
     }
 }

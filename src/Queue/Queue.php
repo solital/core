@@ -7,6 +7,7 @@ use Solital\Core\Kernel\Application;
 use Solital\Core\Console\MessageTrait;
 use Solital\Core\Queue\Exception\QueueException;
 use Solital\Core\FileSystem\HandleFiles;
+use Nette\PhpGenerator\{ClassType, Method};
 
 class Queue
 {
@@ -36,7 +37,16 @@ class Queue
      */
     public function create(string $queue_name): Queue
     {
-        $template = Application::getConsoleComponent("QueueTemplate.php");
+        $dispatch_method = (new Method('dispatch'))
+            ->setPublic()
+            ->setBody("// ...")
+            ->addComment("dispatch");
+
+        $class = (new ClassType($queue_name))
+            ->setExtends(Queue::class)
+            ->addMember($dispatch_method)
+            ->addComment("@generated class generated using Vinci Console");
+
         $queue_file_name = $this->queue_dir . $queue_name . ".php";
 
         if (file_exists($queue_file_name)) {
@@ -44,13 +54,7 @@ class Queue
         }
 
         try {
-            $output_template = file_get_contents($template);
-
-            if (str_contains($output_template, "NameDefault")) {
-                $output_template = str_replace("NameDefault", $queue_name, $output_template);
-            }
-
-            file_put_contents($queue_file_name, $output_template);
+            file_put_contents($this->queue_dir . $queue_name . '.php', "<?php \n\n" . $class);
 
             $this->success("Queue created successfully!")->print()->break();
         } catch (QueueException $e) {

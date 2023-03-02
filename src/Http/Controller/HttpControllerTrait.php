@@ -13,14 +13,6 @@ trait HttpControllerTrait
     protected mixed $request;
 
     /**
-     * @return mixed
-     */
-    public function removeParamsUrl(): mixed
-    {
-        return remove_param();
-    }
-
-    /**
      * @param string|null $index
      * @param string|null $defaultValue
      * @param mixed ...$methods

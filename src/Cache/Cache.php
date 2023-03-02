@@ -23,11 +23,7 @@ class Cache implements CacheInterface
      */
     public function __construct()
     {
-        if (Application::DEBUG == true) {
-            $this->value = Application::getRootTest('cache/');
-        } else {
-            $this->value = Application::getRootApp("Storage/cache/");
-        }
+        $this->value = Application::getRootApp("Storage/cache/");
     }
 
     /**
@@ -54,6 +50,8 @@ class Cache implements CacheInterface
                 return $decoded;
             }
         }
+
+        return null;
     }
 
     /**
@@ -145,6 +143,8 @@ class Cache implements CacheInterface
 
             return true;
         }
+
+        return false;
     }
 
     /**
@@ -265,6 +265,8 @@ class Cache implements CacheInterface
         }
 
         $this->verifyMultipleKeys($keys);
+
+        return true;
     }
 
     /**

@@ -13,6 +13,11 @@ class CourseList extends Course
      */
     private static $routes;
 
+    final public function __construct()
+    {
+        
+    }
+
     /**
      * @param bool $send_console
      * 

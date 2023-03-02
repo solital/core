@@ -4,6 +4,7 @@ use Respect\Validation\Validator;
 use Solital\Core\Resource\Session;
 use Solital\Core\Resource\Str\Str;
 use Solital\Core\Resource\Collection\ArrayCollection;
+use Solital\Core\Security\Guardian;
 use Solital\Core\Validation\Convertime;
 
 /**
@@ -64,17 +65,7 @@ function is_json($json): bool
  */
 function get_url(string $uri = null): string
 {
-    $http = 'http://';
-    if (isset($_SERVER['HTTPS'])) {
-        $http = 'https://';
-    }
-    $url = $http . $_SERVER['HTTP_HOST'];
-
-    if (isset($uri)) {
-        $url = $http . $_SERVER['HTTP_HOST'] . "/" . $uri;
-    }
-
-    return $url;
+    return Guardian::getUrl($uri);
 }
 
 /**

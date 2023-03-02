@@ -2044,6 +2044,6 @@ final class ArrayCollection implements
             throw new \Exception("Property [{$key}] does not exist on this collection instance.");
         }
 
-        return new HigherOrderCollectionProxy($this, $key);
+        //return new HigherOrderCollectionProxy($this, $key);
     }
 }

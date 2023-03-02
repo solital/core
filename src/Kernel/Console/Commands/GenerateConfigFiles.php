@@ -2,15 +2,18 @@
 
 namespace Solital\Core\Kernel\Console\Commands;
 
-use Solital\Core\Console\{
-    Interface\CommandInterface,
-    Command
-};
+use Solital\Core\Console\{Interface\CommandInterface, Command};
+use Solital\Core\Console\Interface\ExtendCommandsInterface;
 use Solital\Core\Kernel\Application;
+use Solital\Core\Kernel\Console\HelpersTrait;
+use Solital\Core\Mail\Mailer;
 use Solital\Core\FileSystem\HandleFiles;
+use Nette\PhpGenerator\{ClassType, Method, PhpNamespace, Property};
 
 class GenerateConfigFiles extends Command implements CommandInterface
 {
+    use HelpersTrait;
+
     /**
      * @var string
      */
@@ -51,9 +54,20 @@ class GenerateConfigFiles extends Command implements CommandInterface
     private function queueFiles(): GenerateConfigFiles
     {
         $dir_queue = Application::getRootApp('Queue/', Application::DEBUG);
-        $config_core_dir = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Templates' . DIRECTORY_SEPARATOR . "Queue";
 
-        $this->copyFiles($config_core_dir, $dir_queue);
+        $dispatch_method = (new Method('dispatch'))
+            ->setPublic()
+            ->setBody("(new " . Mailer::class . ")->sendQueue();")
+            ->addComment("Send queue email");
+
+        $class = (new ClassType('MailQueue'))
+            ->addMember($dispatch_method)
+            ->addComment("@generated class generated using Vinci Console");
+
+        $this->createComponent($class, [
+            'component_name' => 'MailQueue',
+            'directory' => $dir_queue
+        ]);
 
         return $this;
     }
@@ -63,10 +77,48 @@ class GenerateConfigFiles extends Command implements CommandInterface
      */
     private function commandFiles(): GenerateConfigFiles
     {
-        $dir_queue = Application::getRootApp('Console/', Application::DEBUG);
-        $config_core_dir = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Templates' . DIRECTORY_SEPARATOR . "Commands";
+        $dir_cmd = Application::getRootApp('Console/', Application::DEBUG);
 
-        $this->copyFiles($config_core_dir, $dir_queue);
+        $command_class = (new Property('command_class'))
+            ->setType('array')
+            ->setValue([])
+            ->setProtected()
+            ->addComment("\n@var array\n");
+
+        $type_commands = (new Property('type_commands'))
+            ->setType('string')
+            ->setValue("")
+            ->setProtected()
+            ->addComment("\n@var string\n");
+
+        $get_command_class = (new Method('getCommandClass'))
+            ->setPublic()
+            ->setBody('return $this->command_class;')
+            ->setReturnType('array')
+            ->addComment("@return array");
+
+        $get_type_command = (new Method('getTypeCommands'))
+            ->setPublic()
+            ->setBody('return $this->type_commands;')
+            ->setReturnType('string')
+            ->addComment("@return string");
+
+        $class = (new ClassType('Config'))
+            ->addImplement(ExtendCommandsInterface::class)
+            ->addMember($get_command_class)
+            ->addMember($get_type_command)
+            ->addMember($command_class)
+            ->addMember($type_commands)
+            ->addComment("@generated class generated using Vinci Console");
+
+        $data = (new PhpNamespace("Solital\Console"))
+            ->add($class)
+            ->addUse(ExtendCommandsInterface::class);
+
+        $this->createComponent($data, [
+            'component_name' => 'Config',
+            'directory' => $dir_cmd
+        ]);
 
         return $this;
     }

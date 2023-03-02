@@ -59,7 +59,7 @@ trait WolfCacheTrait
     protected function getFolderCache(): string
     {
         if (Application::isCli() == true) {
-            $this->cache_dir = Application::getRootTest('view/cache/');
+            $this->cache_dir = Application::getRootApp('view/cache/');
         } else {
             $this->cache_dir = Application::getRootApp("Storage/cache/wolf/");
         }

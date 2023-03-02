@@ -354,17 +354,14 @@ class Uri implements \JsonSerializable, UriInterface
      * Set raw query-string parameters as string
      *
      * @param string $queryString
-     * @return static
+     * @return mixed
      */
-    public function setQueryString(string $queryString): self
+    public function setQueryString(string $queryString): mixed
     {
         $params = [];
+        parse_str($queryString, $params);
 
-        if (parse_str($queryString, $params) !== false) {
-            return $this->setParams($params);
-        }
-
-        return $this;
+        return $this->setParams($params);
     }
 
     /**

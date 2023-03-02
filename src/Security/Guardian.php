@@ -11,6 +11,7 @@ use Solital\Core\Resource\Session;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Exceptions\InvalidArgumentException;
 
+/** @phpstan-consistent-constructor */
 class Guardian
 {
     /**
@@ -138,7 +139,7 @@ class Guardian
                     throw new \Exception("Failed to open '.env' file");
                 }
 
-                fwrite($file, "\n\n# APP DOMAIN\n" . 'APP_DOMAIN="' . get_url() . '"');
+                fwrite($file, "\n\n# APP DOMAIN\n" . 'APP_DOMAIN="' . self::getUrl() . '"');
 
                 while (($line = fgets($file)) !== false) {
                     echo $line;
@@ -172,7 +173,7 @@ class Guardian
             throw new InvalidArgumentException("Variables not defined in 'bootstrap.yaml' file: verify_domain");
         }
 
-        $url = get_url();
+        $url = self::getUrl();
         $email_validation = Validator::email()->validate($send_to);
 
         if ($email_validation == false) {
@@ -187,6 +188,30 @@ class Guardian
                 $recipient_name
             )->send('Solital: Security Alert', 'We detected that your project made in Solital is in another domain. The detected domain is: ' . $url);
         }
+    }
+
+    /**
+     * Get atual url
+     * 
+     * @param string $uri
+     * 
+     * @return string
+     */
+    public static function getUrl(string $uri = null)
+    {
+        $http = 'http://';
+
+        if (isset($_SERVER['HTTPS'])) {
+            $http = 'https://';
+        }
+
+        $url = $http . $_SERVER['HTTP_HOST'];
+
+        if (isset($uri)) {
+            $url = $http . $_SERVER['HTTP_HOST'] . "/" . $uri;
+        }
+
+        return $url;
     }
 
     /**

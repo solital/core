@@ -11,8 +11,8 @@ class Command
     use DefaultCommandsTrait;
     use MessageTrait;
 
-    const VERSION = "3.2.1";
-    const DATE_VERSION = "Feb 03 2022";
+    const VERSION = "3.2.2";
+    const DATE_VERSION = "Mar 02 2023";
     const SITE_DOC = "http://solitalframework.rf.gd/docs/3.x/vinci-console/";
 
     /**
@@ -103,7 +103,7 @@ class Command
         $this->arguments = $arguments;
 
         $this->filter($this->arguments);
-        $this->verifyDefaultCommand($this->command, $this->arguments);
+        $this->verifyDefaultCommand($this->command, $this->arguments, (object)$this->options);
 
         $command_class = $this->getCommandClass();
 

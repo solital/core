@@ -1,9 +1,15 @@
-<?php
+<?php 
 
-class UserQueue
+/**
+ * @generated class generated using Vinci Console
+ */
+class UserQueue extends Solital\Core\Queue\Queue
 {
-    public function dispatch()
-    {
-        
-    }
+	/**
+	 * dispatch
+	 */
+	public function dispatch()
+	{
+		// ...
+	}
 }
