@@ -1,5 +1,13 @@
 # Released Notes
 
+## v3.4.1 - (2023-04-xx)
+
+### Changed
+
+- Changed Constants for class `Application`
+
+--------------------------------------------------------------------------
+
 ## v3.4.0 - (2023-03-02)
 
 ### Added
