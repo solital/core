@@ -51,6 +51,8 @@ class CacheItemPoolTest extends TestCase
         $keyCopy = 'invalidItemCacheCopy';
         $dirCachePath = __DIR__ . '/cacheTest';
 
+        dd($dirCachePath . '/' . $keyOriginal, $dirCachePath . '/' . $keyCopy);
+
         //I need copy the invalidItemCache file for preserv the test next time.
         $this->assertTrue(copy($dirCachePath . '/' . $keyOriginal, $dirCachePath . '/' . $keyCopy));
         

@@ -4,17 +4,17 @@
     "license": "MIT",
     "homepage": "http://solitalframework.rf.gd/",
     "require": {
-        "php": "^8.0",
+        "php": "^8.2",
         "ext-json": "*",
         "ext-pdo": "*",
         "brenno-duarte/modern-php-exception": "2.*",
         "brenno-duarte/php-secure-password": "2.*",
         "codedungeon/php-cli-colors": "1.*",
         "delight-im/http": "2.*",
-        "egulias/email-validator": "3.*",
+        "egulias/email-validator": "4.*",
         "fig/event-dispatcher-util": "1.*",
         "matthiasmullie/minify": "1.*",
-        "nette/php-generator": "^4.0",
+        "nette/php-generator": "4.*",
         "phpmailer/phpmailer": "6.*",
         "psr/cache": "3.*",
         "psr/container": "2.*",
@@ -25,10 +25,10 @@
         "react/event-loop": "1.*",
         "respect/validation": "2.*",
         "solital/katrina": "2.*",
-        "symfony/var-dumper": "6.0.*",
-        "symfony/var-exporter": "6.0.*",
-        "symfony/yaml": "6.0.*",
-        "vlucas/phpdotenv": "^5.4"
+        "symfony/var-dumper": "6.*",
+        "symfony/var-exporter": "6.*",
+        "symfony/yaml": "6.*",
+        "vlucas/phpdotenv": "5.*"
     },
     "replace": {
         "solital/vinci-console": "self.version"

@@ -173,10 +173,10 @@ class Response implements ResponseInterface
     /**
      * @return void
      */
-    public function refresh(): void
+    /* public function refresh(): void
     {
         $this->redirect($this->request->getUri()->getOriginalUrl());
-    }
+    } */
 
     /**
      * Add header to response
@@ -217,10 +217,10 @@ class Response implements ResponseInterface
      * @param string $reasonPhrase The reason phrase to use with the
      *                             provided status code; if none is provided, implementations MAY
      *                             use the defaults as suggested in the HTTP specification.
-     * @return static
+     * @return ResponseInterface
      * @throws \InvalidArgumentHttpException For invalid status code arguments.
      */
-    public function withStatus($code, $reasonPhrase = '')
+    public function withStatus(int $code, string $reasonPhrase = ''): ResponseInterface
     {
         if ($reasonPhrase == "") {
             $reasonPhrase = $this->statusMessageList[$code];
@@ -250,7 +250,7 @@ class Response implements ResponseInterface
     /**
      * @return string Reason phrase; must return an empty string if none present.
      */
-    public function getReasonPhrase(): ?string
+    public function getReasonPhrase(): string
     {
         if ($this->reasonPhrase) {
             return $this->reasonPhrase;
@@ -259,8 +259,6 @@ class Response implements ResponseInterface
         if (isset($this->messages[$this->statusCode])) {
             return $this->messages[$this->statusCode];
         }
-
-        return null;
     }
 
     /**

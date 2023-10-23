@@ -1,6 +1,20 @@
 # Released Notes
 
-## v3.4.1 - (2023-04-xx)
+## v3.5.0 - (2023-10-23)
+
+### Added
+
+- Added constants in the `KernelTrait` trait
+- Added minimum PHP version to 8.2
+
+### Fixed
+
+- Fixed creating folder in `Seeder` class
+- Fixed PSR in Http folder classes
+
+--------------------------------------------------------------------------
+
+## v3.4.1 - (2023-04-15)
 
 ### Changed
 

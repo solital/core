@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Solital\Core\Http\Traits;
 
+use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\StreamInterface;
 use Solital\Core\Http\Stream;
 
@@ -89,7 +90,7 @@ trait MessageTrait
      *
      * @throws \InvalidArgumentException If the HTTP protocol version is invalid.
      */
-    public function withProtocolVersion($version)
+    public function withProtocolVersion(string $version): MessageInterface
     {
         $this->validateProtocolVersion($version);
 
@@ -226,7 +227,7 @@ trait MessageTrait
      *     name using a case-insensitive string comparison. Returns false if
      *     no matching header name is found in the message.
      */
-    public function hasHeader($name): bool
+    public function hasHeader(string $name): bool
     {
         return isset($this->headerNames[strtolower($name)]);
     }
@@ -246,7 +247,7 @@ trait MessageTrait
      *    header. If the header does not appear in the message, this method MUST
      *    return an empty array.
      */
-    public function getHeader($name): array
+    public function getHeader(string $name): array
     {
         if (!$this->hasHeader($name)) {
             return [];
@@ -277,7 +278,7 @@ trait MessageTrait
      *    concatenated together using a comma. If the header does not appear in
      *    the message, this method MUST return an empty string.
      */
-    public function getHeaderLine($name): string
+    public function getHeaderLine(string $name): string
     {
         return implode(', ', $this->getHeader($name));
     }
@@ -299,7 +300,7 @@ trait MessageTrait
      *
      * @throws \InvalidArgumentException for invalid header names or values.
      */
-    public function withHeader($name, $value)
+    public function withHeader(string $name, $value): MessageInterface
     {
         $this->validateHeaderName($name);
 
@@ -336,7 +337,7 @@ trait MessageTrait
      *
      * @throws \InvalidArgumentException for invalid header names or values.
      */
-    public function withAddedHeader($name, $value)
+    public function withAddedHeader(string $name, $value): MessageInterface
     {
         $this->validateHeaderName($name);
 
@@ -366,7 +367,7 @@ trait MessageTrait
      *
      * @return static
      */
-    public function withoutHeader($name)
+    public function withoutHeader(string $name): MessageInterface
     {
         if (!$this->hasHeader($name)) {
             return clone $this;
@@ -427,7 +428,7 @@ trait MessageTrait
      *
      * @throws \InvalidArgumentException When the body is not valid.
      */
-    public function withBody(StreamInterface $body)
+    public function withBody(StreamInterface $body): MessageInterface
     {
         return $this->cloneWithProperty('stream', $body);
     }

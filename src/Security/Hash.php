@@ -24,7 +24,7 @@ final class Hash
     public static function checkSecrets(): void
     {
         if (getenv('FIRST_SECRET') == "" || getenv('SECOND_SECRET') == "") {
-            throw new \Exception("Empty OPENSSL secrets", 404);
+            throw new \Exception("Empty OPENSSL secrets. Verify '.env' file", 404);
         }
     }
 
