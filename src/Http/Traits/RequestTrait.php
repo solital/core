@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Solital\Core\Http\Traits;
 
 use Psr\Http\Message\UriInterface;
+use Psr\Http\Message\RequestInterface;
 use Solital\Core\Http\Uri;
 
 trait RequestTrait
@@ -97,7 +98,7 @@ trait RequestTrait
      *
      * @throws \InvalidArgumentException for invalid request targets.
      */
-    public function withRequestTarget($requestTarget)
+    public function withRequestTarget($requestTarget): RequestInterface
     {
         if (preg_match('#\s#', $requestTarget)) {
             throw new \InvalidArgumentException("Invalid request target provided. Must be a string without whitespace", 400);
@@ -124,7 +125,7 @@ trait RequestTrait
      *
      * @throws \InvalidArgumentException for invalid HTTP methods.
      */
-    public function withMethod($method)
+    public function withMethod(string $method): RequestInterface
     {
         $method = $this->sanitizeMethod($method);
 
@@ -194,7 +195,7 @@ trait RequestTrait
      *
      * @return static
      */
-    public function withUri(UriInterface $uri, $preserveHost = false)
+    public function withUri(UriInterface $uri, bool $preserveHost = false): RequestInterface
     {
         $clone = clone $this;
         $clone->uri = $uri;

@@ -38,7 +38,7 @@ class Seeder
      */
     public function create(string $seed_name): Seeder
     {
-        #$template = Application::getConsoleComponent("Seeds/SeederTemplate.php");
+        $folder = new HandleFiles();
 
         $run_method = (new Method('run'))
             ->setPublic()
@@ -57,6 +57,10 @@ class Seeder
         }
 
         try {
+            if (!is_dir($this->seeds_dir)) {
+                $folder->create($this->seeds_dir);
+            }
+
             file_put_contents($seed_file_name, "<?php\n\n" . $data);
 
             $this->success("Seeder created successfully!")->print()->break();

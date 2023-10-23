@@ -22,16 +22,16 @@ class Uri implements \JsonSerializable, UriInterface
     /**
      * The URI scheme without "://" suffix.
      *
-     * @var null|string
+     * @var string
      */
-    private ?string $scheme;
+    private string $scheme;
 
     /**
      * The URI host.
      *
-     * @var null|string
+     * @var string
      */
-    private ?string $host;
+    private string $host;
 
     /**
      * The URI port.
@@ -95,8 +95,8 @@ class Uri implements \JsonSerializable, UriInterface
         if ($url !== null && $url !== '/') {
             $data = $this->parseUrl($url);
 
-            $this->scheme = $data['scheme'] ?? null;
-            $this->host = $data['host'] ?? null;
+            $this->scheme = $data['scheme'] ?? "";
+            $this->host = $data['host'] ?? "";
             $this->port = $data['port'] ?? null;
             $this->username = $data['user'] ?? null;
             $this->password = $data['pass'] ?? null;
@@ -105,7 +105,7 @@ class Uri implements \JsonSerializable, UriInterface
                 $this->setPath($data['path']);
             }
 
-            $this->fragment = $data['fragment'] ?? null;
+            $this->fragment = $data['fragment'] ?? "";
 
             if (isset($data['query']) === true) {
                 $this->setQueryString($data['query']);
@@ -183,9 +183,9 @@ class Uri implements \JsonSerializable, UriInterface
     /**
      * Get url scheme
      *
-     * @return string|null
+     * @return string
      */
-    public function getScheme(): ?string
+    public function getScheme(): string
     {
         return $this->scheme;
     }
@@ -206,9 +206,9 @@ class Uri implements \JsonSerializable, UriInterface
     /**
      * Get url host
      *
-     * @return string|null
+     * @return string
      */
-    public function getHost(): ?string
+    public function getHost(): string
     {
         return $this->host;
     }
@@ -298,7 +298,7 @@ class Uri implements \JsonSerializable, UriInterface
      * Get path from url
      * @return string
      */
-    public function getPath(): ?string
+    public function getPath(): string
     {
         return $this->path ?? '/';
     }
@@ -379,7 +379,7 @@ class Uri implements \JsonSerializable, UriInterface
      *
      * @return string|null
      */
-    public function getFragment(): ?string
+    public function getFragment(): string
     {
         return $this->fragment;
     }
@@ -781,7 +781,7 @@ class Uri implements \JsonSerializable, UriInterface
      * @return static A new instance with the specified fragment.
      * @throws \InvalidArgumentException for invalid fragment strings.
      */
-    public function withFragment($fragment)
+    public function withFragment($fragment): UriInterface
     {
         $fragment = $this->sanitizeFragment($fragment);
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Solital\Core\Http;
 
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\UriInterface;
 use Solital\Core\Resource\Session;
 use Solital\Core\Http\{Uri, Input\InputHandler, Traits\RequestTrait};
 use Solital\Core\Course\{Course, Route\RouteUrl, Route\LoadableRouteInterface};
@@ -39,7 +40,7 @@ class Request implements RequestInterface
      * 
      * @var Uri
      */
-    protected Uri $url;
+    protected ?Uri $url = null;
 
     /**
      * Current request url
@@ -96,6 +97,8 @@ class Request implements RequestInterface
      */
     public function __construct(string $method, $uri, $body = 'php://memory', array $headers = [])
     {
+        #dd($method, $uri, $body, $headers);
+
         $this->headers = $_SERVER;
         $this->initialize($method, $uri, $body, $headers);
 
@@ -110,32 +113,42 @@ class Request implements RequestInterface
             $this->scheme = 'http://';
         }
 
-        $this->setHost($this->scheme . $this->getHeader('http-host'));
+        //$header = $this->isConsole('http-host');
 
-        // Check if special IIS header exist, otherwise use default.
-        if ($this->getHeader('unencoded-url', $this->getHeader('request-uri'))) {
-            $this->setUrl(new Uri($this->getFirstHeader(['unencoded-url', 'request-uri'])));
-        }
+        $this->setHost($this->scheme . $this->getHeaderValue('http-host'));
 
-        $method_server = $this->getHeader('request-method');
+        $method_server = $this->getHeaderValue('request-method');
         $this->method = strtolower($method_server);
         $this->inputHandler = new InputHandler($this);
         $this->method = strtolower($this->inputHandler->value('_method', $method_server));
     }
+
+    /* public function isConsole(string $name, bool $value = false)
+    {
+        if ($value == true) {
+            return $this->getHeader($name);
+        } else {
+            return $this->getHeaderValue($name);
+        }
+    } */
 
     /**
      * @return bool
      */
     public function isSecure(): bool
     {
-        return $this->getHeader('http-x-forwarded-proto') === 'https' || $this->getHeader('https') !== null || $this->getHeader('server-port') === 443;
+        return $this->getHeaderValue('http-x-forwarded-proto') === 'https' || $this->getHeaderValue('https') !== null || $this->getHeaderValue('server-port') === 443;
     }
 
     /**
-     * @return Uri
+     * @return UriInterface
      */
-    public function getUri(): Uri
+    public function getUri(): UriInterface
     {
+        if ($this->url == null) {
+            $this->setUrl(new Uri($this->getHeaderValue('request-uri')));
+        }
+
         return $this->url;
     }
 
@@ -146,13 +159,13 @@ class Request implements RequestInterface
     {
         $this->url = $url;
 
-        if ($this->url->getHost() === null) {
+        //if ($this->url->getHost() === null) {
             if ($this->url->getScheme() !== null) {
                 $this->url->setHost((string)$this->getHost());
             }
 
             $this->url->setHost((string)$this->getHost());
-        }
+        //}
     }
 
     /**
@@ -174,9 +187,9 @@ class Request implements RequestInterface
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getMethod(): ?string
+    public function getMethod(): string
     {
         return $this->method;
     }
@@ -187,7 +200,7 @@ class Request implements RequestInterface
      */
     public function getUser(): ?string
     {
-        return $this->getHeader('php-auth-user');
+        return $this->getHeaderValue('php-auth-user');
     }
 
     /**
@@ -196,7 +209,7 @@ class Request implements RequestInterface
      */
     public function getPassword(): ?string
     {
-        return $this->getHeader('php-auth-pw');
+        return $this->getHeaderValue('php-auth-pw');
     }
 
     /**
@@ -239,7 +252,7 @@ class Request implements RequestInterface
     public function getFirstHeader(array $headers, $defaultValue = null)
     {
         foreach ($headers as $header) {
-            $header = $this->getHeader($header);
+            $header = $this->getHeaderValue($header);
             if ($header !== null) {
                 return $header;
             }
@@ -265,7 +278,7 @@ class Request implements RequestInterface
      */
     public function getReferer(): ?string
     {
-        return $this->getHeader('http-referer');
+        return $this->getHeaderValue('http-referer');
     }
 
     /**
@@ -274,20 +287,43 @@ class Request implements RequestInterface
      */
     public function getUserAgent(): ?string
     {
-        return $this->getHeader('http-user-agent');
+        return $this->getHeaderValue('http-user-agent');
+    }
+
+    /**
+     * Get header array
+     *
+     * @param string $name
+     *
+     * @return array
+     */
+    public function getHeader(string $name): array
+    {
+        if ($this->headers == null || array_key_exists($name, $this->headers) == false) {
+            $res[$name] = [];
+        } else {
+            $res[$name] = $this->headers[$name];
+        }
+
+        return $res;
     }
 
     /**
      * Get header value by name
      *
      * @param string $name
-     * @param string|null $defaultValue
      *
      * @return string|null
      */
-    public function getHeader($name, $defaultValue = null): ?string
+    public function getHeaderValue($name): ?string
     {
-        return $this->headers[$name] ?? $defaultValue;
+        $value = $this->getHeader($name);
+
+        if (empty($value[$name])) {
+            return null;
+        } else {
+            return $value[$name];
+        }
     }
 
     /**
@@ -306,10 +342,10 @@ class Request implements RequestInterface
      *
      * @return bool
      */
-    public function isFormatAccepted($format): bool
+    /* public function isFormatAccepted($format): bool
     {
-        return ($this->getHeader('http-accept') !== null && stripos($this->getHeader('http-accept'), $format) !== false);
-    }
+        return ($this->getHeaderValue('http-accept') !== null && stripos($this->getHeaderValue('http-accept'), $format) !== false);
+    } */
 
     /**
      * Returns true if the request is made through Ajax
@@ -318,7 +354,7 @@ class Request implements RequestInterface
      */
     public function isAjax(): bool
     {
-        return (strtolower($this->getHeader('http-x-requested-with')) === 'xmlhttprequest');
+        return (strtolower($this->getHeaderValue('http-x-requested-with')) === 'xmlhttprequest');
     }
 
     /**
@@ -327,7 +363,7 @@ class Request implements RequestInterface
      */
     public function getAcceptFormats(): array
     {
-        return explode(',', $this->getHeader('http-accept'));
+        return explode(',', $this->getHeaderValue('http-accept'));
     }
 
     /**

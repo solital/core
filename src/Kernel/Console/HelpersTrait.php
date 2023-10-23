@@ -16,9 +16,15 @@ trait HelpersTrait
      */
     public function createComponent(string $data, array $config): bool
     {
+        $folder = new HandleFiles();
+
         $file_exists = $config['directory'] . $config['component_name'] . ".php";
 
         if (!file_exists($file_exists)) {
+            if (!is_dir($config['directory'])) {
+                $folder->create($config['directory']);
+            }
+
             file_put_contents($config['directory'] . $config['component_name'] . '.php', "<?php \n\n" . $data);
             return true;
         } else {

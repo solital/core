@@ -54,7 +54,7 @@ class Stream implements StreamInterface
     /**
      * Closes the stream and any underlying resources.
      */
-    public function close()
+    public function close(): void
     {
         $this->stream && fclose($this->stream);
         $this->detach();
@@ -78,7 +78,7 @@ class Stream implements StreamInterface
     /**
      * @return int|null
      */
-    public function getSize()
+    public function getSize(): ?int
     {
         if ($this->stream === null) {
             return null;
@@ -121,7 +121,7 @@ class Stream implements StreamInterface
     /**
      * @throws \RuntimeException
      */
-    public function seek($offset, $whence = SEEK_SET)
+    public function seek(int $offset, int $whence = SEEK_SET): void
     {
         if (!$this->isSeekable() || fseek($this->stream, $offset, $whence) === -1) {
             throw new RuntimeException("Unable tho seek stream position");
@@ -131,7 +131,7 @@ class Stream implements StreamInterface
     /**
      * @throws \RuntimeException
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->seek(0);
     }

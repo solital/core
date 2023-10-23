@@ -38,24 +38,6 @@ class Application
      */
     private static HandleFiles $handle;
 
-    const SOLITAL_VERSION = "3.4.1";
-    const SITE_DOC_DOMAIN = "http://solitalframework.rf.gd/";
-
-    /**
-     * This variable must be changed manually
-     */
-    const DEBUG = false;
-
-    /**
-     * The `connectionDatabaseDebug` method must be edited manually
-     */
-    const DEBUG_DATABASE = false;
-
-    /**
-     * This variable must be changed manually
-     */
-    const MAILER_TEST_UNIT = false;
-
     /**
      * @param int $dir_number
      * 

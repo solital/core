@@ -4,6 +4,7 @@ namespace Solital\Core\Kernel\Console\Commands;
 
 use Solital\Core\Console\Command;
 use Solital\Core\Console\Interface\CommandInterface;
+use Solital\Core\FileSystem\HandleFiles;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Kernel\Console\HelpersTrait;
 
@@ -34,7 +35,7 @@ class MakeRouter extends Command implements CommandInterface
      */
     public function handle(object $arguments, object $options): mixed
     {
-        $router_dir = Application::getRootApp('routers/', Application::DEBUG);
+        $router_dir = Application::getRoot('routers/', Application::DEBUG);
         $router_template = Application::getConsoleComponent('RouterName.php');
         $comment = "";
 
@@ -55,7 +56,7 @@ class MakeRouter extends Command implements CommandInterface
 
         return $this;
     }
-    
+
     /**
      * generateComponent
      *
@@ -67,6 +68,8 @@ class MakeRouter extends Command implements CommandInterface
      */
     public function generateComponent(string $component_template, string $component_dir, string $argument_name, ?array $replace = null): void
     {
+        $folder = new HandleFiles();
+
         $output_template = file_get_contents($component_template);
 
         if (str_contains($output_template, 'NameDefault')) {
