@@ -11,8 +11,8 @@ class Command
     use DefaultCommandsTrait;
     use MessageTrait;
 
-    const VERSION = "3.2.2";
-    const DATE_VERSION = "Mar 02 2023";
+    const VERSION = "3.3.0";
+    const DATE_VERSION = "Nov 05 2023";
     const SITE_DOC = "http://solitalframework.rf.gd/docs/3.x/vinci-console/";
 
     /**
@@ -139,10 +139,38 @@ class Command
             return $this->instance->handle((object)$this->all_arguments, (object)$this->options);
         }
 
-        $this->error("Command not found")->print()->break()->exit();
+        //self::log("CommandNotFound", "Command '" . $this->command . "' not found");
+        $this->error("Command '" . $this->command . "' not found")->print()->break()->exit();
 
         return $this;
     }
+
+    /**
+     * @param string $file_name
+     * @param string $description
+     * 
+     * @return void
+     * 
+     */
+    /* public static function log(string $file_name, string $description = ""): void
+    {
+        $file = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $file_name . "-" . date("Y-m-d");
+
+        if (file_exists($file)) {
+            $log_description = file_get_contents($file);
+            $log_description .= $description;
+
+            file_put_contents(
+                $file,
+                $log_description . " [" . date('Y-m-d - H:i:s') . "]" . "\n"
+            );
+        } else {
+            file_put_contents(
+                $file,
+                $description . " [" . date('Y-m-d - H:i:s') . "]" . "\n"
+            );
+        }
+    } */
 
     /**
      * Get the value of description
@@ -186,20 +214,6 @@ class Command
     public static function getDateVersion(): string
     {
         return self::DATE_VERSION;
-    }
-
-    /**
-     * @param string $cmd
-     */
-    public function execInBackground(string $cmd)
-    {
-        if (substr(php_uname(), 0, 7) == "Windows") {
-            pclose(popen("start /B " . $cmd, "r"));
-        } else {
-            exec($cmd . " > /dev/null &", $output, $return_var);
-
-            return $output;
-        }
     }
 
     /**

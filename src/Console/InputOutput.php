@@ -29,6 +29,37 @@ class InputOutput
     private bool $case_sensitive;
 
     /**
+     * @var string
+     */
+    private string $color = '';
+
+    /**
+     * @param string $color
+     */
+    public function __construct(string $color = '')
+    {
+        if ($color != '') {
+            switch ($color) {
+                case 'green':
+                    $this->color = 'green';
+                    break;
+
+                case 'yellow':
+                    $this->color = 'yellow';
+                    break;
+
+                case 'blue':
+                    $this->color = 'blue';
+                    break;
+
+                default:
+                    throw new CommandException("Color '" . $color . "' not exists");
+                    break;
+            }
+        }
+    }
+
+    /**
      * @param string $message
      * @param string $confirm
      * @param string $refuse
@@ -37,7 +68,21 @@ class InputOutput
      */
     public function confirmDialog(string $message, string $confirm, string $refuse, bool $case_sensitive = true): InputOutput
     {
-        $this->message_console = readline($message . ": [$confirm, $refuse] ");
+        $read_message = $message . ": [$confirm, $refuse] ";
+
+        if ($this->color != '') {
+            if ($this->color == 'green') {
+                $read_message = $this->success($read_message)->getMessage();
+            } else if ($this->color == 'yellow') {
+                $read_message = $this->warning($read_message)->getMessage();
+            } else if ($this->color == 'blue') {
+                $read_message = $this->info($read_message)->getMessage();
+            }
+        } else {
+            $read_message = $this->line($read_message)->getMessage();
+        }
+
+        $this->message_console = $this->readline_with_unicode_support($read_message);
         $this->confirm = $confirm;
         $this->refuse = $refuse;
         $this->case_sensitive = $case_sensitive;
@@ -52,7 +97,19 @@ class InputOutput
      */
     public function dialog(string $message): InputOutput
     {
-        $this->message_console = readline($message);
+        if ($this->color != '') {
+            if ($this->color == 'green') {
+                $message = $this->success($message)->getMessage();
+            } else if ($this->color == 'yellow') {
+                $message = $this->warning($message)->getMessage();
+            } else if ($this->color == 'blue') {
+                $message = $this->info($message)->getMessage();
+            }
+        } else {
+            $message = $this->line($message)->getMessage();
+        }
+
+        $this->message_console = $this->readline_with_unicode_support($message);
         return $this;
     }
 
@@ -108,5 +165,30 @@ class InputOutput
         }
 
         $this->error("Option not found")->print()->break()->exit();
+    }
+
+    /**
+     * For some reason readline() doesn't support unicode, readline STRIPS æøåÆØÅ - 
+     * for a readline function with unicode support, try
+     *
+     * @param string|null $prompt
+     * 
+     * @return mixed
+     */
+    private function readline_with_unicode_support(?string $prompt = null): mixed /*: string|false*/
+    {
+        if ($prompt !== null && $prompt !== '') {
+            echo $prompt;
+        }
+
+        $line = fgets(STDIN);
+
+        // readline() removes the trailing newline, fgets does not,
+        // to emulate the real readline(), we also need to remove it
+        if ($line !== false && strlen($line) >= strlen(PHP_EOL) && substr_compare($line, PHP_EOL, -strlen(PHP_EOL), strlen(PHP_EOL), true) === 0) {
+            $line = substr($line, 0, -strlen(PHP_EOL));
+        }
+
+        return $line;
     }
 }

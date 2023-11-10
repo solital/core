@@ -6,6 +6,9 @@ use Psr\SimpleCache\CacheInterface;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Cache\Exception\InvalidArgumentException;
 
+/**
+ * @deprecated Use \Solital\Core\Cache\SimpleCache
+ */
 class Cache implements CacheInterface
 {
     /**
@@ -71,9 +74,9 @@ class Cache implements CacheInterface
             throw new InvalidArgumentException("$key must be equal to string");
         }
 
-        if (!$ttl instanceof \DateInterval || !is_int($ttl)) {
-            throw new InvalidArgumentException("$ttl is not a valid value. Enter a value equal to int or DateInterval", 500);
-        }
+        /* if (!$ttl instanceof \DateInterval || !is_int($ttl)) {
+            throw new InvalidArgumentException("$ttl is not a valid value. Enter a value equal to int or DateInterval");
+        } */
 
         $file_for_cache = $this->value . $key . ".cache.php";
 
@@ -188,7 +191,7 @@ class Cache implements CacheInterface
                 $decoded = json_decode($file_cache, true);
 
                 if ($decoded['expire_at'] < time() || $decoded['expire_at'] == null) {
-                    $this->deleteMultiple($value);
+                    $this->delete($value);
                 } else {
                     $this->multiple_results[] = $decoded;
                 }

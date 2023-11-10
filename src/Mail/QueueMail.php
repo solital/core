@@ -8,7 +8,7 @@ use Solital\Core\Mail\ConnectDatabase;
 abstract class QueueMail
 {
     use PropertyMailTrait;
-    
+
     /**
      * queue
      *
@@ -20,7 +20,7 @@ abstract class QueueMail
     public function queue(string $subject, string $body, string $alt_body = null): bool
     {
         ConnectDatabase::checkTableQueue();
-        
+
         try {
             $sql = "INSERT INTO mail_queue (subject, body, from_email, from_name, recipient_email, 
             recipient_name, sent_at) VALUES (:subject, :body, :from_email, :from_name, :recipient_email, 
@@ -51,7 +51,7 @@ abstract class QueueMail
     public function sendQueue(int $per_second = 5)
     {
         ConnectDatabase::checkTableQueue();
-        
+
         $mailer = new Mailer();
         $res = ConnectDatabase::select()->where("sent_at IS NULL")->get();
 

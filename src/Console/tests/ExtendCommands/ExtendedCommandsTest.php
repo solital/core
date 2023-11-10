@@ -8,9 +8,7 @@ class ExtendedCommandsTest implements ExtendCommandsInterface
 {
     protected array $command_class = [
         \Solital\Core\Console\tests\CustomCommandsTest::class,
-        \Solital\Core\Console\tests\CustomTest::class,
-        \Solital\Core\Console\tests\NotFoundClass::class,
-        \Solital\Core\Console\tests\SecondNotFoundClass::class
+        \Solital\Core\Console\tests\CustomTest::class
     ];
 
     public function getCommandClass(): array

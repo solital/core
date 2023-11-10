@@ -79,7 +79,8 @@ trait DefaultCommandsTrait
             }
         };
 
-        $this->error("Command not found")->print()->break()->exit();
+        //self::log("CommandNotFound", "Command '". $arguments[2] ."' not found");
+        $this->error("Command '". $arguments[2] ."' not found")->print()->break()->exit();
     }
 
     /**

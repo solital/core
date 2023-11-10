@@ -1,5 +1,19 @@
 # Released Notes
 
+## v3.3.0 - (2023-11-05)
+
+### Added
+
+- Added new progress bar
+- Added colors in `InputOutput` class
+
+### Fixed
+
+- Fixed `readline` class
+- Fixed return types in `MessageTrait`
+
+--------------------------------------------------------------------------
+
 ## v3.2.2 - (2023-03-02)
 
 ### Fixed

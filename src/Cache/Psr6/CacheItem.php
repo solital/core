@@ -4,23 +4,46 @@ namespace Solital\Core\Cache\Psr6;
 
 use Psr\Cache\CacheItemInterface;
 
-/** @phpstan-consistent-constructor */
 class CacheItem implements CacheItemInterface
 {
     /**
-     * @var null|string
+     * @var string
      */
-    protected ?string $key;
-    
+    private string $key;
+
     /**
-     * @var null
+     * @var mixed
      */
-    protected $value = null;
-    
+    private mixed $value;
+
     /**
-     * @var null
+     * @var int
      */
-    protected $expires = null;
+    private int $expiration;
+
+    /**
+     * @var bool
+     */
+    private bool $dirty = false;
+
+    /**
+     * @param string $key
+     * @param mixed $value
+     */
+    public function __construct(string $key, mixed $value)
+    {
+        $this->key = $key;
+        $this->value = $value;
+        $this->expiration = $this->getDefaultExpiration();
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getDefaultExpiration(): mixed
+    {
+        return time() + 60 * 60 * 24;
+    }
 
     /**
      * @return string
@@ -35,6 +58,9 @@ class CacheItem implements CacheItemInterface
      */
     public function get(): mixed
     {
+        if ($this->isHit() === false) {
+            return null;
+        }
         return $this->value;
     }
 
@@ -43,90 +69,85 @@ class CacheItem implements CacheItemInterface
      */
     public function isHit(): bool
     {
-        return !$this->isKeyEmpty() && file_exists(CacheDir::getCacheDir() . $this->key);
+        if ($this->value === null) {
+            return false;
+        }
+        if ($this->expiration < time()) {
+            $this->value = null;
+            $this->expiration = $this->getDefaultExpiration();
+            $this->dirty();
+            return false;
+        }
+        return true;
     }
 
     /**
-     * @param mixed $key
-     * 
-     * @return void
-     */
-    public function setKey($key)
-    {
-        $this->key = $key;
-    }
-
-    /**
-     * @param mixed $key
+     * @param mixed $value
      * 
      * @return static
      */
     public function set(mixed $value): static
     {
         $this->value = $value;
+        $this->expiration = $this->getDefaultExpiration();
 
-        return new static;
+        return $this->dirty();
     }
 
     /**
      * @param \DateTimeInterface|null $expiration
-     * 
-     * @return static
+     * @return $this|CacheItem
      */
     public function expiresAt(?\DateTimeInterface $expiration): static
     {
-        return self::isDateInFuture($expiration) && $this->expires = $expiration->getTimestamp();
+        if ($expiration === null) {
+            $this->expiration = $this->getDefaultExpiration();
+        } else {
+            $this->expiration = $expiration->getTimestamp();
+        }
 
-        return $this;
+        return $this->dirty();
     }
 
     /**
-     * @param \DateTimeInterface|null $expiration
-     * 
-     * @return static
+     * @param \DateInterval|int|null $time
+     * @return $this
      */
     public function expiresAfter(int|\DateInterval|null $time): static
     {
-        $futureDate = date_create()->add(date_interval_create_from_date_string($time));
+        if ($time === null) {
+            $this->expiration = $this->getDefaultExpiration();
+        } else if (is_int($time)) {
+            $this->expiration = time() + $time;
+        } else {
+            $this->expiration = (new \DateTimeImmutable())->add($time)->getTimestamp();
+        }
 
-        return self::isDateInFuture($futureDate) && $this->expires = $futureDate->getTimestamp();
+        return $this->dirty();
+    }
 
+    /**
+     * @return CacheItem
+     */
+    public function dirty(bool $dirty = true): CacheItem
+    {
+        $this->dirty = $dirty;
         return $this;
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
-    public function getExpires()
+    public function isDirty(): bool
     {
-        return $this->expires;
+        return $this->dirty;
     }
 
     /**
-     * @return mixed
+     * @return int
      */
-    public function isKeyEmpty()
+    public function getExpirationTime(): int
     {
-        return empty($this->key);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function isValueEmpty()
-    {
-        return empty($this->value);
-    }
-
-    /**
-     * Check if $date is in the future.
-     * 
-     * @param \DateTime $date
-     * 
-     * @return mixed
-     */
-    public static function isDateInFuture(\DateTime $date)
-    {
-        return $date->getTimestamp() > date_create()->getTimestamp();
+        return $this->expiration;
     }
 }

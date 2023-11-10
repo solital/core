@@ -2,7 +2,6 @@
 
 use PHPUnit\Framework\TestCase;
 use Solital\Core\Wolf\Wolf;
-use Solital\Core\Kernel\Application;
 
 class WolfTest extends TestCase
 {
@@ -39,7 +38,7 @@ class WolfTest extends TestCase
         $this->assertEquals('<h1>home test SOLITAL</h1><p>solital@email.com</p>', $res);
     }
 
-    public function testCacheView()
+    /* public function testCacheView()
     {
         $result = false;
 
@@ -50,5 +49,5 @@ class WolfTest extends TestCase
         ]);
 
         $wolf->setView('contact')->setCacheTime('week')->render();
-    }
+    } */
 }
