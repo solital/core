@@ -2,7 +2,6 @@
 
 namespace Solital\Core\Kernel\Console;
 
-use Solital\Core\Kernel\Application;
 use Solital\Core\Console\InputOutput;
 use Solital\Core\FileSystem\HandleFiles;
 
@@ -40,7 +39,7 @@ trait HelpersTrait
      */
     public function removeComponent(string $dir, string $component): void
     {
-        $input_output = new InputOutput();
+        $input_output = new InputOutput('green');
         $handle_files = new HandleFiles();
 
         $input_output->confirmDialog("Are you sure you want to delete this components? (this process cannot be undone)? ", "Y", "N", false);
@@ -52,7 +51,7 @@ trait HelpersTrait
         });
 
         $input_output->refuse(function () {
-            $this->line("Abort!")->print()->break()->exit();
+            $this->success("Abort!")->print()->break()->exit();
         });
     }
 
@@ -100,24 +99,22 @@ trait HelpersTrait
 
         if (empty($exists)) {
             $this->success("No component found")->print()->break()->exit();
-        } else {
-            $input_output = new InputOutput();
-            $input_output->confirmDialog("Are you sure you want to delete this components? (this process cannot be undone)? ", "Y", "N", false);
-            $input_output->confirm(function () use ($components) {
-                foreach ($components as $file) {
-                    if (is_file($file)) {
-                        unlink($file);
-                    } else {
-                        return false;
-                    }
-                }
-
-                $this->success("Components successfully removed!")->print()->break();
-            });
-
-            $input_output->refuse(function () {
-                $this->line("Abort!")->print()->break()->exit();
-            });
         }
+
+        $input_output = new InputOutput('green');
+        $input_output->confirmDialog("Are you sure you want to delete this components? (this process cannot be undone)? ", "Y", "N", false);
+        $input_output->confirm(function () use ($components) {
+            foreach ($components as $file) {
+                if (is_file($file)) {
+                    unlink($file);
+                }
+            }
+
+            $this->success("Components successfully removed!")->print()->break();
+        });
+
+        $input_output->refuse(function () {
+            $this->line("Abort!")->print()->break()->exit();
+        });
     }
 }

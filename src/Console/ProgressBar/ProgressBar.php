@@ -5,237 +5,228 @@ namespace Solital\Core\Console\ProgressBar;
 class ProgressBar
 {
     /**
-     * Default format for the progress bar
+     * @var object
      */
-    protected string $format = "%current%/%max% [%bar%] %percent%% %eta%";
+    private object $style;
+    private mixed $initialmax;
+    private mixed $starttime;
+    private mixed $value;
+    private ?bool $pause = null;
 
     /**
-     * Instance of Registry. Used to store metrics.
-     * 
-     * @var Registry
+     * Constructor for the Advanced progressbar object
+     * @param object $ProgressbarStyle Style object
+     * @param float $initialmax Intial max number
      */
-    protected Registry $registry;
-
-    /**
-     * Stores replacement rules
-     * 
-     * @var array
-     */
-    protected array $replacementRules = [];
-
-    /**
-     * @param int $current
-     * @param int $max
-     * @param int $width
-     * @param string $doneBarElementCharacter
-     * @param string $remainingBarElementCharacter
-     * @param string $currentPositionCharacter
-     */
-    public function __construct(int $current, int $max, int $width = 80, string $doneBarElementCharacter = '=', string $remainingBarElementCharacter = '-', string $currentPositionCharacter = '>')
+    public function __construct(object $ProgressbarStyle, float $initialmax)
     {
-        $advancement    = [$current => time()];
+        if ($ProgressbarStyle != NULL) {
+            $this->style = $ProgressbarStyle;
+        } else {
+            throw new ProgressBarException("Variable [" . gettype($ProgressbarStyle)  . " ProgressbarStyle]  was not passed to the constructor!");
+        }
 
-        $this->registry = new Registry();
-        $this->registry->setValue('current', $current);
-        $this->registry->setValue('max', $max);
-        $this->registry->setValue('advancement', $advancement);
-        $this->registry->setValue('width', $width);
-        $this->registry->setValue('doneBarElementCharacter', $doneBarElementCharacter);
-        $this->registry->setValue('remainingBarElementCharacter', $remainingBarElementCharacter);
-        $this->registry->setValue('currentPositionCharacter', $currentPositionCharacter);
-        $this->registerDefaultReplacementRules();
+        if ($initialmax >= 0 and !empty($initialmax)) {
+            $this->initialmax = $initialmax;
+        } else {
+            throw new ProgressBarException("Variable [" . gettype($initialmax)  . " initialmax]  was not passed to the constructor or it is negative number!");
+        }
+
+        $this->starttime = time();
+        $this->value = 0;
     }
 
     /**
-     * Sets a Registry
-     * 
-     * @param Registry $registry
+     * Calculates the current progress, returns as float example (0.**)
+     * @return float
      */
-    public function setRegistry(Registry $registry)
+    private function calculateProgress(): float
     {
-        $this->registry = $registry;
+        if ($this->initialmax > 0) {
+            return $this->value / $this->initialmax;
+        }
+        throw new ProgressBarException("Numeric error, cannot divide a zero!");
     }
 
     /**
-     * Returns the Registry
-     * 
-     * @return Registry
-     */
-    public function getRegistry(): Registry
-    {
-        return $this->registry;
-    }
-
-    /**
-     * Returns the current output format
-     *
+     * Builds the progressbar as a string
      * @return string
      */
-    public function getFormat(): string
+    private function constructProgressbar(): string
     {
-        return $this->format;
+        //Get predefined variables
+        list($length, $progress) = [$this->style->getLength(), $this->calculateProgress()];
+
+        //Calculate variables
+        list($wholewidth, $remainderwidth) = [floor($progress * $length), floatval("0." . explode(".", number_format($progress * $length, 2))[1])];
+
+        //Get the desired char depending on the current progress.
+        $char = [" ", "▌"][floor($remainderwidth * 2)];
+
+        //Clears the last space after the progressbar is completed.
+        if (($length - $wholewidth - 1) < 0) {
+            $char = "";
+        }
+
+        return $this->style->getName() . " " . number_format($progress * 100, 0) . "% │" . str_repeat("█", $wholewidth) . $char . str_repeat(" ", ($length - $wholewidth)) . "│";
     }
 
     /**
-     * Sette le format d'affichage
-     *
-     * @param string $string
+     * Constructs the iteration part of the progressbar string
+     * @return string
      */
-    public function setFormat(string $string)
+    private function constructIterationString(): string
     {
-        $this->format = $string;
+        if (empty($this->style->datatype)) {
+            return ("{$this->value}/{$this->initialmax}");
+        } else {
+            return ("{$this->value}/{$this->initialmax} {$this->style->getDatatype()}");
+        }
     }
 
     /**
-     * Allows to define replacements functions for the format string
-     * If you wish to add custom replacements rules, extend this class, and
-     * add overload this method.
-     * Each replacement has a priority and a closure
-     *
+     * Constructs the runtime of the progressbar string
+     * @return string
      */
-    protected function registerDefaultReplacementRules()
+    private function constructTimeString(): string
     {
-        $this->addReplacementRule('%current%', 10, function ($buffer, $registry) {
-            return $registry->getValue('current');
-        });
-
-        $this->addReplacementRule('%max%', 20, function ($buffer, $registry) {
-            return $registry->getValue('max');
-        });
-
-        $this->addReplacementRule('%percent%', 30, function ($buffer, $registry) {
-            return number_format(($registry->getValue('current') * 100) / $registry->getValue('max'), 2);
-        });
-
-        $this->addReplacementRule('%eta%', 40, function ($buffer, $registry) {
-            $advancement = $registry->getValue('advancement');
-
-            if (count($advancement) == 1) return 'Calculating...';
-
-            $current               = $registry->getValue('current');
-            $timeForCurrent        = $advancement[$current];
-            $initialTime           = $advancement[0];
-            $seconds               = ($timeForCurrent - $initialTime);
-            $percent               = ($registry->getValue('current') * 100) / $registry->getValue('max');
-            $estimatedTotalSeconds = intval($seconds * 100 / $percent);
-
-            $estimatedSecondsToEnd = $estimatedTotalSeconds - $seconds;
-            $hoursCount            = intval($estimatedSecondsToEnd / 3600);
-            $rest                  = ($estimatedSecondsToEnd % 3600);
-            $minutesCount          = intval($rest / 60);
-            $secondsCount          = ($rest % 60);
-
-            return sprintf("%02d:%02d:%02d", $hoursCount, $minutesCount, $secondsCount);
-        });
-
-        $this->addReplacementRule('%bar%', 500, function ($buffer, $registry) {
-            $bar             = '';
-            $lengthAvailable = $registry->getValue('width') - (int) strlen(str_replace('', '%bar%', $buffer));
-            $barArray        = array_fill(0, $lengthAvailable, $registry->getValue('remainingBarElementCharacter'));
-            $position        = intval(($registry->getValue('current') * $lengthAvailable) / $registry->getValue('max'));
-
-            for ($i = $position; $i >= 0; $i--)
-                $barArray[$i] = $registry->getValue('doneBarElementCharacter');
-
-            $barArray[$position] = $registry->getValue('currentPositionCharacter');
-
-            return implode('', $barArray);
-        });
+        $time_elapsed = time() - $this->starttime;
+        $eta = intdiv($time_elapsed, $this->value) * $this->initialmax;
+        list($hours_eta, $mins_eta, $secs_eta) = [intdiv($eta, 3600), intdiv($eta, 60) % 60, $eta % 60];
+        list($hours, $mins, $secs) = [intdiv($time_elapsed, 3600), intdiv($time_elapsed, 60) % 60, $time_elapsed % 60];
+        return " (" . sprintf('%02d:%02d:%02d', $hours, $mins, $secs) . "/" . sprintf('%02d:%02d:%02d', $hours_eta, $mins_eta, $secs_eta) . ")";
     }
 
     /**
-     * Register a replacement rule
+     * Increases the progressbar by one step. Triggers the update function automatically if not disabled.
+     * @param bool Defines if the update function should be trigger on each step
+     * @return void
+     */
+    public function step(bool $autoupdate = true): void
+    {
+        if ($this->value < $this->initialmax) {
+            $this->value++;
+        } else {
+            //Show only warning because this is not critical 
+            trigger_error("Value cannot be increased over initial max at line " . __LINE__, E_USER_WARNING);
+        }
+        if ($autoupdate) {
+            $this->update();
+        }
+    }
+
+    /**
+     * Increases the progressbar by the defined step.
+     * Triggers the update function automatically if not disabled.
      * 
-     * @param string   $tag
-     * @param integer  $priority
-     * @param callable $callable
+     * @param float $step Step size
+     * @param bool Defines if the update function should be trigger on each step
+     * @return void
      */
-    public function addReplacementRule(string $tag, int $priority, callable $callable)
+    public function stepBy(float $step, bool $autoupdate = true): void
     {
-        $this->replacementRules[$priority][$tag] = $callable;
-        ksort($this->replacementRules);
-    }
-
-    /**
-     * Prints the progress bar
-     *
-     * @param boolean $lineReturn
-     */
-    protected function display(bool $lineReturn)
-    {
-        $buffer = '';
-        $buffer = $this->format;
-
-        foreach ($this->replacementRules as $priority => $rule) {
-            foreach ($rule as $tag => $closure) {
-                $buffer = str_replace($tag, $closure($buffer, $this->registry), $buffer);
+        //var_dump();exit;
+        if ($step > 0) {
+            if ($step <= abs($this->initialmax - $this->value)) {
+                $this->value += $step;
+            } else {
+                throw new ProgressBarException("Step cannot be greater than the initial max!");
             }
+        } else {
+            throw new ProgressBarException("Step must be positive number and it can't be a zero!");
         }
 
-        $buffer = $this->clearRightCharacters($buffer);
-
-        $eolCharacter = ($lineReturn) ? "\n" : "\r";
-        echo "$buffer$eolCharacter";
+        if ($autoupdate) {
+            $this->update();
+        }
     }
 
     /**
-     * Clears line remaining characters so that buffer length always equals
-     * to max width.
-     * registry->getValue('width') -1 stands for the control character \r or \n
-     * that will be added to the buffer.
-     * 
-     * @param string $buffer
-     * 
-     * @return string
+     * Sets the progressbar to the defined step. Triggers the update function automatically if not disabled.
+     * @param $target Target step
+     * @param bool Defines if the update function should be trigger on each step
+     * @return void
      */
-    protected function clearRightCharacters(string $buffer): string
+    public function stepTo(float $target, bool $autoupdate = true): void
     {
-        $len = mb_strlen($buffer);
-
-        while ($len < $this->registry->getValue('width') - 1) {
-            $buffer .= ' ';
-            $len = mb_strlen($buffer);
+        if ($target >= 0) {
+            if ($target <= $this->initialmax) {
+                $this->value = $target;
+            } else {
+                throw new ProgressBarException("Invalid target value given, target cannot be greater than initial max!");
+            }
+        } else {
+            throw new ProgressBarException("Target cannot be below zero!");
         }
-
-        return $buffer;
+        if ($autoupdate) {
+            $this->update();
+        }
     }
 
     /**
-     * Updates current progress
-     * Saves new metrics in the registry
-     *
-     * @param integer $current
-     * @throws InvalidArgumentException
+     * Terminates the progressbar and resets the object.
+     * @return void
      */
-    public function update(int $current)
+    public function terminateProgressbar(): void
     {
-        if (!is_int($current)) {
-            throw new \InvalidArgumentException('Integer as current counter was expected');
-        }
-
-        if ($this->registry->getValue('current') > $current) {
-            throw new \InvalidArgumentException('Could not set lower current counter');
-        }
-
-        if ($this->registry->getValue('max') < $current) {
-            throw new \InvalidArgumentException('Could not set the progress value ' . $current .
-                ' because the max is ' . $this->registry->getValue('max'));
-        }
-
-        $advancement           = $this->registry->getValue('advancement');
-        $advancement[$current] = time();
-        $this->registry->setValue('current', $current);
-        $this->registry->setValue('advancement', $advancement);
-        $lineReturn = ($current == $this->registry->getValue('max'));
-
-        $this->display($lineReturn);
+        $this->resetProgressbar();
+        echo "\033[1K"; //Clear the row
     }
 
     /**
-     * Advances the progress bar with one step.
+     * Enables pause on the progressbar
+     * @return void
      */
-    public function advance()
+    public function pauseProgressbar(): void
     {
-        $this->update($this->registry->getValue('current') + 1);
+        if (!$this->pause) {
+            $this->pause = true;
+            $this->update();
+        } else {
+            trigger_error("Progressbar cannot be paused at line " . __LINE__ . ", because it is already paused!", E_USER_NOTICE);
+        }
+    }
+
+    /**
+     * Resets the whole progressbar object
+     * @return void
+     */
+    public function resetProgressbar(): void
+    {
+        $this->value = 0;
+        unset($this->initialmax);
+        unset($this->style);
+    }
+
+    /**
+     * Returns the current progressbar value
+     * @return float
+     */
+    public function getValue(): float
+    {
+        return floatval($this->value);
+    }
+
+    /**
+     * Gets the initial max of the progressbar object
+     * @return float
+     */
+    public function getInitialMax(): float
+    {
+        return floatval($this->initialmax);
+    }
+
+    /**
+     * Redraw the progressbar to the CLI
+     * @return void
+     */
+    public function update(): void
+    {
+        if ($this->pause) {
+            echo ("\033[1K\r{$this->style->getColor()}{$this->constructProgressbar()}\e[1m {$this->constructIterationString()} [PAUSED]\e[0m");
+            $this->pause = false; //Pause will be disabled after the first execution.
+        } else {
+            echo ("\r{$this->style->getColor()}{$this->constructProgressbar()}\e[1m {$this->constructIterationString()}{$this->constructTimeString()}\e[0m");
+        }
     }
 }

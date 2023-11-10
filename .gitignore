@@ -4,3 +4,4 @@ tests/files_test/Components/*
 tests/files_test/Database/*
 /nbproject/
 .phpunit.result.cache
+.phpunit.cache

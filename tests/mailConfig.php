@@ -3,7 +3,7 @@
 define('DB_CONFIG', [
     'DRIVE' => 'mysql',
     'HOST' => 'localhost',
-    'DBNAME' => 'db_teste',
+    'DBNAME' => 'teste',
     'USER' => 'root',
     'PASS' => ''
 ]);

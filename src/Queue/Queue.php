@@ -2,7 +2,6 @@
 
 namespace Solital\Core\Queue;
 
-use React\EventLoop\Loop;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Console\MessageTrait;
 use Solital\Core\Queue\Exception\QueueException;
@@ -84,16 +83,22 @@ class Queue
             $handle = new HandleFiles();
             $queue = $handle->folder($this->queue_dir)->files();
 
+            $loop = new EventLoop();
+
             foreach ($queue as $queue) {
-                $loop = Loop::get();
-                $this->warning("[" . date('Y-m-d H:i:s') . "] Processing queue: " . basename($queue))->print()->break();
+                $loop->defer(function () use ($loop, $queue) {
+                    $this->warning("[" . date('Y-m-d H:i:s') . "] Processing queue: " . basename($queue))->print()->break();
 
-                $instance = $this->initiateQueue($queue);
-                $instance->dispatch();
+                    $instance = $this->initiateQueue($queue);
+                    $instance->dispatch();
 
-                $this->success("[" . date('Y-m-d H:i:s') . "] Queue executed: " . basename($queue))->print()->break();
-                $loop->run();
+                    $this->success("[" . date('Y-m-d H:i:s') . "] Queue executed: " . basename($queue))->print()->break();
+
+                    $loop->next();
+                });
             }
+
+            $loop->run();
         }
 
         $end_time = microtime(true);

@@ -1,4 +1,6 @@
-<?php 
+<?php
+
+use Solital\Core\Mail\Mailer;
 
 /**
  * @generated class generated using Vinci Console
@@ -10,6 +12,6 @@ class MailQueue
 	 */
 	public function dispatch()
 	{
-		(new Solital\Core\Mail\Mailer)->sendQueue();
+		//(new Solital\Core\Mail\Mailer)->sendQueue();
 	}
 }

@@ -22,11 +22,6 @@ abstract class Reset
     private string $column;
 
     /**
-     * @var Mailer
-     */
-    private Mailer $mailer;
-
-    /**
      * @var string
      */
     protected string $link;
@@ -64,9 +59,10 @@ abstract class Reset
     /**
      * Construct
      */
-    public function __construct()
+    public function __construct(
+        private Mailer $mailer = new Mailer()
+    )
     {
-        $this->mailer = new Mailer();
     }
 
     /**

@@ -2,10 +2,10 @@
 
 namespace Solital\Core\Cache;
 
-use Solital\Core\Cache\Cache;
+use Solital\Core\Cache\SimpleCache;
 use Solital\Core\Cache\Exception\InvalidArgumentException;
 
-class HttpCache extends Cache
+class HttpCache extends SimpleCache
 {
     /**
      * @var int

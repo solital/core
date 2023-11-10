@@ -4,15 +4,12 @@ namespace Solital\Core\Kernel;
 
 use Solital\Core\Kernel\Application;
 
-/**
- * 
- */
 trait KernelTrait
 {
     /**
      * That variables must be changed manually
      */
-    const SOLITAL_VERSION   = "3.5.0";
+    const SOLITAL_VERSION   = "3.6.0";
     const SITE_DOC_DOMAIN   = "http://solitalframework.rf.gd/";
     const DEBUG             = false;
     const DEBUG_DATABASE    = false;

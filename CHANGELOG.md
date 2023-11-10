@@ -1,5 +1,26 @@
 # Released Notes
 
+## v3.6.0 - (2023-11-10)
+
+### Added
+
+- Added `EventLoop` in Queue using Fibers
+- Added new tests for e-mail
+- Added Console version 3.3.0
+
+### Changed
+
+- Changed PSR-6 class
+- Changed `Cache` class to `SimpleCache` class
+- Changed `Reset` class constructor
+- Changed color in Console
+
+### Removed
+
+- Removed `react/event-loop` component
+
+--------------------------------------------------------------------------
+
 ## v3.5.0 - (2023-10-23)
 
 ### Added

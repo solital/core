@@ -2,7 +2,6 @@
 
 namespace Solital\Core\Wolf;
 
-use Solital\Core\Logger\Logger;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Resource\Collection\ArrayCollection;
 use Solital\Core\Wolf\{WolfCacheTrait, WolfMinifyTrait};

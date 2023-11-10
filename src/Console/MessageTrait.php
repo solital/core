@@ -44,9 +44,9 @@ trait MessageTrait
     /**
      * Get the value of message
      *
-     * @return  string
+     * @return string
      */
-    public function getMessage()
+    public function getMessage(): string
     {
         return self::$message;
     }
@@ -216,7 +216,7 @@ trait MessageTrait
     /**
      * @return bool
      */
-    public function colorIsSupported()
+    public function colorIsSupported(): bool
     {
         if (DIRECTORY_SEPARATOR === '\\') {
             if (function_exists('sapi_windows_vt100_support') && @sapi_windows_vt100_support(STDOUT)) {
@@ -233,7 +233,7 @@ trait MessageTrait
     /**
      * @return bool
      */
-    public function are256ColorsSupported()
+    public function are256ColorsSupported(): bool
     {
         if (DIRECTORY_SEPARATOR === '\\') {
             return function_exists('sapi_windows_vt100_support') && @sapi_windows_vt100_support(STDOUT);
