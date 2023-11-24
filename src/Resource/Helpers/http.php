@@ -59,7 +59,7 @@ function input(string $index = null, string $defaultValue = null, ...$methods)
  * 
  * @return void
  */
-function redirect(string $url, ?int $code = null): void
+function to_route(string $url, ?int $code = null): void
 {
     if ($code !== null) {
         response()->httpCode($code);

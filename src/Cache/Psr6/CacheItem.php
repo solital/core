@@ -61,6 +61,7 @@ class CacheItem implements CacheItemInterface
         if ($this->isHit() === false) {
             return null;
         }
+        
         return $this->value;
     }
 
@@ -72,12 +73,14 @@ class CacheItem implements CacheItemInterface
         if ($this->value === null) {
             return false;
         }
+
         if ($this->expiration < time()) {
             $this->value = null;
             $this->expiration = $this->getDefaultExpiration();
             $this->dirty();
             return false;
         }
+
         return true;
     }
 
