@@ -1,5 +1,14 @@
 # Released Notes
 
+## v3.3.1 - (2023-11-24)
+
+### Fixed
+
+- Fixed documentation link
+- Fixed PSR-12 in `ProgressBar` class
+
+--------------------------------------------------------------------------
+
 ## v3.3.0 - (2023-11-05)
 
 ### Added

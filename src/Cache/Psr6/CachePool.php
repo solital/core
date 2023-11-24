@@ -4,15 +4,16 @@ namespace Solital\Core\Cache\Psr6;
 
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Solital\Core\Cache\Adapter\MemcacheAdapter;
 use Solital\Core\Cache\Exception\InvalidArgumentException;
 use Solital\Core\Kernel\Application;
 
 class CachePool implements CacheItemPoolInterface
 {
     /**
-     * @var FileBackend
+     * @var mixed
      */
-    private FileBackend $backend;
+    private mixed $backend;
 
     /**
      * @var array|CacheItem[]
@@ -20,15 +21,31 @@ class CachePool implements CacheItemPoolInterface
     private array $items = [];
 
     /**
-     * @param string $directory
+     * Construct
      */
-    public function __construct(string $directory = "")
+    public function __construct()
     {
-        if ($directory == "" || is_null($directory)) {
-            $directory = Application::getRootApp("Storage/cache/");
-        }
+        $yaml_data = Application::getYamlVariables(5, 'cache.yaml');
 
-        $this->backend = new FileBackend($directory);
+        switch ($yaml_data['cache_drive']) {
+            case 'file':
+                $directory = Application::getRootApp("Storage/cache/");
+                $this->backend = new FileBackend($directory);
+
+                break;
+
+            case 'memcache':
+                $this->backend = new MemcacheAdapter(
+                    $yaml_data['cache_host'],
+                    $yaml_data['cache_port']
+                );
+
+                break;
+
+            case '':
+                throw new InvalidArgumentException("Drive not found");
+                break;
+        }
     }
 
     public function __destruct()

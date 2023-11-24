@@ -24,6 +24,8 @@
         "psr/simple-cache": "3.*",
         "respect/validation": "2.*",
         "solital/katrina": "2.*",
+        "spatie/db-dumper": "^3.4",
+        "symfony/polyfill-php83": "^1.28",
         "symfony/var-dumper": "6.*",
         "symfony/var-exporter": "6.*",
         "symfony/yaml": "6.*",

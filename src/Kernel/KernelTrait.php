@@ -9,8 +9,8 @@ trait KernelTrait
     /**
      * That variables must be changed manually
      */
-    const SOLITAL_VERSION   = "3.6.0";
-    const SITE_DOC_DOMAIN   = "http://solitalframework.rf.gd/";
+    const SOLITAL_VERSION   = "3.7.0";
+    const SITE_DOC_DOMAIN   = "https://solital.github.io/site/";
     const DEBUG             = false;
     const DEBUG_DATABASE    = false;
     const MAILER_TEST_UNIT  = false;

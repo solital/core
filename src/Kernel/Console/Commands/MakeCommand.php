@@ -90,7 +90,7 @@ class MakeCommand extends Command implements CommandInterface
             ->setBody('return $this;')
             ->setReturnType('mixed')
             ->setParameters([
-                (new Parameter('argumments'))->setType('object'),
+                (new Parameter('arguments'))->setType('object'),
                 (new Parameter('options'))->setType('object')
             ])
             ->addComment("@param object " . '$arguments' . "\n@param object " . '$options' . "\n@return mixed");

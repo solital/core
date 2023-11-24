@@ -1,5 +1,27 @@
 # Released Notes
 
+## v3.7.0 - (2023-11-24)
+
+### Added
+
+- Added Server class to start built-in PHP server
+- Added polyfill PHP 8.3
+- Added `spatie/db-dumper` to create a dump database file
+- Added Process class
+- Added comments in YAML files
+- Added support to memcache
+
+### Changed
+
+- Changed `redirect` helper to `to_route`
+- Changed HTML in Guardian class
+
+### Fixed
+
+- Fixed param in `CachePool` class
+
+--------------------------------------------------------------------------
+
 ## v3.6.0 - (2023-11-10)
 
 ### Added

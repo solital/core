@@ -8,9 +8,25 @@ class ProgressBar
      * @var object
      */
     private object $style;
+
+    /**
+     * @var mixed
+     */
     private mixed $initialmax;
+    
+    /**
+     * @var mixed
+     */
     private mixed $starttime;
+    
+    /**
+     * @var mixed
+     */
     private mixed $value;
+    
+    /**
+     * @var bool|null|null
+     */
     private ?bool $pause = null;
 
     /**
@@ -45,6 +61,7 @@ class ProgressBar
         if ($this->initialmax > 0) {
             return $this->value / $this->initialmax;
         }
+        
         throw new ProgressBarException("Numeric error, cannot divide a zero!");
     }
 

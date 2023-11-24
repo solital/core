@@ -21,6 +21,7 @@ use Solital\Core\Kernel\Console\Commands\{
     Migrations,
     Queues,
     Seeders,
+    Server,
     Version
 };
 
@@ -52,6 +53,7 @@ class SolitalCommands implements ExtendCommandsInterface
         Migrations::class,
         Queues::class,
         Seeders::class,
+        Server::class,
         Version::class
     ];
 

@@ -186,7 +186,7 @@ class Guardian
                 'Solital Guardian',
                 $send_to,
                 $recipient_name
-            )->send('Solital: Security Alert', 'We detected that your project made in Solital is in another domain. The detected domain is: ' . $url);
+            )->send('Solital: Security Alert', '<p><h1>We detected that your project made in Solital is in another domain. The detected domain is:</h1></p>' . $url);
         }
     }
 

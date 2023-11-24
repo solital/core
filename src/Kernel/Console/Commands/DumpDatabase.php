@@ -32,9 +32,17 @@ class DumpDatabase extends Command implements CommandInterface
      */
     public function handle(object $arguments, object $options): mixed
     {
-        $dir_dump = Application::getRootApp("Storage/dump/", Application::DEBUG);
+        $dir_dump = Application::getRootApp("Storage/dump/", true);
 
-        (new Dump())->dumpDatabase($dir_dump);
+        $dump = new Dump();
+
+        if (isset($options->exclude)) {
+            $dump->excludeTables($options->exclude);
+        }
+
+        $dump->dumpDatabase($dir_dump);
+
+        $this->success("Dump Database created successfully!")->print()->break()->exit();
 
         return $this;
     }
