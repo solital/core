@@ -3,8 +3,7 @@
 namespace Solital\Components\Controller\Auth;
 
 use Solital\Core\Auth\Auth;
-use Solital\Core\Http\Request;
-use Solital\Core\Http\Controller\Controller;
+use Solital\Core\Http\{Request, Controller\Controller};
 
 class LoginController extends Controller
 {
@@ -21,7 +20,7 @@ class LoginController extends Controller
      */
     public function auth(): mixed
     {
-        Auth::isLogged();
+        Auth::isRemembering();
 
         return view('auth.auth-form', [
             'title' => 'Login',
@@ -42,6 +41,7 @@ class LoginController extends Controller
         $res = Auth::login('auth_users')
             ->columns('username', 'password')
             ->values('inputEmail', 'inputPassword')
+            ->remember('inputRemember')
             ->register();
 
         if ($res == false) {
@@ -55,8 +55,6 @@ class LoginController extends Controller
      */
     public function dashboard(): mixed
     {
-        Auth::isNotLogged();
-
         return view('auth.auth-dashboard', [
             'title' => 'Dashboard',
         ]);

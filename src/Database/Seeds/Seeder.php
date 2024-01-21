@@ -6,7 +6,7 @@ use Solital\Core\Console\MessageTrait;
 use Solital\Core\Database\Seeds\Exception\SeedsException;
 use Solital\Core\Kernel\Application;
 use Solital\Core\FileSystem\HandleFiles;
-use Nette\PhpGenerator\{ClassType, Method};
+use Nette\PhpGenerator\{ClassType, Method, PhpNamespace};
 
 class Seeder
 {
@@ -18,17 +18,11 @@ class Seeder
     private string $seeds_dir;
 
     /**
-     * @var bool
-     */
-    private bool $debug;
-
-    /**
      * Construct
      */
     public function __construct()
     {
-        $this->debug = Application::DEBUG;
-        $this->seeds_dir = Application::getRootApp('Database/seeds/', $this->debug);
+        $this->seeds_dir = Application::getRootApp('Database/seeds/', Application::DEBUG);
     }
 
     /**
@@ -45,15 +39,20 @@ class Seeder
             ->setBody("// ...")
             ->addComment("Run a Seed");
 
-        $data = (new ClassType($seed_name))
+        $class = (new ClassType($seed_name))
             ->setExtends(Seeder::class)
             ->addMember($run_method)
             ->addComment("@generated class generated using Vinci Console");
 
+        $data = (new PhpNamespace("Solital\Database\seeds"))
+            ->add($class)
+            ->addUse(Seeder::class);
+
         $seed_file_name = $this->seeds_dir . $seed_name . ".php";
 
         if (file_exists($seed_file_name)) {
-            $this->error("Seed '{$seed_name}' already exists. Aborting!")->print()->break()->exit();
+            $this->error("Seed '{$seed_name}' already exists!")->print()->break();
+            return $this;
         }
 
         try {
@@ -78,29 +77,31 @@ class Seeder
      */
     public function executeSeeds(object $options): Seeder
     {
+
         $start_time = microtime(true);
 
         if (isset($options->class)) {
-            $this->warning("Running seeder: " . $this->seeds_dir . $options->class)->print()->break();
+            $this->warning("Running seeder: " . $options->class)->print()->break();
 
-            $instance = $this->initiateSeeder($this->seeds_dir . $options->class . ".php");
+            $instance = $this->initiateSeeder($this->seeds_dir . $options->class . '.php');
             $instance->run();
 
-            $this->success("Seeder executed: " . $this->seeds_dir . $options->class)->print()->break();
+            $this->success("Seeder executed: " . $options->class)->print()->break();
         } else {
-            $handle = new HandleFiles();
+            //$handle = new HandleFiles();
+            $handle = Application::provider('handler-files');
             $seeder = $handle->folder($this->seeds_dir)->files();
 
             if (empty($seeder)) {
                 $this->success("No seeds found")->print()->break();
             } else {
                 foreach ($seeder as $seeder) {
-                    $this->warning("Running seeder: " . $seeder)->print()->break();
+                    $this->warning("Running seeder: " . basename($seeder))->print()->break();
 
                     $instance = $this->initiateSeeder($seeder);
                     $instance->run();
 
-                    $this->success("Seeder executed: " . $seeder)->print()->break();
+                    $this->success("Seeder executed: " . basename($seeder))->print()->break();
                 }
             }
         }
@@ -109,7 +110,7 @@ class Seeder
         $execution_time = ($end_time - $start_time);
 
         echo PHP_EOL;
-        $this->success("Seeds performed on: " . $execution_time . " sec")->print()->break()->exit();
+        $this->success("Seeds performed on: " . $execution_time . " sec")->print()->break();
 
         return $this;
     }
@@ -122,10 +123,11 @@ class Seeder
     private function initiateSeeder(string $seeder): mixed
     {
         if (file_exists($seeder)) {
-            require_once $this->seeds_dir . basename($seeder);
-            $class = str_replace(".php", "", basename($seeder));
+            $seeder_replace = str_replace(".php", "", basename($seeder));
+            $class = 'Solital\Database\seeds\\' . $seeder_replace;
 
-            return new $class();
+            $class = new \ReflectionClass($class);
+            return $class->newInstance();
         }
 
         return null;
@@ -139,11 +141,13 @@ class Seeder
     public function call(string|array $seed_name): Seeder
     {
         if (is_string($seed_name)) {
-            $instance = $this->initiateSeeder($this->seeds_dir . $seed_name . ".php");
+            $instance = $this->initiateSeeder($this->seeds_dir . $seed_name);
             $instance->run();
-        } elseif (is_array($seed_name)) {
+        }
+
+        if (is_array($seed_name)) {
             foreach ($seed_name as $seeds) {
-                $instance = $this->initiateSeeder($this->seeds_dir . $seeds . ".php");
+                $instance = $this->initiateSeeder($this->seeds_dir . $seeds);
                 $instance->run();
             }
         }

@@ -42,6 +42,11 @@ class MakeController extends Command implements CommandInterface
             $this->removeComponent($controller_dir, $arguments->controller_name . ".php");
         }
 
+        if (!isset($arguments->controller_name)) {
+            $this->error("Error: Controller name not found")->print()->break();
+            return false;
+        }
+
         $data = $this->codeGenerated($arguments->controller_name);
 
         $res = $this->createComponent($data, [
@@ -51,15 +56,11 @@ class MakeController extends Command implements CommandInterface
 
         if ($res == true) {
             $this->success("Controller successfully created!")->print()->break();
-
             return true;
-        } else {
-            $this->error("Error: Controller already exists!")->print()->break();
-
-            return false;
         }
 
-        return $this;
+        $this->error("Error: Controller already exists!")->print()->break();
+        return false;
     }
 
     /**

@@ -34,6 +34,11 @@ class MakeQueue extends Command implements CommandInterface
      */
     public function handle(object $arguments, object $options): mixed
     {
+        if (!isset($arguments->queue_name)) {
+            $this->error("Error: Queue name not found")->print()->break();
+            return false;
+        }
+
         (new Queue)->create($arguments->queue_name);
         return true;
     }

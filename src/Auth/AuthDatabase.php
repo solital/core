@@ -27,7 +27,7 @@ class AuthDatabase extends Katrina
         $users = self::checkTableExists('auth_users');
 
         if (empty($users)) {
-            if (defined('DB_CONFIG')) {
+            if (DB_CONFIG['DRIVE'] != "") {
                 if (DB_CONFIG['DRIVE'] == "mysql") {
                     $res = self::createTable("auth_users")
                         ->int('id')->primary()->increment()
@@ -42,23 +42,19 @@ class AuthDatabase extends Katrina
                         ->varchar("password", 150)->notNull()
                         ->closeTable();
                 }
-            } else {
+
+                if ($res == true) {
+                    $this->success("Table created successfully!")->print()->break();
+
+                    $users = self::customQuery("SELECT * FROM auth_users", true);
+                    return $users;
+                }
+
+                $this->error("Error: table not created!")->print()->break();
                 return false;
             }
-
-            if ($res == true) {
-                $this->success("Table created successfully!")->print()->break();
-
-                $users = self::customQuery("SELECT * FROM auth_users", true);
-
-                return $users;
-            } else {
-                $this->error("Error: table not created!")->print()->break();
-            }
-        } else {
-            return $users;
         }
 
-        return $this;
+        return $users;
     }
 }

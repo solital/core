@@ -21,10 +21,11 @@ interface TokenProviderInterface
     public function getToken(?string $defaultValue = null): ?string;
 
     /**
-     * Set csrf token
+     * Set csrf token - default: 30 minutes
+     * 
      * @param int $seconds
      * @return string
      */
-    public function setToken(int $seconds = 20): string;
+    public function setToken(int $seconds = 1800): string;
 
 }

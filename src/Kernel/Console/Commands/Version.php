@@ -6,6 +6,7 @@ use Katrina\Katrina;
 use Solital\Core\Console\Command;
 use Solital\Core\Kernel\Console\HelpersTrait;
 use Solital\Core\Console\Interface\CommandInterface;
+use Solital\Core\Console\TableBuilder;
 use Solital\Core\Kernel\Application;
 
 class Version extends Command implements CommandInterface
@@ -36,9 +37,14 @@ class Version extends Command implements CommandInterface
     public function handle(object $arguments, object $options): mixed
     {
         $this->info("Solital framework - Fast, easy and practical")->print()->break(true);
-        $this->line("Core " . $this->solitalVersion())->print()->break();
-        $this->line("PHP " . $this->phpVersion())->print()->break();
-        $this->line("Katrina " . $this->katrinaVersion())->print()->break(true);
+
+        TableBuilder::formattedArray([
+            'Solital Core' => $this->solitalVersion(),
+            'PHP Version' => $this->phpVersion(),
+            'Katrina ORM' => $this->katrinaVersion()
+        ], 20);
+
+        echo PHP_EOL;
         $this->warning("Thank you for using Solital, you can see the full documentation at " . Application::SITE_DOC_DOMAIN)->print()->break();
 
         return true;

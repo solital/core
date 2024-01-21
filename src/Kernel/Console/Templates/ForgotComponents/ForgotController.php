@@ -3,9 +3,8 @@
 namespace Solital\Components\Controller\Auth;
 
 use Solital\Core\Auth\Auth;
-use Solital\Core\Http\Request;
 use Solital\Core\Security\Hash;
-use Solital\Core\Http\Controller\Controller;
+use Solital\Core\Http\{Request, Controller\Controller};
 
 class ForgotController extends Controller
 {
@@ -43,13 +42,15 @@ class ForgotController extends Controller
         $res = Auth::forgot('auth_users')
             ->columns('username')
             ->values($email, url('change'))
-            ->mailSender('mail_sender@email.com')
             ->register();
 
         if ($res == true) {
             message('forgot', 'Link sent to your email!');
             response()->redirect(url('forgot'));
         }
+
+        message('forgot', 'E-mail not exists!');
+        response()->redirect(url('forgot'));
     }
 
     /**
@@ -64,16 +65,16 @@ class ForgotController extends Controller
         if ($res == true) {
             $email = Hash::decrypt($hash)->value();
 
-            return view('auth.change-pass-form', [
+            return view('auth.forgot-change-pass', [
                 'title' => 'Change Password',
                 'email' => $email,
                 'hash' => $hash,
                 'msg' => message('forgot')
             ]);
-        } else {
-            message('login', 'The informed link has already expired!');
-            response()->redirect(url('auth'));
         }
+
+        message('login', 'The informed link has already expired!');
+        response()->redirect(url('auth'));
     }
 
     /**
@@ -93,17 +94,17 @@ class ForgotController extends Controller
             if ($pass != $confPass) {
                 message('forgot', 'The fields do not match!');
                 response()->redirect(url('change', ['hash' => $hash]));
-            } else {
-                Auth::change('auth_users')
-                    ->columns('username', 'password')
-                    ->values($email, $pass)
-                    ->register();
-
-                message('login', 'Password changed successfully!');
-                response()->redirect(url('auth'));
             }
-        } else {
+
+            Auth::change('auth_users')
+                ->columns('username', 'password')
+                ->values($email, $pass)
+                ->register();
+
+            message('login', 'Password changed successfully!');
             response()->redirect(url('auth'));
         }
+
+        response()->redirect(url('auth'));
     }
 }

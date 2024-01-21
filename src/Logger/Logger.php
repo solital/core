@@ -1,96 +1,60 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Solital\Core\Logger;
 
-use Psr\Log\LoggerTrait;
-use Psr\Log\LoggerInterface;
-use Solital\Core\Logger\Entry\LogEntry;
-use Solital\Core\Logger\Entry\LogEntryInterface;
-use Solital\Core\Logger\Handler\HandlerAwareTrait;
-use Solital\Core\Logger\Handler\HandlerAwareInterface;
+use Monolog\Logger as Monolog;
+use Solital\Core\Logger\Exception\LoggerException;
 
-class Logger implements LoggerInterface, HandlerAwareInterface
+class Logger extends AbstractHandlers
 {
-    use LoggerTrait;
-    use HandlerAwareTrait;
-
     /**
-     * @var string
+     * @var array
      */
-    protected $channel;
+    private static array $channel;
 
     /**
-     * Channel usually is APP ID
-     *
-     * @param  string $channel
-     */
-    public function __construct(string $channel)
-    {
-        $this->channel = $channel;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function log($level, string|\Stringable $message, array $context = []): void
-    {
-        $entry = ($this->initEntry($message, $level, $context))->process();
-
-        foreach ($this->getHandlers($entry) as $handler) {
-            $handler($entry);
-        }
-    }
-
-    /**
-     * @param  LogEntryInterface|string $message
-     * @param  string                   $level
-     * @param  array                    $context
-     * @return LogEntryInterface
-     * @throws \InvalidArgumentException if message not right
-     */
-    protected function initEntry($message, string $level, array $context): LogEntryInterface
-    {
-        $entry = $this->validate($message);
-
-        // update channel name in context
-        $this->setChannel($context);
-
-        return $entry
-            ->setLevel($level)
-            ->setContext(array_merge($entry->getContext(), $context));
-    }
-
-    /**
-     * @param mixed $message
+     * @param string $channel
      * 
-     * @return LogEntryInterface
-     * @throws \InvalidArgumentException if message not right
+     * @return Monolog
+     * @throws LoggerException
      */
-    protected function validate(mixed $message): LogEntryInterface
+    public static function channel(string $channel): Monolog
     {
-        if (is_string($message)) {
-            $entry = new LogEntry($message);
-        } elseif (is_object($message) && $message instanceof LogEntryInterface) {
-            $entry = $message;
-        } else {
-            throw new \InvalidArgumentException("not valid message " . (string) $message);
+        self::getLogConfig();
+
+        if (array_key_exists($channel, self::$log_config['channel'])) {
+            self::$channel = self::$log_config['channel'][$channel];
+
+            return self::createLog($channel);
         }
-        return $entry;
+
+        throw new LoggerException("Channel '" . $channel . "' not exists in 'logger.yaml'");
     }
 
     /**
-     * Set channel name in context
-     *
-     * @param  array &$context
+     * @param string $channel
      * 
-     * @return void
+     * @return Monolog
      */
-    protected function setChannel(array &$context): void
+    private static function createLog(string $channel): Monolog
     {
-        if (!isset($context['__channel'])) {
-            $context['__channel'] = $this->channel;
+        $monolog = new Monolog($channel);
+
+        if (self::$log_config['enable_logs'] === true) {
+            $level = self::setLevel(self::$channel['level']);
+            $handle = self::setHandler(self::$channel['type'], $level, self::$channel['path']);
+
+            if (isset(self::$channel['processor'])) {
+                foreach (self::$channel['processor'] as $processor) {
+                    $class = new \ReflectionClass("\Monolog\Processor\\$processor");
+                    $instance = $class->newInstance();
+                    $monolog->pushProcessor($instance);
+                }
+            }
+
+            $monolog->pushHandler($handle);
         }
+
+        return $monolog;
     }
 }

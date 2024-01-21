@@ -18,28 +18,38 @@ trait WolfMinifyTrait
     private static string $dir_public;
 
     /**
-     * @param mixed $type
+     * @param array|string $type
      * 
      * @return self
      */
-    public function setMinify(mixed $type): self
+    public function setMinify(array|string $type): self
     {
         if (is_array($type)) {
             if ($type['wolf_minify'] != false) {
                 if ($type['wolf_minify'] == 'style') {
                     $this->style();
-                } elseif ($type['wolf_minify'] == 'script') {
+                }
+
+                if ($type['wolf_minify'] == 'script') {
                     $this->script();
-                } elseif ($type['wolf_minify'] == 'all') {
+                }
+
+                if ($type['wolf_minify'] == 'all') {
                     $this->all();
                 }
             }
-        } elseif (is_string($type)) {
+        }
+
+        if (is_string($type)) {
             if ($type == 'style') {
                 $this->style();
-            } elseif ($type == 'script') {
+            }
+
+            if ($type == 'script') {
                 $this->script();
-            } elseif ($type == 'all') {
+            }
+
+            if ($type == 'all') {
                 $this->all();
             }
         }

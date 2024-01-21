@@ -2,13 +2,14 @@
 
 namespace Solital\Core\Kernel\Console\Commands;
 
-use Solital\Core\Console\{Interface\CommandInterface, Command};
-use Solital\Core\Console\Interface\ExtendCommandsInterface;
-use Solital\Core\Kernel\Application;
-use Solital\Core\Kernel\Console\HelpersTrait;
+use Solital\Core\Console\Command;
+use Solital\Core\Console\Interface\{ExtendCommandsInterface, CommandInterface};
+use Solital\Core\Kernel\{Application, Console\HelpersTrait};
 use Solital\Core\Mail\Mailer;
 use Solital\Core\FileSystem\HandleFiles;
 use Nette\PhpGenerator\{ClassType, Method, PhpNamespace, Property};
+use Solital\Core\Container\Interface\{ContainerInterface, ServiceProviderInterface};
+use Solital\Core\Queue\Queue;
 
 class GenerateConfigFiles extends Command implements CommandInterface
 {
@@ -22,7 +23,7 @@ class GenerateConfigFiles extends Command implements CommandInterface
     /**
      * @var array
      */
-    protected array $arguments = [];
+    protected array $arguments = ["component_name"];
 
     /**
      * @var string
@@ -40,9 +41,33 @@ class GenerateConfigFiles extends Command implements CommandInterface
         $config_app_dir = Application::getRootApp('config/', Application::DEBUG);
         $config_core_dir = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Config';
 
+        if (isset($arguments->component_name) && isset($options->component)) {
+            $arguments_default = (object)[
+                'controller_name' => $arguments->component_name . 'Controller',
+                'model_name' => $arguments->component_name,
+                'migration_name' => 'create_' . strtolower($arguments->component_name),
+                'seeder_name' => $arguments->component_name . 'Seed'
+            ];
+
+            $controller = new MakeController();
+            $controller->handle($arguments_default, $options);
+
+            $model = new MakeModel();
+            $model->handle($arguments_default, $options);
+
+            $migration = new MakeMigrations();
+            $migration->handle($arguments_default, $options);
+
+            $seeder = new MakeSeeder();
+            $seeder->handle($arguments_default, $options);
+
+            return true;
+        }
+
         $this->copyFiles($config_core_dir, $config_app_dir);
         $this->queueFiles();
         $this->commandFiles();
+        $this->serviceContainerClass();
         $this->success('Configuration files copied successfully!')->print()->break();
 
         return true;
@@ -57,16 +82,59 @@ class GenerateConfigFiles extends Command implements CommandInterface
 
         $dispatch_method = (new Method('dispatch'))
             ->setPublic()
-            ->setBody("(new " . Mailer::class . ")->sendQueue();")
+            ->setBody("(new Mailer)->sendQueue();")
             ->addComment("Send queue email");
 
         $class = (new ClassType('MailQueue'))
             ->addMember($dispatch_method)
-            ->addComment("@generated class generated using Vinci Console");
+            ->addComment("@generated class generated using Vinci Console")
+            ->setExtends(Queue::class);
 
-        $this->createComponent($class, [
+        $class->addProperty('sleep', 10.0)
+            ->setProtected()
+            ->setType('float')
+            ->addComment('For codes that take a considerable amount of time to execute, change the $sleep variable');
+
+        $data = (new PhpNamespace("Solital\Queue"))
+            ->add($class)
+            ->addUse(Mailer::class)
+            ->addUse(Queue::class);
+
+        $this->createComponent($data, [
             'component_name' => 'MailQueue',
             'directory' => $dir_queue
+        ]);
+
+        return $this;
+    }
+
+    /**
+     * @return GenerateConfigFiles
+     */
+    private function serviceContainerClass(): GenerateConfigFiles
+    {
+        $provider_dir = Application::getRootApp('', Application::DEBUG);
+
+        $register_method = (new Method('register'))
+            ->setPublic()
+            ->setBody("// ...")
+            ->addComment("Register all containers");
+
+        $register_method->addParameter('container')->setType(ContainerInterface::class);
+
+        $class = (new ClassType('ServiceContainer'))
+            ->addMember($register_method)
+            ->addComment("@generated class generated using Vinci Console")
+            ->addImplement(ServiceProviderInterface::class);
+
+        $data = (new PhpNamespace("Solital"))
+            ->add($class)
+            ->addUse(ContainerInterface::class)
+            ->addUse(ServiceProviderInterface::class);
+
+        $this->createComponent($data, [
+            'component_name' => 'ServiceContainer',
+            'directory' => $provider_dir
         ]);
 
         return $this;
@@ -131,7 +199,8 @@ class GenerateConfigFiles extends Command implements CommandInterface
      */
     private function copyFiles(string $config_core_dir, string $template_dir): void
     {
-        $handle_files = new HandleFiles();
+        $handle_files = Application::provider('handler-file');
+        //$handle_files = new HandleFiles();
         $files = $handle_files->folder($config_core_dir)->files();
         $handle_files->create($template_dir);
 

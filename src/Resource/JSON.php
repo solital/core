@@ -30,30 +30,11 @@ class JSON
     {
         $json = json_encode($value, $this->constants);
 
-        if (json_last_error() == JSON_ERROR_NONE) {
-            return $json;
-        } else {
-            switch (json_last_error()) {
-                case JSON_ERROR_DEPTH:
-                    $error = 'Maximum stack depth exceeded';
-                    break;
-                case JSON_ERROR_STATE_MISMATCH:
-                    $error = 'Underflow or the modes mismatch';
-                    break;
-                case JSON_ERROR_CTRL_CHAR:
-                    $error = 'Unexpected control character found';
-                    break;
-                case JSON_ERROR_SYNTAX:
-                    $error = 'Syntax error, malformed JSON';
-                    break;
-                case JSON_ERROR_UTF8:
-                    $error = 'Malformed UTF-8 characters, possibly incorrectly encoded';
-                    break;
-            }
-
-            $error = ['json_error' => $error];
-            return json_encode($error);
+        if (json_validate($json) == false) {
+            return $this->error();
         }
+
+        return $json;
     }
 
     /**
@@ -64,36 +45,44 @@ class JSON
      */
     public function decode(mixed $value, bool $associative_array = false): mixed
     {
+        if (json_validate($value) == false) {
+            return $this->error();
+        }
+
+        $array = json_decode($value, flags: $this->constants);
+
         if ($associative_array == true) {
             $array = json_decode($value, true, flags: $this->constants);
-        } else {
-            $array = json_decode($value, flags: $this->constants);
         }
 
-        if (json_last_error() == JSON_ERROR_NONE) {
-            return $array;
-        } else {
-            switch (json_last_error()) {
-                case JSON_ERROR_DEPTH:
-                    $error = 'Maximum stack depth exceeded';
-                    break;
-                case JSON_ERROR_STATE_MISMATCH:
-                    $error = 'Underflow or the modes mismatch';
-                    break;
-                case JSON_ERROR_CTRL_CHAR:
-                    $error = 'Unexpected control character found';
-                    break;
-                case JSON_ERROR_SYNTAX:
-                    $error = 'Syntax error, malformed JSON';
-                    break;
-                case JSON_ERROR_UTF8:
-                    $error = 'Malformed UTF-8 characters, possibly incorrectly encoded';
-                    break;
-            }
+        return $array;
+    }
 
-            $error = ['json_error' => $error];
-            return json_encode($error);
+    /**
+     * @return mixed
+     */
+    private function error(): mixed
+    {
+        switch (json_last_error()) {
+            case JSON_ERROR_DEPTH:
+                $error = 'Maximum stack depth exceeded';
+                break;
+            case JSON_ERROR_STATE_MISMATCH:
+                $error = 'Underflow or the modes mismatch';
+                break;
+            case JSON_ERROR_CTRL_CHAR:
+                $error = 'Unexpected control character found';
+                break;
+            case JSON_ERROR_SYNTAX:
+                $error = 'Syntax error, malformed JSON';
+                break;
+            case JSON_ERROR_UTF8:
+                $error = 'Malformed UTF-8 characters, possibly incorrectly encoded';
+                break;
         }
+
+        $error = ['json_error' => $error];
+        return json_encode($error);
     }
 
     /**

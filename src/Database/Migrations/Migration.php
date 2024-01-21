@@ -45,7 +45,8 @@ class Migration
     public function __construct()
     {
         $this->migrations_directory = Application::getRootApp('Database/migrations/', Application::DEBUG);
-        $this->handle = new HandleFiles();
+        //$this->handle = new HandleFiles();
+        $this->handle = Application::provider('handler-file');
         $this->provider = new MigratorVersionProviderDB();
         $this->provider->initDB();
 
@@ -64,9 +65,11 @@ class Migration
     {
         // initialize migrations dir
         $migrationsDir = $this->getMigrationsDirectory();
+
         if (!file_exists($migrationsDir)) {
-            $handle = new HandleFiles();
-            $handle->create($migrationsDir);
+            //$handle = new HandleFiles();
+            //$handle->create($migrationsDir);
+            $this->handle->create($migrationsDir);
         }
     }
 
@@ -99,7 +102,7 @@ class Migration
     {
         if (empty($this->migration_files)) {
             $this->line("No migrations available")->print()->break();
-            return true;
+            return null;
         }
 
         $migration_files = array_keys($this->migration_files);
@@ -143,7 +146,7 @@ class Migration
 
         $file_name = $this->warning($file_name)->getMessage();
         $file_path = $this->success($file_path)->getMessage();
-        $msg1 = $this->line("\nCreated migration ")->getMessage();
+        $msg1 = $this->line("Created migration ")->getMessage();
         $msg2 = $this->line(" at ")->getMessage();
 
         echo $msg1 . $file_name . $msg2 . $file_path . PHP_EOL;
@@ -168,10 +171,10 @@ class Migration
 
         if (in_array("create", $migration_explode)) {
 
+            $table_name = "table_name";
+
             if (isset($migration_explode[3])) {
                 $table_name = str_replace(".php", "", $migration_explode[3]);
-            } else {
-                $table_name = "table_name";
             }
 
             $up_body = "Katrina::createTable('" . $table_name . "')
@@ -205,7 +208,7 @@ class Migration
             ->addMember($down_method)
             ->addComment("@generated class generated using Vinci Console");
 
-        $data = (new PhpNamespace("Solital\Console\Command"))
+        $data = (new PhpNamespace("Solital\Database\migrations"))
             ->add($class)
             ->addUse(Katrina::class)
             ->addUse(Migration::class);
@@ -343,14 +346,19 @@ class Migration
         }
 
         if (file_exists($migration_file)) {
-            require_once($migration_file);
+            include_once $migration_file;
 
             $migrationName = explode("_", $migrationName);
             $migrationName = $migrationName[0] . $migrationName[1];
 
             $migrationClassName = "Migration{$migrationName}";
 
-            return new $migrationClassName();
+            $class = "Solital\Database\migrations\\" . $migrationClassName;
+
+            if (class_exists($class)) {
+                $instance = new \ReflectionClass($class);
+                return $instance->newInstance();
+            };
         }
 
         return null;

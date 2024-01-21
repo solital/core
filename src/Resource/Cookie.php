@@ -364,18 +364,18 @@ final class Cookie
     /**
      * Sets a new cookie in a way compatible to PHP's `setcookie(...)` function
      *
-     * @param string $name the name of the cookie which is also the key for future accesses via `$_COOKIE[...]`
-     * @param mixed|null $value the value of the cookie that will be stored on the client's machine
-     * @param int $expiryTime the Unix timestamp indicating the time that the cookie will expire at, 
+     * @param string      $name the name of the cookie which is also the key for future accesses via `$_COOKIE[...]`
+     * @param mixed|null  $value the value of the cookie that will be stored on the client's machine
+     * @param int         $expiryTime the Unix timestamp indicating the time that the cookie will expire at, 
      *                        i.e. usually `time() + $seconds`
-     * @param string|null $path the path on the server that the cookie will be valid for (including all 
+     * @param string      $path the path on the server that the cookie will be valid for (including all 
      *                          sub-directories), e.g. an empty string for the current directory or `/` for 
      *                          the root directory
      * @param string|null $domain the domain that the cookie will be valid for (including subdomains) 
      *                            or `null` for the current host (excluding subdomains)
-     * @param bool $secureOnly indicates that the cookie should be sent back by the client over secure 
+     * @param bool        $secureOnly indicates that the cookie should be sent back by the client over secure 
      *                         HTTPS connections only
-     * @param bool $httpOnly indicates that the cookie should be accessible through the HTTP protocol 
+     * @param bool        $httpOnly indicates that the cookie should be accessible through the HTTP protocol 
      *                       only and not through scripting languages
      * @param string|null $sameSiteRestriction indicates that the cookie should not be sent along with 
      *                                         cross-site requests (either `null`, `None`, `Lax` or `Strict`)
@@ -386,7 +386,7 @@ final class Cookie
         string $name,
         mixed $value = null,
         int $expiryTime = 0,
-        ?string $path = null,
+        string $path = '/',
         ?string $domain = null,
         bool $secureOnly = false,
         bool $httpOnly = false,
@@ -552,11 +552,11 @@ final class Cookie
 
     /**
      * @param string $index
-     * @param string|null $path
+     * @param string $path
      * 
      * @return bool
      */
-    public static function unset(string $index, string $path = null): bool
+    public static function unset(string $index, string $path = '/'): bool
     {
         if (self::exists($index)) {
             setcookie($index, expires_or_options: time() - 3600, path: $path);

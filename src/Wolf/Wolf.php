@@ -3,8 +3,10 @@
 namespace Solital\Core\Wolf;
 
 use Solital\Core\Kernel\Application;
+use Solital\Core\Logger\Logger;
 use Solital\Core\Resource\Collection\ArrayCollection;
 use Solital\Core\Wolf\{WolfCacheTrait, WolfMinifyTrait};
+use Solital\Core\Wolf\Exception\WolfException;
 use Solital\Core\Wolf\Functions\{AssetsTrait, ExtendsTrait};
 
 class Wolf
@@ -27,7 +29,7 @@ class Wolf
     /**
      * @var string
      */
-    private string $view;
+    private string $view = "";
 
     /**
      * @var array
@@ -75,25 +77,6 @@ class Wolf
     }
 
     /**
-     * @param string $view
-     * @param array|null $args
-     * 
-     * @return mixed
-     */
-    public function loadView(string $view, array $args = null): mixed
-    {
-        $view = str_replace(".", DIRECTORY_SEPARATOR, $view);
-        $config = Application::getYamlVariables(5, 'bootstrap.yaml');
-
-        $this->setArgs($args);
-        $this->setView($view);
-        $this->setCacheTime($config);
-        $this->setMinify($config);
-
-        return $this->render();
-    }
-
-    /**
      * @param array|null $args
      * 
      * @return Wolf
@@ -125,6 +108,8 @@ class Wolf
      */
     public function setView(string $view): Wolf
     {
+        $view = str_replace(".", DIRECTORY_SEPARATOR, $view);
+
         if (str_contains('.', $view)) {
             $view = str_replace(".", DIRECTORY_SEPARATOR, $view);
         }
@@ -137,8 +122,15 @@ class Wolf
     /**
      * @return string
      */
-    public function render(): string
+    public function render(): ?string
     {
+        $config = Application::getYamlVariables(5, 'bootstrap.yaml');
+        
+        if (is_array($config)) {
+            $this->setCacheTime($config);
+            $this->setMinify($config);
+        }
+
         $cache_template = $this->generateCacheNameFile($this->view);
         $cache_template = $this->loadCache($cache_template);
 

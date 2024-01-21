@@ -22,6 +22,11 @@
             <label for="floatingPassword">Password</label>
         </div>
 
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="inputRemember" name="inputRemember" value="true">
+            <label class="form-check-label" for="inputRemember">Remember?</label>
+        </div>
+
         <button class="w-100 btn btn-lg btn-primary mt-3" type="submit">
             <span class="material-icons">send</span> Login
         </button>

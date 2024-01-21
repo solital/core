@@ -23,7 +23,7 @@ composer create-project solital/solital project
 
 ## Documentation
 
-You can access the complete documentation at the following link: [https://solitalframework.com/](https://solitalframework.rf.gd/)
+You can access the complete documentation at the following link: [https://solital.github.io/site/](https://solital.github.io/site/)
 
 ## License
 

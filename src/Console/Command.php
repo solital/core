@@ -11,9 +11,9 @@ class Command
     use DefaultCommandsTrait;
     use MessageTrait;
 
-    const VERSION = "3.3.1";
-    const DATE_VERSION = "Nov 24 2023";
-    const SITE_DOC = "https://solital.github.io/site/docs/3.x/vinci-console/";
+    const VERSION = "4.0.0";
+    const DATE_VERSION = "Jan 21 2024";
+    const SITE_DOC = "https://solital.github.io/site/docs/4.x/vinci-console/";
 
     /**
      * @var string
@@ -78,9 +78,10 @@ class Command
     /**
      * @param array $class
      */
-    public function __construct($class)
+    public function __construct(array $class = [])
     {
-        (new ModernPHPException)->start();
+        /* $exc = new ModernPHPException();
+        $exc->start(); */
 
         if ($class) {
             foreach ($class as $class) {
@@ -92,14 +93,21 @@ class Command
     }
 
     /**
-     * @param string $command
-     * @param array $arguments
+     * @param string|array $command
+     * @param array        $arguments
      * 
      * @return mixed
      */
-    public function read(string $command = "", array $arguments = []): mixed
+    public function read(string|array $command = "", array $arguments = []): mixed
     {
-        $this->command = $command;
+        if (is_array($command)) {
+            $this->command = $command[1];
+        }
+
+        if (is_string($command)) {
+            $this->command = $command;
+        }
+
         $this->arguments = $arguments;
 
         $this->filter($this->arguments);
@@ -113,7 +121,9 @@ class Command
                     if (!class_exists($class)) {
                         array_push($this->not_found_class, $class);
                     } else {
-                        $instance = new $class(null);
+                        $reflection = new \ReflectionClass($class);
+                        $instance = $reflection->newInstanceWithoutConstructor();
+                        
                         $args = $instance->getAllArguments();
                         $cmd = $instance->getCommand();
 
@@ -139,38 +149,10 @@ class Command
             return $this->instance->handle((object)$this->all_arguments, (object)$this->options);
         }
 
-        //self::log("CommandNotFound", "Command '" . $this->command . "' not found");
         $this->error("Command '" . $this->command . "' not found")->print()->break()->exit();
 
         return $this;
     }
-
-    /**
-     * @param string $file_name
-     * @param string $description
-     * 
-     * @return void
-     * 
-     */
-    /* public static function log(string $file_name, string $description = ""): void
-    {
-        $file = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $file_name . "-" . date("Y-m-d");
-
-        if (file_exists($file)) {
-            $log_description = file_get_contents($file);
-            $log_description .= $description;
-
-            file_put_contents(
-                $file,
-                $log_description . " [" . date('Y-m-d - H:i:s') . "]" . "\n"
-            );
-        } else {
-            file_put_contents(
-                $file,
-                $description . " [" . date('Y-m-d - H:i:s') . "]" . "\n"
-            );
-        }
-    } */
 
     /**
      * Get the value of description

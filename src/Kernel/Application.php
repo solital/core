@@ -5,18 +5,26 @@ namespace Solital\Core\Kernel;
 use ModernPHPException\ModernPHPException;
 use Symfony\Component\Yaml\Yaml;
 use Solital\Core\Course\Course;
-use Solital\Core\Logger\Logger;
 use Solital\Core\Resource\Session;
 use Solital\Core\Security\Guardian;
-use Solital\Core\Kernel\KernelTrait;
-use Solital\Core\Validation\Convertime;
 use Solital\Core\FileSystem\HandleFiles;
-use Solital\Core\Logger\Handler\LogfileHandler;
-use Solital\Core\Exceptions\ApplicationException;
+use Solital\Core\Kernel\Exceptions\ApplicationException;
+
+use Solital\Core\Kernel\Traits\{
+    KernelTrait,
+    ClassLoaderTrait
+};
+
+use Solital\Core\Container\{
+    Interface\ContainerInterface,
+    Container,
+    DefaultServiceContainer
+};
 
 class Application
 {
     use KernelTrait;
+    use ClassLoaderTrait;
 
     /**
      * @var string
@@ -29,6 +37,11 @@ class Application
     private static int $error_code;
 
     /**
+     * @var string
+     */
+    private static string $default_timezone = "America/Fortaleza";
+
+    /**
      * @var ModernPHPException
      */
     private static ModernPHPException $exception;
@@ -39,6 +52,13 @@ class Application
     private static HandleFiles $handle;
 
     /**
+     * @var mixed
+     */
+    private static mixed $container;
+
+    /**
+     * Get directory of the YAML files
+     * 
      * @param int $dir_number
      * 
      * @return string
@@ -55,6 +75,8 @@ class Application
     }
 
     /**
+     * Returns variables by YAML file
+     * 
      * @param int $dir_number
      * @param string $yaml_file
      * 
@@ -62,7 +84,13 @@ class Application
      */
     public static function getYamlVariables(int $dir_number, string $yaml_file): mixed
     {
-        return Yaml::parseFile(self::getDirConfigFiles($dir_number) . $yaml_file);
+        $yaml_file = self::getDirConfigFiles($dir_number) . $yaml_file;
+
+        if (file_exists($yaml_file)) {
+            return Yaml::parseFile($yaml_file);
+        }
+
+        return false;
     }
 
     /**
@@ -70,113 +98,86 @@ class Application
      */
     private static function getInstance(): void
     {
-        $exception_type = "";
-        $exception_theme = null;
+        /* LOAD YAML CONFIG */
+        $modern_php_exception_config = [];
+        $exception_config = self::getDirConfigFiles(5) . 'exceptions.yaml';
+        $bootstrap_config = self::getYamlVariables(5, 'bootstrap.yaml');
 
-        if (self::DEBUG == false) {
-            if (file_exists(self::getDirConfigFiles(5) . 'bootstrap.yaml')) {
-                $modern_php_exception = self::getYamlVariables(5, 'bootstrap.yaml');
+        /* LOAD SERVICE PROVIDER */
+        self::$container = new Container();
+        self::loadServiceContainer(self::$container);
 
-                if (array_key_exists('exception_json_return', $modern_php_exception)) {
-                    if ($modern_php_exception['exception_json_return'] == true) {
-                        $exception_type = "json";
-                    }
-                }
+        /* LOAD DEFAULT TIMEZONE */
+        date_default_timezone_set(self::$default_timezone);
 
-                if (array_key_exists('exception_dark_theme', $modern_php_exception)) {
-                    $exception_theme = $modern_php_exception['exception_dark_theme'];
-                }
-            }
+        if ($bootstrap_config != false && $bootstrap_config['default_timezone'] != "") {
+            date_default_timezone_set($bootstrap_config['default_timezone']);
         }
 
-        self::$exception = new ModernPHPException([
-            'type' => $exception_type,
-            'title' => '',
-            'dark_mode' => $exception_theme,
-            'production_mode' => getenv('PRODUCTION_MODE')
-        ]);
+        /* CONFIG MODERN PHP EXCEPTION */
+        if (file_exists($exception_config)) {
+            $modern_php_exception_config = $exception_config;
+        }
+
+        self::$exception = new ModernPHPException($modern_php_exception_config);
         self::$exception->start();
 
-        self::$handle = new HandleFiles();
+        /* LOAD PROVIDER HANDLE FILES */
+        self::$handle = self::provider('handler-file');
+        //self::$handle = new HandleFiles();
     }
 
     /**
+     * Init all Solital instances, database connection, security methods and
+     * start all routers
+     * 
      * @return void
      */
     public static function init(): void
     {
-        (new Convertime());
         self::getInstance();
         self::connectionDatabase();
-        self::protectDomain();
+        Guardian::validateDomain();
+
         Course::start();
     }
 
     /**
-     * @param \Exception $e
+     * Get container ID
+     *
+     * @param string $provider
+     * 
+     * @return mixed
+     */
+    public static function provider(string $provider): mixed
+    {
+        return self::$container->get($provider);
+    }
+
+    /**
+     * Set database connection constants
      * 
      * @return void
      */
-    public static function exceptionHandler(\Exception $e): void
+    public static function connectionDatabase(): void
     {
-        self::$exception->exceptionHandler($e);
-    }
+        $db_config = self::$db;
+        $database_connection = self::getYamlVariables(5, 'database.yaml');
 
-    /**
-     * @return mixed
-     */
-    public static function connectionDatabase()
-    {
-        if (self::DEBUG_DATABASE == true) {
-            return self::connectionDatabaseDebug();
-        } else {
-            $database_connection = self::getYamlVariables(5, 'database.yaml');
+        if ($database_connection != false) {
+            $db_config = self::setDatabaseConnection($database_connection);
         }
 
-        if ($database_connection['enable_test'] == true) {
-            if (!defined('DB_CONFIG')) {
-                define('DB_CONFIG', [
-                    'DRIVE' => $database_connection['db_test']['drive'],
-                    'HOST' => $database_connection['db_test']['host'],
-                    'DBNAME' => $database_connection['db_test']['name'],
-                    'USER' => $database_connection['db_test']['user'],
-                    'PASS' => $database_connection['db_test']['pass'],
-                    'SQLITE_DIR' => $database_connection['db_test']['sqlite']
-                ]);
-            }
-        } else {
-            if (!defined('DB_CONFIG')) {
-                define('DB_CONFIG', [
-                    'DRIVE' => getenv('DB_DRIVE'),
-                    'HOST' => getenv('DB_HOST'),
-                    'DBNAME' => getenv('DB_NAME'),
-                    'USER' => getenv('DB_USER'),
-                    'PASS' => getenv('DB_PASS'),
-                    'SQLITE_DIR' => getenv('SQLITE_DIR')
-                ]);
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @return mixed
-     */
-    private static function connectionDatabaseDebug()
-    {
         if (!defined('DB_CONFIG')) {
             define('DB_CONFIG', [
-                'DRIVE' => '',
-                'HOST' => '',
-                'DBNAME' => '',
-                'USER' => '',
-                'PASS' => '',
-                'SQLITE_DIR' => ''
+                'DRIVE' => $db_config['drive'],
+                'HOST' => $db_config['host'],
+                'DBNAME' => $db_config['name'],
+                'USER' => $db_config['user'],
+                'PASS' => $db_config['pass'],
+                'SQLITE_DIR' => $db_config['sqlite_dir']
             ]);
         }
-
-        return null;
     }
 
     /**
@@ -192,18 +193,18 @@ class Application
         if ($cli_test == true) {
             $dir = str_replace('/', DIRECTORY_SEPARATOR, $dir);
             return "tests" . DIRECTORY_SEPARATOR . "files_test" . DIRECTORY_SEPARATOR . $dir;
-        } else {
-            if (defined('SITE_ROOT')) {
-                if ($dir != "" || !empty($dir)) {
-                    $dir = str_replace('/', DIRECTORY_SEPARATOR, $dir);
-                    $dir = $dir . DIRECTORY_SEPARATOR;
-                }
-
-                return constant('SITE_ROOT') . DIRECTORY_SEPARATOR . $dir;
-            } else {
-                throw new ApplicationException("SITE_ROOT constant not defined");
-            }
         }
+
+        if (defined('SITE_ROOT')) {
+            if ($dir != "" || !empty($dir)) {
+                $dir = str_replace('/', DIRECTORY_SEPARATOR, $dir);
+                $dir = $dir . DIRECTORY_SEPARATOR;
+            }
+
+            return constant('SITE_ROOT') . DIRECTORY_SEPARATOR . $dir;
+        }
+
+        throw new ApplicationException("SITE_ROOT constant not defined");
     }
 
     /**
@@ -245,6 +246,8 @@ class Application
      */
     public static function createAppFolder(string $directory)
     {
+        self::getInstance();
+
         if (!is_dir($directory)) {
             self::$handle->create($directory);
         }
@@ -256,12 +259,12 @@ class Application
      * @param  mixed $directory
      * @return void
      */
-    public static function removeAppFolder(string $directory)
+    /* public static function removeAppFolder(string $directory)
     {
         if (is_dir($directory)) {
             self::$handle->remove($directory, false);
         }
-    }
+    } */
 
     /**
      * @param string $dir
@@ -277,163 +280,59 @@ class Application
     }
 
     /**
-     * @return bool
-     */
-    public static function isCli(): bool
-    {
-        if (defined('STDIN')) {
-            return true;
-        }
-
-        if (php_sapi_name() === "cli") {
-            return true;
-        }
-
-        if (PHP_SAPI === 'cli') {
-            return true;
-        }
-
-        if (stristr(PHP_SAPI, 'cgi') and getenv('TERM')) {
-            return true;
-        }
-
-        if (
-            empty($_SERVER['REMOTE_ADDR']) and
-            !isset($_SERVER['HTTP_USER_AGENT']) and
-            count($_SERVER['argv']) > 0
-        ) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Recursively loads all php files in all subdirectories of the given path
-     *
-     * @param $directory
-     *
-     * @throws \Exception
-     */
-    public static function autoload($directory)
-    {
-        // Ensure this path exists
-        if (!is_dir($directory)) {
-            return;
-        }
-
-        // Get a listing of the current directory
-        $scanned_dir = scandir($directory);
-
-        // Ignore these items from scandir
-        $ignore = [
-            '.',
-            '..'
-        ];
-
-        // Remove the ignored items
-        $scanned_dir = array_diff($scanned_dir, $ignore);
-
-        if (empty($scanned_dir)) {
-            return;
-        }
-
-        if (count($scanned_dir) > 250) {
-            throw new \Exception('Too many files attempted to load via autoload');
-        }
-
-        foreach ($scanned_dir as $item) {
-
-            $filename  = $directory . '/' . $item;
-            $real_path = realpath($filename);
-
-            if (false === $real_path) {
-                continue;
-            }
-
-            $filetype = filetype($real_path);
-
-            if (empty($filetype)) {
-                continue;
-            }
-
-            // If it's a directory then recursively load it
-            if ('dir' === $filetype) {
-                self::autoload($real_path);
-            } // If it's a file, let's try to load it
-            else if ('file' === $filetype) {
-
-                if (true !== is_readable($real_path)) {
-                    continue;
-                }
-
-                // Don't allow files that have been uploaded
-                if (is_uploaded_file($real_path)) {
-                    continue;
-                }
-
-                // Only for files that really exist
-                if (true !== file_exists($real_path)) {
-                    continue;
-                }
-
-                $pathinfo = pathinfo($real_path);
-
-                // An empty filename wouldn't be a good idea
-                if (empty($pathinfo['filename'])) {
-                    continue;
-                }
-
-                // Sorry, need an extension
-                if (empty($pathinfo['extension'])) {
-                    continue;
-                }
-
-                // Actually, we want just a PHP extension!
-                if ('php' !== $pathinfo['extension']) {
-                    continue;
-                }
-
-                $filesize = filesize($real_path);
-
-                // Don't include negative sized files
-                if ($filesize < 0) {
-                    throw new \Exception('File size is negative, not autoloading');
-                }
-
-                // Don't include files that are greater than 300kb
-                if ($filesize > 300000) {
-                    throw new \Exception('File size is greater than 300kb, not autoloading');
-                }
-
-                require_once($real_path);
-            }
-        }
-    }
-
-    /**
-     * @return void
-     */
-    public static function protectDomain(): void
-    {
-        Guardian::validateDomain();
-    }
-
-    /**
      * @return void
      */
     public static function sessionInit(): void
     {
-        $session_dir = dirname(__DIR__, 5) . DIRECTORY_SEPARATOR . "app" . DIRECTORY_SEPARATOR . "Storage" . DIRECTORY_SEPARATOR . "session" . DIRECTORY_SEPARATOR;
+        $session_dir = self::getRootApp('Storage/session');
 
         if (!session_id()) {
             if (!is_dir($session_dir)) {
-                (new HandleFiles)->create($session_dir);
+                self::$handle->create($session_dir);
             }
 
             session_save_path($session_dir);
             Session::start();
         }
+    }
+
+    /**
+     * Load CSRF verifier
+     *
+     * @return void
+     */
+    public static function loadCsrfVerifier(): void
+    {
+        $custom_csrf = self::getYamlVariables(5, 'bootstrap.yaml');
+
+        $class = 'Solital\Core\Http\Middleware\\' . $custom_csrf['custom_csrf'];
+
+        if (!class_exists($class)) {
+            $class = 'Solital\Middleware\\' . $custom_csrf['custom_csrf'];
+        }
+
+        $reflection = new \ReflectionClass($class);
+        $instance = $reflection->newInstance();
+
+        Course::csrfVerifier($instance);
+    }
+
+    /**
+     * Load service provider class and default class
+     *
+     * @param ContainerInterface $container
+     * 
+     * @return void
+     */
+    public static function loadServiceContainer(ContainerInterface $container): void
+    {
+        if (class_exists('Solital\ServiceContainer')) {
+            $service = new \Solital\ServiceContainer;
+            $service->register($container);
+        }
+
+        $default_service = new DefaultServiceContainer;
+        $default_service->register($container);
     }
 
     /**
@@ -453,12 +352,23 @@ class Application
             empty(getenv('DB_DRIVE'))
         ) {
             $config = false;
-            $message[] = "<span class='alert'>Database not configured:</span> check '.env' file";
+            $message['Database not configured'] = "Check database configuration at '.env' file";
+        }
+
+        if (
+            empty(getenv('MAIL_HOST')) ||
+            empty(getenv('MAIL_USER')) ||
+            empty(getenv('MAIL_PASS')) ||
+            empty(getenv('MAIL_SECURITY')) ||
+            empty(getenv('MAIL_PORT'))
+        ) {
+            $config = false;
+            $message['E-mail not configured'] = "Check e-mail configuration at '.env' file";
         }
 
         if (empty(getenv('FIRST_SECRET')) || empty(getenv('SECOND_SECRET'))) {
             $config = false;
-            $message[] = "<span class='alert'>OpenSSL error:</span> FIRST_SECRET and SECOND_SECRET variables don't have a defined value";
+            $message['OpenSSL error'] = "FIRST_SECRET and SECOND_SECRET variables don't have a defined value";
         }
 
         if (date('H') >= 18) {
@@ -472,26 +382,5 @@ class Application
             'message' => $message,
             'theme_dark' => $theme_dark
         ];
-    }
-
-    /**
-     * @param string $log_level
-     * @param string $log_file
-     * @param string $message
-     * 
-     * @return void
-     */
-    public static function logFile(
-        string $channel,
-        string $log_level,
-        string $log_file,
-        string $message
-    ): void {
-        $logger = new Logger($channel);
-        $logger->addHandler(
-            $log_level,
-            new LogfileHandler($log_file),
-        );
-        $logger->critical($message);
     }
 }

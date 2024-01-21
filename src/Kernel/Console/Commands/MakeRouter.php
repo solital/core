@@ -41,7 +41,6 @@ class MakeRouter extends Command implements CommandInterface
 
         if (empty($arguments->router_name)) {
             $this->error("Error: You need to define a name for your route")->print()->break();
-
             return false;
         }
 
@@ -64,11 +63,12 @@ class MakeRouter extends Command implements CommandInterface
      * @param  mixed $component_dir
      * @param  mixed $argument_name
      * @param  mixed $replace
-     * @return void
+     * @return bool
      */
-    public function generateComponent(string $component_template, string $component_dir, string $argument_name, ?array $replace = null): void
+    public function generateComponent(string $component_template, string $component_dir, string $argument_name, ?array $replace = null): bool
     {
-        $folder = new HandleFiles();
+        //$folder = new HandleFiles();
+        $folder = Application::provider('handler-file');
 
         $output_template = file_get_contents($component_template);
 
@@ -89,8 +89,10 @@ class MakeRouter extends Command implements CommandInterface
         if (!file_exists($file_exists)) {
             file_put_contents($component_dir . $argument_name . ".php", $output_template);
             $this->success("Router successfully created!")->print()->break();
-        } else {
-            $this->error("Error: Router already exists!")->print()->break();
+            return true;
         }
+
+        $this->error("Error: Router already exists!")->print()->break();
+        return false;
     }
 }

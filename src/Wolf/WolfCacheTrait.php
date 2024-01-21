@@ -26,11 +26,11 @@ trait WolfCacheTrait
     protected ?string $time = null;
 
     /**
-     * @param mixed $time
+     * @param array|string $time
      * 
      * @return self
      */
-    public function setCacheTime(mixed $time): self
+    public function setCacheTime(array|string $time): self
     {
         if (is_array($time)) {
             if ($time['wolf_cache']['enabled'] == true) {
@@ -41,16 +41,20 @@ trait WolfCacheTrait
                     'week' => $this->forOneWeek()
                 };
             }
-        } elseif (is_string($time)) {
+
+            return $this;
+        }
+        
+        if (is_string($time)) {
             match ($time) {
                 'minute' => $this->forOneMinute(),
                 'hour' => $this->forOneHour(),
                 'day' => $this->forOneDay(),
                 'week' => $this->forOneWeek()
             };
-        }
 
-        return $this;
+            return $this;
+        }
     }
 
     /**

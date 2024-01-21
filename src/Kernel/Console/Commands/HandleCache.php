@@ -12,7 +12,7 @@ class HandleCache extends Command implements CommandInterface
     /**
      * @var string
      */
-    protected string $command = "cache:clear";
+    protected string $command = "storage:clear";
 
     /**
      * @var array
@@ -22,7 +22,7 @@ class HandleCache extends Command implements CommandInterface
     /**
      * @var string
      */
-    protected string $description = "Clear the Solital cache";
+    protected string $description = "Clear the Solital storage files";
 
     /**
      * @param object $arguments
@@ -33,15 +33,25 @@ class HandleCache extends Command implements CommandInterface
     public function handle(object $arguments, object $options): mixed
     {
         if (isset($options->session)) {
-            $this->clearSession();
-            exit;
-        } elseif (isset($options->cache)) {
-            $this->clearCache();
-            exit;
+            return $this->clearSession();
+        }
+
+        if (isset($options->cache)) {
+            return $this->clearCache();
+        }
+
+        if (isset($options->schedules)) {
+            return $this->clearSchedule();
+        }
+
+        if (isset($options->log)) {
+            return $this->clearLogs();
         }
 
         $this->clearSession();
         $this->clearCache();
+        $this->clearSchedule();
+        $this->clearLogs();
 
         return $this;
     }
@@ -52,10 +62,11 @@ class HandleCache extends Command implements CommandInterface
     public function clearSession(): bool
     {
         if (Application::DEBUG == true) {
-            $this->error("SESSION: Debug mode enabled! It is not possible to delete the sessions!")->print()->break()->exit();
+            $this->error("SESSION: Debug mode enabled! It is not possible to delete the sessions!")->print()->break();
+            return false;
         }
 
-        $dir = constant('SITE_ROOT') . DIRECTORY_SEPARATOR . "app" . DIRECTORY_SEPARATOR . "Storage" . DIRECTORY_SEPARATOR . "session" . DIRECTORY_SEPARATOR;
+        $dir = Application::getRootApp('Storage/session/', false);
         $this->eraseFiles($dir);
         $this->success("Sessions was cleared successfully!")->print()->break();
 
@@ -72,12 +83,8 @@ class HandleCache extends Command implements CommandInterface
             'wolf'
         ];
 
-        if (Application::DEBUG == true) {
-            $this->error("SESSION: Debug mode enabled! It is not possible to delete the cache!")->print()->break()->exit();
-        }
-
         foreach ($dir_cache as $folder) {
-            $dir = constant('SITE_ROOT') . DIRECTORY_SEPARATOR . "app" . DIRECTORY_SEPARATOR . "Storage" . DIRECTORY_SEPARATOR . "cache" . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR;
+            $dir = Application::getRootApp('Storage/cache/' . $folder, false);
             $this->eraseFiles($dir);
         }
 
@@ -87,14 +94,38 @@ class HandleCache extends Command implements CommandInterface
     }
 
     /**
+     * @return bool
+     */
+    public function clearSchedule(): bool
+    {
+        $dir = Application::getRootApp('Storage/schedules/', false);
+        $this->eraseFiles($dir);
+        $this->success("Log schedules was cleared successfully!")->print()->break();
+
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function clearLogs(): bool
+    {
+        $dir = Application::getRootApp('Storage/log/', false);
+        $this->eraseFiles($dir);
+        $this->success("Logs was cleared successfully!")->print()->break();
+
+        return true;
+    }
+
+    /**
      * @param string $dir
      * 
-     * @return void
+     * @return bool
      */
-    private function eraseFiles(string $dir): void
+    private function eraseFiles(string $dir): bool
     {
         if (!is_dir($dir)) {
-            (new HandleFiles)->create($dir);
+            return false;
         }
 
         $directory = dir($dir);
@@ -106,5 +137,7 @@ class HandleCache extends Command implements CommandInterface
         }
 
         $directory->close();
+
+        return true;
     }
 }

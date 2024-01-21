@@ -28,20 +28,6 @@ class MakeSeeder extends Command implements CommandInterface
     protected string $description = "Create a Seed class";
 
     /**
-     * @var Seeder
-     */
-    private Seeder $seeder;
-
-    /**
-     * Construct
-     */
-    public function __construct()
-    {
-        Application::connectionDatabase();
-        $this->seeder = new Seeder(Application::DEBUG);
-    }
-
-    /**
      * @param object $arguments
      * @param object $options
      * 
@@ -49,7 +35,13 @@ class MakeSeeder extends Command implements CommandInterface
      */
     public function handle(object $arguments, object $options): mixed
     {
-        $this->seeder->create($arguments->seeder_name);
+        if (!isset($arguments->seeder_name)) {
+            $this->error("Error: Seeder name not found")->print()->break();
+            return false;
+        }
+
+        Application::connectionDatabase();
+        (new Seeder(Application::DEBUG))->create($arguments->seeder_name);
 
         return true;
     }

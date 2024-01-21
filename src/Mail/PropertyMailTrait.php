@@ -30,4 +30,9 @@ trait PropertyMailTrait
      * @var string
      */
     protected string $recipient_name;
+
+    /**
+     * @var array
+     */
+    protected array $php_mailer_config = [];
 }

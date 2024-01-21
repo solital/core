@@ -2,9 +2,9 @@
 
 namespace Solital\Core\Kernel\Console\Commands;
 
-use Solital\Core\Database\Dump;
 use Solital\Core\Console\Command;
 use Solital\Core\Console\Interface\CommandInterface;
+use Solital\Core\Database\Dump\Dump;
 use Solital\Core\Kernel\Application;
 
 class DumpDatabase extends Command implements CommandInterface
@@ -32,8 +32,9 @@ class DumpDatabase extends Command implements CommandInterface
      */
     public function handle(object $arguments, object $options): mixed
     {
-        $dir_dump = Application::getRootApp("Storage/dump/", true);
+        Application::connectionDatabase();
 
+        $dir_dump = Application::getRootApp("Storage/dump/", true);
         $dump = new Dump();
 
         if (isset($options->exclude)) {
@@ -41,7 +42,6 @@ class DumpDatabase extends Command implements CommandInterface
         }
 
         $dump->dumpDatabase($dir_dump);
-
         $this->success("Dump Database created successfully!")->print()->break()->exit();
 
         return $this;

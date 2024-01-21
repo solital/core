@@ -41,9 +41,9 @@ class TableBuilder
     {
         foreach ($data as $name => $work) {
             if ($margin == true) {
-                echo "  "  . Color::green() . str_pad($name, $space) . Color::white() . $work . PHP_EOL;
+                echo "  "  . Color::light_green() . str_pad($name, $space) . Color::white() . $work . PHP_EOL;
             } else {
-                echo Color::green() . str_pad($name, $space) . Color::white() . $work . PHP_EOL;
+                echo Color::light_green() . str_pad($name, $space) . Color::white() . $work . PHP_EOL;
             }
         }
     }

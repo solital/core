@@ -2,11 +2,16 @@
 
 namespace Solital\Core\Course;
 
-use Psr\Log\LogLevel;
-use Solital\Core\Http\{Uri, Request, Middleware\BaseCsrfVerifier, Response};
+use Solital\Core\Logger\Logger;
+use Solital\Core\Http\{Uri, Request, Middleware\BaseCsrfVerifier};
 use Solital\Core\Course\Handlers\{EventHandler, EventHandlerInterface};
 use Solital\Core\Course\ClassLoader\{ClassLoader, ClassLoaderInterface};
-use Solital\Core\Exceptions\{InvalidArgumentException, ExceptionHandlerInterface, RuntimeException};
+
+use Solital\Core\Exceptions\{
+    InvalidArgumentException,
+    ExceptionHandlerInterface,
+    RuntimeException
+};
 
 use Solital\Core\Course\Route\{
     RouteInterface,
@@ -15,9 +20,7 @@ use Solital\Core\Course\Route\{
     ControllerRouteInterface,
     PartialGroupRouteInterface
 };
-
-use Solital\Core\Logger\Logger;
-use Solital\Core\Logger\Handler\LogfileHandler;
+use Solital\Core\Security\Guardian;
 
 class Router
 {
@@ -27,14 +30,14 @@ class Router
      * 
      * @var Request
      */
-    protected $request;
+    protected Request $request;
 
     /**
      * Defines if a route is currently being processed.
      * 
      * @var bool
      */
-    protected $isProcessingRoute;
+    protected bool $isProcessingRoute;
 
     /**
      * All added routes
@@ -68,9 +71,9 @@ class Router
     /**
      * Csrf verifier class
      * 
-     * @var BaseCsrfVerifier
+     * @var BaseCsrfVerifier|null
      */
-    protected $csrfVerifier;
+    protected ?BaseCsrfVerifier $csrfVerifier = null;
 
     /**
      * Get exception handlers
@@ -99,12 +102,12 @@ class Router
      * 
      * @var ClassLoader
      */
-    protected $classLoader;
+    protected ClassLoader $classLoader;
 
     /**
      * @var array
      */
-    private $url;
+    private array $url;
 
     /**
      * @var bool
@@ -122,16 +125,10 @@ class Router
     private static bool $redirect = false;
 
     /**
-     * @var Logger
-     */
-    private Logger $logger;
-
-    /**
      * Router constructor.
      */
     public function __construct()
     {
-        $this->logger = new Logger('router');
         $this->reset();
     }
 
@@ -144,18 +141,18 @@ class Router
 
         try {
             $this->request = new Request($_SERVER["REQUEST_METHOD"], $_SERVER["REQUEST_URI"], 'php://memory');
-        } catch (\Exception $e) {
-            throw new \Exception("Invalid request-uri url: " . $e->getMessage());
+        } catch (InvalidArgumentException $e) {
+            throw new InvalidArgumentException("Invalid request-uri url: " . $e->getMessage());
         }
 
-        $this->routes = [];
+        /* $this->routes = [];
         $this->bootManagers = [];
         $this->routeStack = [];
         $this->processedRoutes = [];
         $this->exceptionHandlers = [];
         $this->loadedExceptionHandlers = [];
-        $this->eventHandlers = [];
-        $this->csrfVerifier = null;
+        $this->eventHandlers = []; */
+        //$this->csrfVerifier = null;
         $this->classLoader = new ClassLoader();
     }
 
@@ -353,7 +350,7 @@ class Router
             ]);
 
             /* Verify csrf token for request */
-            $this->csrfVerifier->handle($this->request);
+            $this->csrfVerifier->validateToken($this->request);
         }
 
         $output = $this->routeRequest();
@@ -390,7 +387,6 @@ class Router
                     /* Check if request method matches */
                     if (\count($route->getRequestMethods()) !== 0 && \in_array($this->request->getMethod(), $route->getRequestMethods(), true) === false) {
                         throw new \Exception("Route '" . $this->request->getUri()->getPath() . "' or method '" . strtoupper($this->request->getMethod()) . "' not allowed", 403);
-
                         continue;
                     }
 
@@ -433,20 +429,15 @@ class Router
 
             $rewriteUrl = $this->request->getRewriteUrl();
 
-            $this->logger->addHandler(
-                LogLevel::INFO,
-                new LogfileHandler('course'),
-            );
-
             if ($rewriteUrl !== null) {
                 $this->redirectRoute();
 
-                $this->logger->warning("Route '" . $rewriteUrl . "' not found (rewrite from: '" . $this->request->getUri()->getPath() . "')");
+                Logger::channel('single')->warning("Route '" . $rewriteUrl . "' not found (rewrite from: '" . $this->request->getUri()->getPath() . "')");
                 throw new RuntimeException("Route '" . $rewriteUrl . "' not found (rewrite from: '" . $this->request->getUri()->getPath() . "')", 404);
             } else {
                 $this->redirectRoute();
 
-                $this->logger->warning("Route '" . $this->request->getUri()->getPath() . "' not found");
+                Logger::channel('single')->warning("Route '" . $this->request->getUri()->getPath() . "' not found");
                 throw new RuntimeException("Route '" . $this->request->getUri()->getPath() . "' not found", 404);
             }
         }
@@ -645,6 +636,8 @@ class Router
      */
     public function getUri(?string $name = null, $parameters = null, ?array $getParams = null): Uri
     {
+        $domain = Guardian::getUrl();
+        
         $this->fireEvents(EventHandler::EVENT_GET_URL, [
             'name'       => $name,
             'parameters' => $parameters,
@@ -683,6 +676,9 @@ class Router
         $route = $this->findRoute($name);
 
         if ($route !== null) {
+            /* FOR FUTURE BUGS */
+            //$name = $domain . "/" . $name;
+
             return $this->request
                 ->getUrlCopy()
                 ->setPath($route->findUrl($route->getMethod(), $parameters, $name))
@@ -724,6 +720,13 @@ class Router
             ->getUrlCopy()
             ->setPath($url)
             ->setParams($getParams);
+    }
+
+    public function addExceptionHandler(ExceptionHandlerInterface $handler): self
+    {
+        $this->exceptionHandlers[] = $handler;
+
+        return $this;
     }
 
     /**

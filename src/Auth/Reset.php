@@ -6,6 +6,7 @@ use Katrina\Sql\KatrinaStatement;
 use Katrina\Connection\Connection;
 use Solital\Core\Mail\Mailer;
 use Solital\Core\Auth\Password;
+use Solital\Core\Security\Guardian;
 use Solital\Core\Security\Hash;
 use Solital\Core\Validation\Valid;
 
@@ -24,7 +25,7 @@ abstract class Reset
     /**
      * @var string
      */
-    protected string $link;
+    protected string $link = "";
 
     /**
      * @var string
@@ -39,7 +40,7 @@ abstract class Reset
     /**
      * @var string
      */
-    protected string $subject = "Forgot Password";
+    protected string $subject = "Reset Password";
 
     /**
      * @var string
@@ -54,15 +55,14 @@ abstract class Reset
     /**
      * @var string
      */
-    protected string $mail_sender;
+    protected ?string $mail_sender = null;
 
     /**
      * Construct
      */
     public function __construct(
         private Mailer $mailer = new Mailer()
-    )
-    {
+    ) {
     }
 
     /**
@@ -96,12 +96,12 @@ abstract class Reset
 
             if ($res == true) {
                 return true;
-            } else {
-                return false;
             }
-        } else {
+
             return false;
         }
+
+        return false;
     }
 
     /**
@@ -145,9 +145,10 @@ abstract class Reset
      */
     private function generateDefaultLink(string $uri, string $email, string $time): ?string
     {
-        if (empty($this->link)) {
+        if (empty($this->link) || $this->link == "") {
+            $domain = Guardian::getUrl();
             $hash = Hash::encrypt($email, $time);
-            $this->link = $uri . $hash;
+            $this->link = $domain . $uri . $hash;
 
             return $this->link;
         }
@@ -173,15 +174,10 @@ abstract class Reset
         $this->generateDefaultLink($uri, $email, $time);
 
         if ($this->message_email == '') {
-            $this->message_email = "
-            <h1>" . $this->subject . "</h1>
-
-            <p>Hello " . $this->name_recipient . ", click the link below to change your password</p>
-
-            <p><a href='" . $this->link . "' target='_blank' style='padding: 10px; background-color: red; 
-            border-radius: 5px; color: #fff; text-decoration: none;'>Change Password</a></p>
-            
-            <small>Sent from the solital framework</small>";
+            $template =  __DIR__ . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'template-recovery-password.php';
+            $template = file_get_contents($template);
+            $template = str_replace(['{{ subject }}', '{{ name_recipient }}', '{{ link }}'], [$this->subject, $this->name_recipient, $this->link], $template);
+            $this->message_email = $template;
         }
 
         $res = $this->mailer->add($this->mail_sender, $this->name_sender, $email, $this->name_recipient)
@@ -194,8 +190,8 @@ abstract class Reset
 
         if ($res == true) {
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 }

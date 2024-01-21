@@ -123,10 +123,18 @@ final class Session
 	 * Removes the value for the specified key from the session
 	 *
 	 * @param string $key the key to remove the value for
+	 * 
+	 * @return true
 	 */
-	public static function delete(string $key)
+	public static function delete(string|array $key, mixed $value = null): true
 	{
+		if (!is_null($value)) {
+			unset($_SESSION[$key][$value]);
+			return true;
+		}
+
 		unset($_SESSION[$key]);
+		return true;
 	}
 
 	/**

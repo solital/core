@@ -2,48 +2,40 @@
 
 namespace Solital\Core\Wolf\Functions;
 
-use Psr\Log\LogLevel;
-use Solital\Core\Logger\Handler\LogfileHandler;
-use Solital\Core\Kernel\Application;
+use Solital\Core\Logger\Logger;
+use Solital\Core\Security\Hash;
 use Solital\Core\Wolf\Exception\WolfException;
 use Solital\Core\Wolf\Wolf;
 
 trait ExtendsTrait
 {
+    use AssetsTrait;
+
     /**
      * @param string $view
+     * 
+     * @return mixed
      */
-    protected function generateTemplate(string $view)
+    protected function generateTemplate(string $view): mixed
     {
-        try {
-            if (file_exists($view)) {
-                ob_start();
+        if (file_exists($view)) {
+            ob_start();
+            extract($this->getArgs(), EXTR_SKIP);
 
-                extract($this->getArgs(), EXTR_SKIP);
+            $view_in_temp = $this->generateTempFile($view);
+            include_once $view_in_temp;
 
-                $view_in_temp = $this->generateTempFile($view);
-
-                include_once $view_in_temp;
-
-                if ($this->time != null) {
-                    $result = ob_get_contents();
-                    ob_flush();
-                    file_put_contents($this->file_cache, $result);
-                }
-
-                return ob_get_clean();
-            } else {
-                throw new WolfException("Template " . basename($view) . " not found");
+            if ($this->time != null) {
+                $result = ob_get_contents();
+                ob_flush();
+                file_put_contents($this->file_cache, $result);
             }
-        } catch (WolfException $e) {
-            Application::logFile(
-                'wolf',
-                LogLevel::CRITICAL,
-                'template',
-                "Template '" . basename($view) . "' not found"
-            );
-            Application::exceptionHandler($e);
+
+            return ob_get_clean();
         }
+
+        Logger::channel('single')->error("Template '" . basename($view) . "' not found");
+        throw new WolfException("Template " . basename($view) . " not found");
     }
 
     /**
@@ -66,6 +58,48 @@ trait ExtendsTrait
     }
 
     /**
+     * Replace all internal function on PHP code
+     *
+     * @param string $view
+     * 
+     * @return mixed
+     */
+    private function checkInternalFunctions(string $view): mixed
+    {
+        $view = str_replace("{% production %}", "<?php if (self::production() == true) : ?>", $view);
+        $view = str_replace("{% endproduction %}", "<?php endif; ?>", $view);
+        $view = str_replace("{% development %}", "<?php if (self::production() == false) : ?>", $view);
+        $view = str_replace("{% enddevelopment %}", "<?php endif; ?>", $view);
+        $view = str_replace("generate_link", "self::generate_link", $view);
+        return $view;
+    }
+
+    /**
+     * Execute code in production or development mode
+     *
+     * @return mixed
+     */
+    public function production(): mixed
+    {
+        $config = $this->getConfigYaml();
+        return $config['production_mode'];
+    }
+
+    /**
+     * @param string $email
+     * @param string $time
+     * 
+     * @return string
+     */
+    public function generate_link(string $email, string $uri, string $time): string
+    {
+        $hash = Hash::encrypt($email, $time);
+        $link = $uri . $hash;
+
+        return $link;
+    }
+
+    /**
      * @param string $view
      * 
      * @return string
@@ -73,6 +107,7 @@ trait ExtendsTrait
     private function generateTempFile(string $view): string
     {
         $render = file_get_contents($view);
+        $render = $this->checkInternalFunctions($render);
         $render = str_replace(["{{", "}}"], ["<?=", "?>"], $render);
         $render = str_replace(["{%", "%}"], ["<?php", "?>"], $render);
 

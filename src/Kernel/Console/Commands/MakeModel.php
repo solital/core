@@ -42,6 +42,11 @@ class MakeModel extends Command implements CommandInterface
             $this->removeComponent($model_dir, $arguments->model_name . ".php");
         }
 
+        if (!isset($arguments->model_name)) {
+            $this->error("Error: Model name not found")->print()->break();
+            return false;
+        }
+
         $data = $this->codeGenerated($arguments->model_name);
 
         $res = $this->createComponent($data, [
@@ -51,15 +56,11 @@ class MakeModel extends Command implements CommandInterface
 
         if ($res == true) {
             $this->success("Model successfully created!")->print()->break();
-
             return true;
-        } else {
-            $this->error("Error: Model already exists!")->print()->break();
-
-            return false;
         }
 
-        return $this;
+        $this->error("Error: Model already exists!")->print()->break();
+        return false;
     }
 
     /**

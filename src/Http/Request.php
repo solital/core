@@ -40,7 +40,7 @@ class Request implements RequestInterface
      * 
      * @var Uri
      */
-    protected ?Uri $url = null;
+    protected ?Uri $uri = null;
 
     /**
      * Current request url
@@ -97,8 +97,6 @@ class Request implements RequestInterface
      */
     public function __construct(string $method, $uri, $body = 'php://memory', array $headers = [])
     {
-        #dd($method, $uri, $body, $headers);
-
         $this->headers = $_SERVER;
         $this->initialize($method, $uri, $body, $headers);
 
@@ -141,15 +139,15 @@ class Request implements RequestInterface
     }
 
     /**
-     * @return UriInterface
+     * @return Uri
      */
-    public function getUri(): UriInterface
+    public function getUri(): Uri
     {
-        if ($this->url == null) {
+        if ($this->uri == null) {
             $this->setUrl(new Uri($this->getHeaderValue('request-uri')));
         }
 
-        return $this->url;
+        return $this->uri;
     }
 
     /**
@@ -157,15 +155,15 @@ class Request implements RequestInterface
      */
     public function setUrl(Uri $url): void
     {
-        $this->url = $url;
+        $this->uri = $url;
 
-        //if ($this->url->getHost() === null) {
-            if ($this->url->getScheme() !== null) {
-                $this->url->setHost((string)$this->getHost());
+        if ($this->uri->getHost() === null) {
+            if ($this->uri->getScheme() !== null) {
+                $this->uri->setHost((string)$this->getHost());
             }
 
-            $this->url->setHost((string)$this->getHost());
-        //}
+            $this->uri->setHost((string)$this->getHost());
+        }
     }
 
     /**
@@ -175,7 +173,7 @@ class Request implements RequestInterface
      */
     public function getUrlCopy(): Uri
     {
-        return clone $this->url;
+        return clone $this->uri;
     }
 
     /**

@@ -47,7 +47,7 @@ trait RequestTrait
     /**
      * @var \Psr\Http\Message\UriInterface
      */
-    private $uri;
+    private UriInterface $uri_interface;
 
     /**
      * @param string|null                                       $method
@@ -78,14 +78,14 @@ trait RequestTrait
             return $this->requestTarget;
         }
 
-        $path = $this->uri->getPath();
+        $path = $this->uri_interface->getPath();
 
         if (empty($path)) {
             return '/';
         }
 
-        if ($this->uri->getQuery()) {
-            $path .= '?' . $this->uri->getQuery();
+        if ($this->uri_interface->getQuery()) {
+            $path .= '?' . $this->uri_interface->getQuery();
         }
 
         return $path;
@@ -171,11 +171,11 @@ trait RequestTrait
     private function setUriInstance($uri)
     {
         if ($uri instanceof UriInterface) {
-            $this->uri = $uri;
+            $this->uri_interface = $uri;
         } elseif (is_string($uri)) {
-            $this->uri = new Uri($uri);
+            $this->uri_interface = new Uri($uri);
         } elseif ($uri === null) {
-            $this->uri = new Uri;
+            $this->uri_interface = new Uri;
         } else {
             throw new \InvalidArgumentException("Invalid URI provided. Must be null, a string or a Psr\Http\Message\UriInterface instance");
         }
@@ -186,7 +186,7 @@ trait RequestTrait
      */
     public function getUri(): UriInterface
     {
-        return $this->uri;
+        return $this->uri_interface;
     }
 
     /**

@@ -4,6 +4,7 @@ namespace Solital\Core\Kernel\Console;
 
 use Solital\Core\Console\Interface\ExtendCommandsInterface;
 use Solital\Core\Kernel\Console\Commands\{
+    AppStatus,
     DumpDatabase,
     GenerateConfigFiles,
     HandleCache,
@@ -17,9 +18,11 @@ use Solital\Core\Kernel\Console\Commands\{
     MakeModel,
     MakeQueue,
     MakeRouter,
+    MakeSchedule,
     MakeSeeder,
     Migrations,
     Queues,
+    Scanner,
     Seeders,
     Server,
     Version
@@ -36,6 +39,7 @@ class SolitalCommands implements ExtendCommandsInterface
      * @var array
      */
     protected array $command_class = [
+        AppStatus::class,
         DumpDatabase::class,
         GenerateConfigFiles::class,
         HandleCache::class,
@@ -49,9 +53,11 @@ class SolitalCommands implements ExtendCommandsInterface
         MakeModel::class,
         MakeQueue::class,
         MakeRouter::class,
+        MakeSchedule::class,
         MakeSeeder::class,
         Migrations::class,
         Queues::class,
+        Scanner::class,
         Seeders::class,
         Server::class,
         Version::class

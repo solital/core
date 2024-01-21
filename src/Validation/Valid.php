@@ -27,7 +27,7 @@ class Valid
      * 
      * @return mixed|null
      */
-    public static function number($number)
+    public static function number(mixed $number): mixed
     {
         $res = Validator::number()->validate($number);
 
@@ -43,7 +43,7 @@ class Valid
      * 
      * @return bool
      */
-    public static function isNull($value): bool
+    public static function isNull(mixed $value): bool
     {
         $res = Validator::nullType()->validate($value);
 
@@ -104,7 +104,7 @@ class Valid
      * 
      * @return bool
      */
-    public static function identical($value, $identical_to): bool
+    public static function identical(string $value, string $identical_to): bool
     {
         $res = Validator::identical($value)->validate($identical_to);
 

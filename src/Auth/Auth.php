@@ -4,12 +4,15 @@ namespace Solital\Core\Auth;
 
 use Solital\Core\Auth\Reset;
 use Solital\Core\Course\Course;
+use Solital\Core\Http\Controller\HttpControllerTrait;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Security\{Hash, Guardian};
 use Solital\Core\Resource\{Cookie, Session};
 
 final class Auth extends Reset
 {
+    use HttpControllerTrait;
+
     /**
      * @var string
      */
@@ -61,48 +64,22 @@ final class Auth extends Reset
     protected static string $dashboard_url;
 
     /**
+     * Check if exist an user
+     * 
+     * @param string $user
      * @param string $redirect
-     * @param string $index
      * 
      * @return void
      */
-    public static function isLogged(string $redirect = "", string $index = ""): void
+    public static function check(string $user = '', string $redirect = ''): void
     {
         self::getEnv();
-
-        if ($index == '') {
-            $index = getenv('INDEX_LOGIN');
-        }
-
-        if ($redirect == "") {
-            $redirect = self::$dashboard_url;
-        }
-
-        if (Session::has($index)) {
-            Course::response()->redirect($redirect);
-            exit;
-        }
-    }
-
-    /**
-     * @param string $redirect
-     * @param string $index
-     * 
-     * @return void
-     */
-    public static function isNotLogged(string $redirect = "", string $index = ""): void
-    {
-        self::getEnv();
-
-        if ($index == '') {
-            $index = getenv('INDEX_LOGIN');
-        }
 
         if ($redirect == "") {
             $redirect = self::$login_url;
         }
 
-        if (empty(Session::get($index))) {
+        if (is_null(self::user($user))) {
             Course::response()->redirect($redirect);
             exit;
         }
@@ -194,26 +171,51 @@ final class Auth extends Reset
     }
 
     /**
+     * Remember login in next time
+     * 
+     * @param string $form_name
      * @param int $time
      * 
      * @return Auth
      */
-    public function remember(int $time = 644800): Auth
+    public function remember(string $form_name, int $time = 644800): Auth
     {
-        $this->remember = true;
-        $this->time = $time;
+        $form_value = $this->getRequestParams()->all([$form_name]);
+
+        if (!empty($form_value)) {
+            $value = filter_var($form_value[$form_name], FILTER_VALIDATE_BOOL);
+
+            if ($value == true) {
+                $this->remember = true;
+                $this->time = $time;
+
+                return $this;
+            }
+        }
 
         return $this;
     }
 
     /**
+     * Redirect login if is remembering login
+     * 
      * @param string $redirect
+     * 
+     * @return void
      */
-    public static function isRemembering(string $redirect)
+    public static function isRemembering(string $redirect = ''): void
     {
+        self::getEnv();
+
         if (Cookie::exists('auth_remember_login') == true) {
-            $user = Cookie::get('auth_remember_login');
-            Guardian::validate($redirect, $user);
+            Cookie::get('auth_remember_login');
+
+            if ($redirect == "") {
+                $redirect = self::$dashboard_url;
+            }
+
+            Course::response()->redirect($redirect);
+            exit;
         }
     }
 
@@ -230,11 +232,13 @@ final class Auth extends Reset
     }
 
     /**
+     * Custom mail sender when recovery password
+     * 
      * @param string $mail_sender
      * 
      * @return Auth
      */
-    public function mailSender(string $mail_sender): Auth
+    public function customMailSender(string $mail_sender): Auth
     {
         $this->mail_sender = $mail_sender;
 
@@ -242,43 +246,44 @@ final class Auth extends Reset
     }
 
     /**
+     * Custom email template when recovery password
+     * 
      * @param string $name_sender
      * @param string $name_recipient
      * @param string $subject
-     * @param string $message
+     * @param string $html_message
      * 
      * @return Auth
      */
-    public function fields(string $name_sender, string $name_recipient, string $subject, string $message = ""): Auth
+    public function customMailFields(string $name_sender, string $name_recipient, string $subject, string $html_message = ""): Auth
     {
         $this->name_sender = $name_sender;
         $this->name_recipient = $name_recipient;
         $this->subject = $subject;
-        $this->message_email = $message;
+        $this->message_email = $html_message;
 
         return $this;
     }
 
     /**
+     * Logoff application
+     * 
+     * @param string $user
      * @param string $redirect
-     * @param string $index
      * 
      * @return void
      */
-    public static function logoff(string $redirect = "", string $index = ''): void
+    public static function logoff(string $user = '', string $redirect = ""): void
     {
         self::getEnv();
-
-        if ($index == '') {
-            $index = getenv('INDEX_LOGIN');
-        }
 
         if ($redirect == "") {
             $redirect = self::$login_url;
         }
 
-        Session::delete($index);
-        Cookie::unset("auth_remember_login");
+        self::deleteUser($user);
+        Session::delete('auth_users');
+        Cookie::unset('auth_remember_login');
         Course::response()->redirect($redirect);
         exit;
     }
@@ -317,6 +322,44 @@ final class Auth extends Reset
     }
 
     /**
+     * @param string $username
+     * 
+     * @return mixed
+     */
+    public static function user(string $username = ''): mixed
+    {
+        $users = Session::get('auth_users');
+
+        if ($username != '') {
+            if (!is_null($users)) {
+                return (array_key_exists($username, $users)) ? $users[$username] : null;
+            }
+        }
+
+        return $users;
+    }
+
+    /**
+     * @param string $username
+     * 
+     * @return void
+     */
+    public static function registerUser(string $username): void
+    {
+        Session::set('auth_users', [$username => $username]);
+    }
+
+    /**
+     * @param string $username
+     * 
+     * @return void
+     */
+    public static function deleteUser(string $username): void
+    {
+        Session::delete('auth_users', $username);
+    }
+
+    /**
      * @param string $redirect
      * 
      * @return bool
@@ -329,6 +372,7 @@ final class Auth extends Reset
 
         $user = filter_input(INPUT_POST, $this->user_post);
         $pass = filter_input(INPUT_POST, $this->pass_post);
+        $user_crypt = Hash::encrypt($user);
 
         $res = Guardian::verifyLogin()
             ->table(self::$table_db)
@@ -336,12 +380,13 @@ final class Auth extends Reset
 
         if ($res) {
             if ($this->remember == true) {
-                Cookie::setcookie("auth_remember_login", $this->user_post, time() + $this->time, "/");
+                Cookie::setcookie('auth_remember_login', $user_crypt, time() + $this->time, "/");
             }
 
-            Guardian::validate($redirect, $user);
-        } else {
-            return false;
+            self::registerUser($user);
+            Course::response()->redirect($redirect);
+
+            return true;
         }
 
         return false;
@@ -352,14 +397,18 @@ final class Auth extends Reset
      */
     private function registerForgot(): bool
     {
+        if (is_null($this->mail_sender)) {
+            $this->mail_sender = getenv('MAIL_USER');
+        }
+
         $res = $this->tableForgot(self::$table_db, $this->user_column)
             ->forgotPass($this->user_post, $this->pass_post);
 
         if ($res == true) {
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
@@ -377,9 +426,9 @@ final class Auth extends Reset
 
         if ($res == true) {
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**

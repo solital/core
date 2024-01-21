@@ -4,11 +4,14 @@ use Solital\Core\Wolf\Wolf;
 
 /**
  * @param string $view
- * @param array|null $data
+ * @param array|null $args
  */
-function view(string $view, array $data = null)
+function view(string $view, array $args = null)
 {
-    echo (new Wolf)->loadView($view, $data);
+    $wolf = new Wolf();
+    $wolf->setArgs($args);
+    $wolf->setView($view);
+    echo $wolf->render();
 }
 
 /**
@@ -73,4 +76,15 @@ function load_file(string $asset): string
 function extend(string $view)
 {
     (new Wolf)->extend($view);
+}
+
+/**
+ * @param string $needle
+ * @param bool $value
+ * 
+ * @return string
+ */
+function conditional(string $needle, bool $value): string
+{
+    return ($value == true) ? $needle : "";
 }

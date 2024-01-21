@@ -5,6 +5,7 @@ namespace Solital\Core\Http\Controller;
 use Solital\Core\Resource\Message;
 use Solital\Core\Container\Container;
 use Solital\Core\Logger\Logger;
+use Solital\Core\Security\Hash;
 
 trait BaseControllerTrait
 {
@@ -33,12 +34,18 @@ trait BaseControllerTrait
     }
 
     /**
-     * @param string $channel
+     * Generate link to recovery password
      * 
-     * @return void
+     * @param string $email
+     * @param string $time
+     * 
+     * @return string
      */
-    public function logger(string $channel): void
+    public function generateRecoveryLink(string $email, string $uri, string $time): string
     {
-        $this->logger = new Logger($channel);
+        $hash = Hash::encrypt($email, $time);
+        $link = $uri . $hash;
+
+        return $link;
     }
 }

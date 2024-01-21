@@ -2,8 +2,6 @@
 
 namespace Solital\Core\Resource\Str;
 
-use Solital\Core\Exceptions\StrException;
-
 final class Str
 {
     const DEFAULT_CHUNK_END = "\r\n";

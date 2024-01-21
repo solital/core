@@ -2,12 +2,24 @@
 
 namespace Solital\Core\Wolf\Functions;
 
+use Solital\Core\Kernel\Application;
+
 trait AssetsTrait
 {
     /**
      * @var array
      */
     protected static array $allow_tags = [];
+
+    /**
+     * Return YAML variables
+     *
+     * @return mixed
+     */
+    protected static function getConfigYaml(): mixed
+    {
+        return Application::getYamlVariables(5, 'exceptions.yaml');
+    }
 
     /**
      * @param string $asset

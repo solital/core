@@ -6,7 +6,7 @@ use Solital\Core\Kernel\Application;
 use Solital\Core\Console\MessageTrait;
 use Solital\Core\Queue\Exception\QueueException;
 use Solital\Core\FileSystem\HandleFiles;
-use Nette\PhpGenerator\{ClassType, Method};
+use Nette\PhpGenerator\{ClassType, Method, PhpNamespace};
 
 class Queue
 {
@@ -18,6 +18,11 @@ class Queue
     private string $queue_dir;
 
     /**
+     * @var float
+     */
+    protected float $sleep = 0.1;
+
+    /**
      * Construct
      */
     public function __construct()
@@ -25,7 +30,9 @@ class Queue
         $this->queue_dir = Application::getRootApp('Queue/', Application::DEBUG);
 
         if (!is_dir($this->queue_dir)) {
-            (new HandleFiles)->create($this->queue_dir);
+            $handle = Application::provider('handler-file');
+            $handle->create($this->queue_dir);
+            //(new HandleFiles)->create($this->queue_dir);
         }
     }
 
@@ -46,6 +53,15 @@ class Queue
             ->addMember($dispatch_method)
             ->addComment("@generated class generated using Vinci Console");
 
+        $class->addProperty('sleep', 1)
+            ->setProtected()
+            ->setType('float')
+            ->addComment('For codes that take a considerable amount of time to execute, change the $sleep variable');
+
+        $data = (new PhpNamespace("Solital\Queue"))
+            ->add($class)
+            ->addUse(Queue::class);
+
         $queue_file_name = $this->queue_dir . $queue_name . ".php";
 
         if (file_exists($queue_file_name)) {
@@ -53,7 +69,7 @@ class Queue
         }
 
         try {
-            file_put_contents($this->queue_dir . $queue_name . '.php', "<?php \n\n" . $class);
+            file_put_contents($this->queue_dir . $queue_name . '.php', "<?php \n\n" . $data);
 
             $this->success("Queue created successfully!")->print()->break();
         } catch (QueueException $e) {
@@ -75,12 +91,13 @@ class Queue
         if (isset($options->class)) {
             $this->warning("[" . date('Y-m-d H:i:s') . "] Processing queue: " . $options->class)->print()->break();
 
-            $instance = $this->initiateQueue($this->queue_dir . $options->class . ".php");
+            $instance = $this->initiateQueue($this->queue_dir . $options->class);
             $instance->dispatch();
 
             $this->success("[" . date('Y-m-d H:i:s') . "] Queue executed: " . $options->class)->print()->break();
         } else {
-            $handle = new HandleFiles();
+            //$handle = new HandleFiles();
+            $handle = Application::provider('handler-file');
             $queue = $handle->folder($this->queue_dir)->files();
 
             $loop = new EventLoop();
@@ -90,6 +107,8 @@ class Queue
                     $this->warning("[" . date('Y-m-d H:i:s') . "] Processing queue: " . basename($queue))->print()->break();
 
                     $instance = $this->initiateQueue($queue);
+                    $sleep_time = $instance->getSleep();
+                    $loop->sleep($sleep_time);
                     $instance->dispatch();
 
                     $this->success("[" . date('Y-m-d H:i:s') . "] Queue executed: " . basename($queue))->print()->break();
@@ -105,7 +124,7 @@ class Queue
         $execution_time = ($end_time - $start_time);
 
         echo PHP_EOL;
-        $this->success("Seeds performed on: " . $execution_time . " sec")->print()->break()->exit();
+        $this->success("Queues performed on: " . $execution_time . " sec")->print()->break()->exit();
 
         return $this;
     }
@@ -118,12 +137,21 @@ class Queue
     private function initiateQueue(string $queue): mixed
     {
         if (file_exists($queue)) {
-            require_once $this->queue_dir . basename($queue);
-            $class = str_replace(".php", "", basename($queue));
+            $queue_replace = str_replace(".php", "", basename($queue));
+            $class = 'Solital\Queue\\' . $queue_replace;
 
-            return new $class();
+            $class = new \ReflectionClass($class);
+            return $class->newInstance();
         }
 
         return null;
+    }
+
+    /**
+     * @return float|null
+     */
+    protected function getSleep(): ?float
+    {
+        return $this->sleep;
     }
 }

@@ -1,9 +1,7 @@
 <?php
 
 use Respect\Validation\Validator;
-use Solital\Core\Resource\Session;
-use Solital\Core\Resource\Str\Str;
-use Solital\Core\Resource\Collection\ArrayCollection;
+use Solital\Core\Resource\{Session, Str\Str, Collection\ArrayCollection};
 use Solital\Core\Security\Guardian;
 use Solital\Core\Validation\Convertime;
 
@@ -14,30 +12,8 @@ use Solital\Core\Validation\Convertime;
  */
 function remove_param(): void
 {
-    $http = 'http://';
-
-    if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
-        $http = 'https://';
-    }
-
-    $url = $http . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-
-    $url = parse_url($url);
-
-    if (isset($url['query'])) {
-        if (strpos($_SERVER["HTTP_HOST"], "localhost") !== false) {
-            header('Refresh: 0, url =' . $url['scheme'] . "://" . $_SERVER["HTTP_HOST"] . $url['path']);
-            die;
-        } else {
-            if (isset($url['path'])) {
-                header('Refresh: 0, url =' . $url['scheme'] . "://" . $url['host'] . $url['path']);
-                die;
-            } else {
-                header('Refresh: 0, url =' . $url['scheme'] . "://" . $url['host']);
-                die;
-            }
-        }
-    }
+    $class = new \ReflectionMethod(Solital\Core\Http\Controller\Controller::class, 'removeParamsUrl');
+    $class->invoke(Solital\Core\Http\Controller\Controller::class);
 }
 
 /**

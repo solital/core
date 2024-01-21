@@ -33,20 +33,6 @@ class MakeMigrations extends Command implements CommandInterface
     private mixed $targetVersion = false;
 
     /**
-     * @var Migration
-     */
-    private Migration $migrations;
-
-    /**
-     * Construct
-     */
-    public function __construct()
-    {
-        Application::connectionDatabase();
-        $this->migrations = new Migration();
-    }
-
-    /**
      * @param object $arguments
      * @param object $options
      * 
@@ -54,12 +40,15 @@ class MakeMigrations extends Command implements CommandInterface
      */
     public function handle(object $arguments, object $options): mixed
     {
+        Application::connectionDatabase();
+        $migrations = new Migration();
+
         try {
             if (empty($arguments->migration_name) || !isset($arguments->migration_name)) {
                 $arguments->migration_name = "";
             }
 
-            $this->migrations->createMigration($arguments->migration_name);
+            $migrations->createMigration($arguments->migration_name);
 
             return true;
         } catch (\Exception $e) {

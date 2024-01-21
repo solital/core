@@ -42,6 +42,11 @@ class MakeMiddleware extends Command implements CommandInterface
             $this->removeComponent($middleware_dir, $arguments->middleware_name . ".php");
         }
 
+        if (!isset($arguments->middleware_name)) {
+            $this->error("Error: Middleware name not found")->print()->break();
+            return false;
+        }
+
         $data = $this->codeGenerated($arguments->middleware_name);
 
         $res = $this->createComponent($data, [

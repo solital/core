@@ -28,20 +28,6 @@ class Seeders extends Command implements CommandInterface
     protected string $description = "Run a user-created Seeder";
 
     /**
-     * @var Seeder
-     */
-    private Seeder $seeder;
-
-    /**
-     * Construct
-     */
-    public function __construct()
-    {
-        Application::connectionDatabase();
-        $this->seeder = new Seeder();
-    }
-
-    /**
      * @param object $arguments
      * @param object $options
      * 
@@ -49,8 +35,10 @@ class Seeders extends Command implements CommandInterface
      */
     public function handle(object $arguments, object $options): mixed
     {
-        $this->seeder->executeSeeds($options);
+        Application::connectionDatabase();
+        $seeder = new Seeder();
+        $seeder->executeSeeds($options);
 
-        return true;
+        return $this;
     }
 }

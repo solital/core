@@ -28,20 +28,6 @@ class Migrations extends Command implements CommandInterface
     protected string $description = "Run a migration";
 
     /**
-     * @var Migration
-     */
-    private Migration $migrations;
-
-    /**
-     * Construct
-     */
-    public function __construct()
-    {
-        Application::connectionDatabase();
-        $this->migrations = new Migration();
-    }
-
-    /**
      * @param object $arguments
      * @param object $options
      * 
@@ -49,7 +35,9 @@ class Migrations extends Command implements CommandInterface
      */
     public function handle(object $arguments, object $options): mixed
     {
-        $this->migrations->runMigrationsDB($options);
+        Application::connectionDatabase();
+        $migrations = new Migration();
+        $migrations->runMigrationsDB($options);
 
         return true;
     }

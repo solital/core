@@ -8,19 +8,21 @@ class Diff
     const DELETED    = 1;
     const INSERTED   = 2;
 
-    /* Returns the diff for two strings. The return value is an array, each of
-   * whose values is an array containing two values: a line (or character, if
-   * $compareCharacters is true), and one of the constants DIFF::UNMODIFIED (the
-   * line or character is in both strings), DIFF::DELETED (the line or character
-   * is only in the first string), and DIFF::INSERTED (the line or character is
-   * only in the second string). The parameters are:
-   *
-   * $string1           - the first string
-   * $string2           - the second string
-   * $compareCharacters - true to compare characters, and false to compare
-   *                      lines; this optional parameter defaults to false
-   */
-    public static function compare($string1, $string2, $compareCharacters = false)
+    /** 
+     * Returns the diff for two strings. The return value is an array, each of
+     * whose values is an array containing two values: a line (or character, if
+     * $compareCharacters is true), and one of the constants DIFF::UNMODIFIED (the
+     * line or character is in both strings), DIFF::DELETED (the line or character
+     * is only in the first string), and DIFF::INSERTED (the line or character is
+     * only in the second string). The parameters are:
+     *
+     * @param string $string1           - the first string
+     * @param string $string2           - the second string
+     * @param bool   $compareCharacters - true to compare characters, and false to compare
+     *                                    lines; this optional parameter defaults to false
+     * @return array
+     */
+    public static function compare(string $string1, string $string2, bool $compareCharacters = false): array
     {
 
         // initialise the sequences and comparison start and end positions
@@ -81,14 +83,15 @@ class Diff
         return $diff;
     }
 
-    /* Returns the diff for two files. The parameters are:
-   *
-   * $file1             - the path to the first file
-   * $file2             - the path to the second file
-   * $compareCharacters - true to compare characters, and false to compare
-   *                      lines; this optional parameter defaults to false
-   */
-    public static function compareFiles($file1, $file2, $compareCharacters = false)
+    /** Returns the diff for two files. The parameters are:
+     *
+     * @param string $file1             - the path to the first file
+     * @param string $file2             - the path to the second file
+     * @param bool   $compareCharacters - true to compare characters, and false to compare
+     *                                    lines; this optional parameter defaults to false
+     * @return array
+     */
+    public static function compareFiles(string $file1, string $file2, bool $compareCharacters = false): array
     {
 
         // return the diff of the files
@@ -196,15 +199,16 @@ class Diff
         return $diff;
     }
 
-    /* Returns a diff as a string, where unmodified lines are prefixed by '  ',
-   * deletions are prefixed by '- ', and insertions are prefixed by '+ '. The
-   * parameters are:
-   *
-   * $diff      - the diff array
-   * $separator - the separator between lines; this optional parameter defaults
-   *              to "\n"
-   */
-    public static function toString($diff, $separator = "\n")
+    /** Returns a diff as a string, where unmodified lines are prefixed by '  ',
+     * deletions are prefixed by '- ', and insertions are prefixed by '+ '. The
+     * parameters are:
+     *
+     * @param array  $diff      - the diff array
+     * @param string $separator - the separator between lines; this optional parameter defaults
+     *                            to "\n"
+     * @return string
+     */
+    public static function toString(array $diff, string $separator = "\n"): string
     {
 
         // initialise the string
@@ -234,15 +238,16 @@ class Diff
         return $string;
     }
 
-    /* Returns a diff as an HTML string, where unmodified lines are contained
-   * within 'span' elements, deletions are contained within 'del' elements, and
-   * insertions are contained within 'ins' elements. The parameters are:
-   *
-   * $diff      - the diff array
-   * $separator - the separator between lines; this optional parameter defaults
-   *              to '<br>'
-   */
-    public static function toHTML($diff, $separator = '<br>')
+    /** Returns a diff as an HTML string, where unmodified lines are contained
+     * within 'span' elements, deletions are contained within 'del' elements, and
+     * insertions are contained within 'ins' elements. The parameters are:
+     *
+     * @param array  $diff      - the diff array
+     * @param string $separator - the separator between lines; this optional parameter defaults
+     *              to '<br>'
+     * @return string
+     */
+    public static function toHTML(array $diff, string $separator = '<br>'): string
     {
 
         // initialise the HTML
@@ -277,15 +282,16 @@ class Diff
         return $html;
     }
 
-    /* Returns a diff as an HTML table. The parameters are:
-   *
-   * $diff        - the diff array
-   * $indentation - indentation to add to every line of the generated HTML; this
-   *                optional parameter defaults to ''
-   * $separator   - the separator between lines; this optional parameter
-   *                defaults to '<br>'
-   */
-    public static function toTable($diff, $indentation = '', $separator = '<br>')
+    /** Returns a diff as an HTML table. The parameters are:
+     *
+     * @param array $diff        - the diff array
+     * @param string $indentation - indentation to add to every line of the generated HTML; this
+     *                optional parameter defaults to ''
+     * @param string $separator   - the separator between lines; this optional parameter
+     *                defaults to '<br>'
+     * @return string
+     */
+    public static function toTable(array $diff, string $indentation = '', string $separator = '<br>'): string
     {
 
         // initialise the HTML

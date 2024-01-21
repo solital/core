@@ -49,11 +49,11 @@ trait DefaultCommandsTrait
         foreach ($res as $res) {
             if (isset($res)) {
                 foreach ($res as $class) {
-                    $cmd = (new $class(null))->getCommand();
+                    $reflection = new \ReflectionClass($class);
+                    $instance = $reflection->newInstanceWithoutConstructor();
+                    $cmd = $instance->getCommand();
 
                     if (in_array($cmd, $arguments)) {
-                        $instance = new $class(null);
-
                         $this->warning("Usage:")->print()->break();
                         $this->line($instance->getCommand(), true)->print()->break(true);
 
@@ -79,8 +79,11 @@ trait DefaultCommandsTrait
             }
         };
 
-        //self::log("CommandNotFound", "Command '". $arguments[2] ."' not found");
-        $this->error("Command '". $arguments[2] ."' not found")->print()->break()->exit();
+        if (isset($arguments[2])) {
+            $this->error("Command '" . $arguments[2] . "' not found")->print()->break()->exit();
+        }
+
+        $this->error("You must specify the command name after 'help'")->print()->break()->exit();
     }
 
     /**
@@ -107,7 +110,8 @@ trait DefaultCommandsTrait
         foreach ($all['cmd'] as $key => $cmd_class) {
             if (isset($cmd_class)) {
                 foreach ($cmd_class as $class) {
-                    $command_class = new $class(null);
+                    $reflection = new \ReflectionClass($class);
+                    $command_class = $reflection->newInstanceWithoutConstructor();
 
                     $reflection = new \ReflectionClass($command_class);
                     $class_commands = $reflection->getMethod('getCommand')->invoke($command_class);
@@ -142,13 +146,16 @@ trait DefaultCommandsTrait
      */
     private function about(): void
     {
-        $about = $this->line("Vinci Console ")->getMessage();
+        $about = $this->info("Vinci Console ")->getMessage();
         $version = $this->success(self::getVersion())->getMessage();
         $date = $this->line(" (" . self::getDateVersion() . ")")->getMessage();
+        $about2 = $this->info("PHP Version ")->getMessage();
+        $php_version = $this->success(PHP_VERSION)->getMessage();
+        $about3 = $this->line("By Solital Framework. Access ")->getMessage();
+        $docs = $this->warning(Command::SITE_DOC)->getMessage();
 
-        echo $about . $version . $date . PHP_EOL . PHP_EOL;
-        $this->line("PHP Version (" . PHP_VERSION . ")")->print()->break();
-        $this->line("By Solital Framework. Access ")->print();
-        $this->warning(Command::SITE_DOC)->print()->break();
+        echo $about . $version . $date . PHP_EOL;
+        echo $about2 . $php_version . PHP_EOL . PHP_EOL;
+        echo $about3 . $docs . PHP_EOL;
     }
 }

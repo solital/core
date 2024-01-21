@@ -18,18 +18,38 @@ class Mailer extends QueueMail
     public function __construct()
     {
         if (Application::MAILER_TEST_UNIT == true) {
-            $this->connectUnitTest();
+            $this->mailerConfig('unit');
         } else {
-            $config = Application::getYamlVariables(5, 'bootstrap.yaml');
+            $config = Application::getYamlVariables(5, 'mail.yaml');
 
             if ($config['mail_test']['mail_test_enable'] == true) {
-                $this->connectionTest();
+                $this->mailerConfig('development');
             } else {
-                $this->connection();
+                $this->mailerConfig('production');
             }
         }
+
+        $this->connection();
     }
 
+    /**
+     * @return PHPMailer
+     */
+    public function getConnection(): PHPMailer
+    {
+        return $this->mail;
+    }
+
+    /**
+     * @param string $subject
+     * 
+     * @return Mailer
+     */
+    public function setSubject(string $subject): Mailer
+    {
+        $this->mail->Subject = $subject;
+        return $this;
+    }
 
     /**
      * add
@@ -125,59 +145,59 @@ class Mailer extends QueueMail
      */
     private function connection(): Mailer
     {
-        $config = Application::getYamlVariables(5, 'bootstrap.yaml');
-
-        $this->mail = new PHPMailer($config['mail_exceptions']);
-        $this->mail->SMTPDebug = (int)getenv('MAIL_DEBUG');
+        $this->mail = new PHPMailer($this->php_mailer_config['exceptions']);
         $this->mail->isSMTP();
-        $this->mail->Host       = getenv('MAIL_HOST');
         $this->mail->SMTPAuth   = true;
-        $this->mail->Username   = getenv('MAIL_USER');
-        $this->mail->Password   = getenv('MAIL_PASS');
-        $this->mail->SMTPSecure = getenv('MAIL_SECURITY');
-        $this->mail->Port       = getenv('MAIL_PORT');
+        $this->mail->SMTPDebug  = $this->php_mailer_config['debug'];
+        $this->mail->Host       = $this->php_mailer_config['host'];
+        $this->mail->Username   = $this->php_mailer_config['user'];
+        $this->mail->Password   = $this->php_mailer_config['pass'];
+        $this->mail->SMTPSecure = $this->php_mailer_config['security'];
+        $this->mail->Port       = $this->php_mailer_config['port'];
         $this->mail->setLanguage('br');
 
         return $this;
     }
 
     /**
-     * @return Mailer
+     * @param string $type
+     * 
+     * @return array
      */
-    private function connectionTest(): Mailer
+    private function mailerConfig(string $type): array
     {
-        $config = Application::getYamlVariables(5, 'bootstrap.yaml');
+        $config = Application::getYamlVariables(5, 'mail.yaml');
 
-        $this->mail = new PHPMailer($config['mail_exceptions']);
-        $this->mail->SMTPDebug = (int)$config['mail_test']['mail_debug'];
-        $this->mail->isSMTP();
-        $this->mail->Host       = $config['mail_test']['mail_host'];
-        $this->mail->SMTPAuth   = true;
-        $this->mail->Username   = $config['mail_test']['mail_user'];
-        $this->mail->Password   = $config['mail_test']['mail_pass'];
-        $this->mail->SMTPSecure = $config['mail_test']['mail_security'];
-        $this->mail->Port       = $config['mail_test']['mail_port'];
-        $this->mail->setLanguage('br');
+        if ($type === 'unit') {
+            $this->php_mailer_config['exceptions'] = true;
+            $this->php_mailer_config['debug']      = 0;
+            $this->php_mailer_config['host']       = constant('MAIL_HOST');
+            $this->php_mailer_config['user']       = constant('MAIL_USER');
+            $this->php_mailer_config['pass']       = constant('MAIL_PASS');
+            $this->php_mailer_config['security']   = constant('MAIL_SECURE');
+            $this->php_mailer_config['port']       = constant('MAIL_PORT');
+        }
 
-        return $this;
-    }
+        if ($type === 'development') {
+            $this->php_mailer_config['exceptions'] = $config['mail_exceptions'];
+            $this->php_mailer_config['debug']      = (int)$config['mail_test']['mail_debug'];
+            $this->php_mailer_config['host']       = $config['mail_test']['mail_host'];
+            $this->php_mailer_config['user']       = $config['mail_test']['mail_user'];
+            $this->php_mailer_config['pass']       = $config['mail_test']['mail_pass'];
+            $this->php_mailer_config['security']   = $config['mail_test']['mail_security'];
+            $this->php_mailer_config['port']       = $config['mail_test']['mail_port'];
+        }
 
-    /**
-     * @return Mailer
-     */
-    private function connectUnitTest(): Mailer
-    {
-        $this->mail = new PHPMailer(true);
-        $this->mail->SMTPDebug = 0;
-        $this->mail->isSMTP();
-        $this->mail->Host       = constant('MAIL_HOST');
-        $this->mail->SMTPAuth   = true;
-        $this->mail->Username   = constant('MAIL_USER');
-        $this->mail->Password   = constant('MAIL_PASS');
-        $this->mail->SMTPSecure = constant('MAIL_SECURE');
-        $this->mail->Port       = constant('MAIL_PORT');
-        $this->mail->setLanguage('br');
+        if ($type === 'production') {
+            $this->php_mailer_config['exceptions'] = $config['mail_exceptions'];
+            $this->php_mailer_config['debug']      = (int)getenv('MAIL_DEBUG');
+            $this->php_mailer_config['host']       = getenv('MAIL_HOST');
+            $this->php_mailer_config['user']       = getenv('MAIL_USER');
+            $this->php_mailer_config['pass']       = getenv('MAIL_PASS');
+            $this->php_mailer_config['security']   = getenv('MAIL_SECURITY');
+            $this->php_mailer_config['port']       = getenv('MAIL_PORT');
+        }
 
-        return $this;
+        return $this->php_mailer_config;
     }
 }

@@ -13,19 +13,12 @@ class Convertime
     private \DateTime $datetime;
 
     /**
-     * @param string|null $timezone
+     * @param string $datetime
+     * @param \DateTimeZone|null|null $timezone
      */
-    public function __construct(?string $timezone = null)
+    public function __construct(string $datetime = 'now', \DateTimeZone|null $timezone = null)
     {
-        $default_timezone = Yaml::parseFile(Application::getDirConfigFiles(5) . 'bootstrap.yaml');
-
-        if ($timezone == null || empty($timezone)) {
-            date_default_timezone_set($default_timezone['default_timezone']);
-        } else {
-            date_default_timezone_set($timezone);
-        }
-        
-        $this->datetime = new \DateTime();
+        $this->datetime = new \DateTime($datetime, $timezone);
     }
 
     /**

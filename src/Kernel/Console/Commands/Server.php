@@ -4,6 +4,7 @@ namespace Solital\Core\Kernel\Console\Commands;
 
 use Solital\Core\Console\Command;
 use Solital\Core\Console\Interface\CommandInterface;
+use Solital\Core\Kernel\Application;
 use Solital\Core\Process\{Process, ProcessException};
 
 class Server extends Command implements CommandInterface
@@ -35,6 +36,11 @@ class Server extends Command implements CommandInterface
 	 */
 	public function handle(object $arguments, object $options): mixed
 	{
+		if (Application::DEBUG == true) {
+            $this->error("Debug mode enabled! Server won't working!")->print()->break();
+			return false;
+        }
+
 		if (isset($arguments->host)) {
 			$this->host = $arguments->host;
 		}

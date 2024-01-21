@@ -56,6 +56,8 @@ trait HelpersTrait
     }
 
     /**
+     * Create Auth file with pre-existing template
+     * 
      * @param string $auth_controller_dir
      * @param string $auth_template_dir
      * @param string $file_name
@@ -68,16 +70,23 @@ trait HelpersTrait
         string $file_name
     ): bool {
         $handle_files = new HandleFiles();
-        $res = $handle_files->folder($auth_controller_dir)->fileExists($file_name);
 
-        if ($res != true) {
+        if (!is_dir($auth_controller_dir)) {
             $handle_files->create($auth_controller_dir);
-            $res = $handle_files->getAndPutContents($auth_template_dir, $auth_controller_dir . $file_name);
+            $handle_files->getAndPutContents($auth_template_dir, $auth_controller_dir . $file_name);
 
             return true;
-        } else {
-            return false;
         }
+
+        $file_exists = $handle_files->folder($auth_controller_dir)->fileExists($file_name);
+
+        if ($file_exists == false) {
+            $handle_files->getAndPutContents($auth_template_dir, $auth_controller_dir . $file_name);
+
+            return true;
+        }
+
+        return false;
     }
 
     /**

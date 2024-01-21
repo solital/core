@@ -10,6 +10,7 @@ use Respect\Validation\Validator;
 use Solital\Core\Resource\Session;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Exceptions\InvalidArgumentException;
+use Solital\Core\Kernel\Dotenv;
 
 /** @phpstan-consistent-constructor */
 class Guardian
@@ -75,9 +76,9 @@ class Guardian
 
         if ($this->password->verify($password, $res->$pass_column)) {
             return $res;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
@@ -94,37 +95,20 @@ class Guardian
 
         if ($res) {
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
-     * @param string $redirect
-     * @param string $session
-     * @param string $index
+     * Verify if Solital project is at another domain
      * 
-     * @return void
-     */
-    public static function validate(string $redirect, string $session, string $index = ''): void
-    {
-        if ($index == '') {
-            $index = $_ENV['INDEX_LOGIN'];
-        }
-
-        self::verifyConstants();
-        Session::set($index, $session);
-        Course::response()->redirect($redirect);
-        exit;
-    }
-
-    /**
      * @param string $domain
      * 
-     * @return self
+     * @return void
      * @throws InvalidArgumentException
      */
-    public static function validateDomain(): self
+    public static function validateDomain(): void
     {
         $config = Application::getYamlVariables(5, 'bootstrap.yaml');
 
@@ -132,7 +116,7 @@ class Guardian
             self::checkEnvMail();
             self::$mailer = new Mailer();
 
-            if (Application::DEBUG == false &&  empty(getenv('APP_DOMAIN'))) {
+            if (Application::DEBUG == false &&  Dotenv::isset('APP_DOMAIN') == false) {
                 $file = fopen(dirname(__DIR__, 5) . DIRECTORY_SEPARATOR . ".env", "a+");
 
                 if (!$file) {
@@ -157,17 +141,16 @@ class Guardian
                 $config['verify_domain']['recipient_name']
             );
         }
-
-        return new static;
     }
 
     /**
      * @param string|null $send_to
      * @param string|null $recipient_name
      * 
+     * @return void
      * @throws InvalidArgumentException
      */
-    private static function sendTo(?string $send_to, ?string $recipient_name)
+    private static function sendTo(?string $send_to, ?string $recipient_name): void
     {
         if (!$send_to || !$recipient_name) {
             throw new InvalidArgumentException("Variables not defined in 'bootstrap.yaml' file: verify_domain");
@@ -177,8 +160,11 @@ class Guardian
         $email_validation = Validator::email()->validate($send_to);
 
         if ($email_validation == false) {
-            throw new InvalidArgumentException("Recipient email not valid");
+            throw new InvalidArgumentException("Recipient e-mail not valid");
         }
+
+        $template = file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'template-verify-domain.php');
+        $template = str_replace('{{ link }}', $url, $template);
 
         if ($url != getenv('APP_DOMAIN')) {
             self::$mailer->add(
@@ -186,7 +172,7 @@ class Guardian
                 'Solital Guardian',
                 $send_to,
                 $recipient_name
-            )->send('Solital: Security Alert', '<p><h1>We detected that your project made in Solital is in another domain. The detected domain is:</h1></p>' . $url);
+            )->send('Solital: Security Alert', $template);
         }
     }
 
@@ -225,19 +211,6 @@ class Guardian
     }
 
     /**
-     * Checks for constants
-     * 
-     * @return void
-     * @throws InvalidArgumentException
-     */
-    private static function verifyConstants(): void
-    {
-        if ($_ENV['INDEX_LOGIN'] == "" || empty($_ENV['INDEX_LOGIN'])) {
-            throw new InvalidArgumentException("INDEX_LOGIN not defined", 404);
-        }
-    }
-
-    /**
      * Check if email variable have defined
      * 
      * @return void
@@ -246,12 +219,12 @@ class Guardian
     private static function checkEnvMail(): void
     {
         if (
-            !getenv('MAIL_DEBUG') || getenv('MAIL_DEBUG') == "" ||
-            !getenv('MAIL_HOST') || getenv('MAIL_HOST') == "" ||
-            !getenv('MAIL_USER') || getenv('MAIL_USER') == "" ||
-            !getenv('MAIL_PASS') || getenv('MAIL_PASS') == "" ||
-            !getenv('MAIL_SECURITY') || getenv('MAIL_SECURITY') == "" ||
-            !getenv('MAIL_PORT') || getenv('MAIL_PORT') == ""
+            getenv('MAIL_DEBUG') == "" ||
+            getenv('MAIL_HOST') == "" ||
+            getenv('MAIL_USER') == "" ||
+            getenv('MAIL_PASS') == "" ||
+            getenv('MAIL_SECURITY') == "" ||
+            getenv('MAIL_PORT') == ""
         ) {
             throw new InvalidArgumentException("Email variables have not been defined in the '.env' file");
         }

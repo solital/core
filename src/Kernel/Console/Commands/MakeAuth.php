@@ -3,6 +3,7 @@
 namespace Solital\Core\Kernel\Console\Commands;
 
 use Solital\Core\Auth\AuthDatabase;
+use Solital\Core\FileSystem\HandleFiles;
 use Solital\Core\Console\{Command, Interface\CommandInterface};
 use Solital\Core\Kernel\{Application, Console\HelpersTrait};
 
@@ -28,26 +29,27 @@ class MakeAuth extends Command implements CommandInterface
     /**
      * @var string
      */
-    private string $controller_dir;
+    private string $controller_dir = '';
 
     /**
      * @var string
      */
-    private string $route_dir;
+    private string $middleware_dir = '';
 
     /**
      * @var string
      */
-    private string $view_dir;
+    private string $route_dir = '';
 
     /**
-     * Construct
+     * @var string
      */
-    public function __construct()
-    {
-        Application::connectionDatabase();
-        $this->getAuthFolders();
-    }
+    private string $view_dir = '';
+
+    /**
+     * @var array
+     */
+    private array $components = [];
 
     /**
      * @param object $arguments
@@ -57,133 +59,144 @@ class MakeAuth extends Command implements CommandInterface
      */
     public function handle(object $arguments, object $options): mixed
     {
-        $header_template = Application::getConsoleComponent('header.php');
-        $footer_template = Application::getConsoleComponent('footer.php');
+        Application::connectionDatabase();
+        $this->getAuthFolders();
 
-        $login_template_controller = Application::getConsoleComponent('LoginComponents/LoginController.php');
-        $login_template_route = Application::getConsoleComponent('LoginComponents/login-routers.php');
-        $login_template_dashboard = Application::getConsoleComponent('LoginComponents/auth-dashboard.php');
-        $login_template_form = Application::getConsoleComponent('LoginComponents/auth-form.php');
+        $handle_files = Application::provider('handler-file');
+        //$handle_files = new HandleFiles;
 
-        $forgot_template_controller = Application::getConsoleComponent('ForgotComponents/ForgotController.php');
-        $forgot_template_route = Application::getConsoleComponent('ForgotComponents/forgot-routers.php');
-        $forgot_template_form = Application::getConsoleComponent('ForgotComponents/forgot-form.php');
-        $forgot_template_pass = Application::getConsoleComponent('ForgotComponents/change-pass-form.php');
+        $this->createUserAuth();
 
-        if (isset($options->user)) {
-            $this->createUserAuth();
-
-            return true;
-        }
+        $root_dir = Application::getRootCore('/Kernel/Console/Templates/');
 
         if (isset($options->login)) {
+            $login_components = $handle_files->folder($root_dir . 'LoginComponents')->files();
+
             if (isset($options->remove)) {
                 $this->removeAuthComponent([
+                    $this->middleware_dir . 'AuthMiddleware.php',
                     $this->controller_dir . 'LoginController.php',
-                    $this->route_dir . 'login.php',
+                    $this->route_dir . 'auth-login-routers.php',
                     $this->view_dir . 'auth-dashboard.php',
                     $this->view_dir . 'auth-form.php'
                 ]);
 
                 return true;
-            } else {
-                $this->createUserAuth();
-
-                $this->login(
-                    $login_template_controller,
-                    $login_template_route,
-                    $login_template_dashboard,
-                    $login_template_form,
-                    $header_template,
-                    $footer_template
-                );
-
-                return true;
             }
-        } elseif (isset($options->forgot)) {
+
+            $this->createLoginSkeleton($login_components);
+
+            return true;
+        }
+
+        if (isset($options->forgot)) {
+            $forgot_components = $handle_files->folder($root_dir . 'ForgotComponents')->files();
+
             if (isset($options->remove)) {
                 $this->removeAuthComponent([
                     $this->controller_dir . 'ForgotController.php',
-                    $this->route_dir . 'forgot.php',
+                    $this->route_dir . 'forgot-routers.php',
                     $this->view_dir . 'forgot-form.php',
-                    $this->view_dir . 'change-pass-form.php'
+                    $this->view_dir . 'forgot-change-pass.php'
                 ]);
 
                 return true;
-            } else {
-                $this->createUserAuth();
-
-                $this->forgot(
-                    $forgot_template_controller,
-                    $forgot_template_route,
-                    $forgot_template_form,
-                    $forgot_template_pass,
-                    $header_template,
-                    $footer_template
-                );
             }
+
+            $this->createForgotSkeleton($forgot_components);
+
+            return true;
         }
+
+        $this->error('You must inform options: --login/--forgot/--remove')->print();
 
         return true;
     }
 
     /**
-     * @param string $login_template_controller
-     * @param string $login_template_route
-     * @param string $login_template_dashboard
-     * @param string $login_template_form
-     * @param string $header_template
-     * @param string $footer_template
+     * @param array $components
      * 
-     * @return void
+     * @return MakeAuth
      */
-    public function login(
-        string $login_template_controller,
-        string $login_template_route,
-        string $login_template_dashboard,
-        string $login_template_form,
-        string $header_template,
-        string $footer_template
-    ): void {
-        Application::createAppFolder($this->controller_dir);
-        $this->createAuthComponents($this->controller_dir, $login_template_controller, 'LoginController.php');
-        $this->createAuthComponents($this->route_dir, $login_template_route, 'login.php');
-        $this->createAuthComponents($this->view_dir, $login_template_dashboard, 'auth-dashboard.php');
-        $this->createAuthComponents($this->view_dir, $login_template_form, 'auth-form.php');
-        $this->createAuthComponents($this->view_dir, $header_template, 'header.php');
-        $this->createAuthComponents($this->view_dir, $footer_template, 'footer.php');
+    private function createLoginSkeleton(array $components): MakeAuth
+    {
+        $view_dir = [
+            $components[0], $components[1]
+        ];
 
+        $components = [
+            'route_dir' => $components[2],
+            'middleware_dir' => $components[3],
+            'controller_dir' => $components[4]
+        ];
+
+        $this->generateAuthTemplate($components, $view_dir);
         $this->success("Login components created successfully!")->print()->break();
+
+        return $this;
     }
 
     /**
-     * @param string $forgot_template_controller
-     * @param string $forgot_template_route
-     * @param string $forgot_template_dashboard
-     * @param string $forgot_template_form
-     * @param string $forgot_template_pass
-     * @param string $header_template
-     * @param string $footer_template
+     * @param array $components
      * 
-     * @return void
+     * @return MakeAuth
      */
-    public function forgot(
-        string $forgot_template_controller,
-        string $forgot_template_route,
-        string $forgot_template_form,
-        string $forgot_template_pass,
-        string $header_template,
-        string $footer_template
-    ): void {
-        Application::createAppFolder($this->controller_dir);
-        $this->createAuthComponents($this->controller_dir, $forgot_template_controller, 'ForgotController.php');
-        $this->createAuthComponents($this->route_dir, $forgot_template_route, 'forgot.php');
-        $this->createAuthComponents($this->view_dir, $forgot_template_form, 'forgot-form.php');
-        $this->createAuthComponents($this->view_dir, $forgot_template_pass, 'change-pass-form.php');
+    private function createForgotSkeleton(array $components): MakeAuth
+    {
+        $view_dir = [
+            $components[0], $components[1]
+        ];
+
+        $components = [
+            'route_dir' => $components[2],
+            'controller_dir' => $components[3]
+        ];
+
+        $this->generateAuthTemplate($components, $view_dir);
+        $this->success("Forgot components created successfully!")->print()->break();
+
+        return $this;
+    }
+
+    /**
+     * Generate header and footer components in Auth view
+     * 
+     * @return MakeAuth
+     */
+    private function createHeader(): MakeAuth
+    {
+        $header_template = Application::getConsoleComponent('header.php');
+        $footer_template = Application::getConsoleComponent('footer.php');
+
         $this->createAuthComponents($this->view_dir, $header_template, 'header.php');
         $this->createAuthComponents($this->view_dir, $footer_template, 'footer.php');
 
-        $this->success("Forgot components created successfully!")->print()->break();
+        return $this;
+    }
+
+    /**
+     * Generate Auth components
+     *
+     * @param array $components
+     * @param array $view_dir
+     * 
+     * @return MakeAuth
+     */
+    private function generateAuthTemplate(array $components, array $view_dir): MakeAuth
+    {
+        foreach ($components as $key => $component) {
+            $class = new \ReflectionClass($this);
+            $property = $class->getProperty($key)->getValue($this);
+            $this->createAuthComponents($property, $component, basename($component));
+        }
+
+        foreach ($view_dir as $view) {
+            $this->createAuthComponents($this->view_dir, $view, basename($view));
+        }
+
+        $this->createHeader();
+
+        return $this;
     }
 
     /**
@@ -210,9 +223,10 @@ class MakeAuth extends Command implements CommandInterface
     /**
      * @return void
      */
-    public function getAuthFolders(): void
+    private function getAuthFolders(): void
     {
-        $this->controller_dir = Application::getRootApp('Components/Controller/Auth/', Application::DEBUG, false);
+        $this->controller_dir = Application::getRootApp('Components/Controller/Auth/', Application::DEBUG);
+        $this->middleware_dir = Application::getRootApp('Middleware/', Application::DEBUG);
         $this->route_dir = Application::getRoot('routers/', Application::DEBUG);
         $this->view_dir = Application::getRoot('resources/view/auth/', Application::DEBUG);
     }

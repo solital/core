@@ -1,7 +1,7 @@
 <?php
 
-use Solital\Core\Resource\Session;
 use Solital\Core\Course\Course as Course;
+use Solital\Core\Exceptions\RuntimeException;
 use Solital\Core\Http\{Uri, Request, Response};
 use Solital\Core\Kernel\Application;
 
@@ -41,16 +41,11 @@ function request(): Request
  * @param string|null $index Parameter index name
  * @param string|null $defaultValue Default return value
  * @param array ...$methods Default methods
- * 
- * @return mixed
  */
 function input(string $index = null, string $defaultValue = null, ...$methods)
 {
-    if ($index !== null) {
-        return request()->getInputHandler()->value($index, $defaultValue, ...$methods);
-    }
-
-    return request()->getInputHandler();
+    $class = new \ReflectionMethod(Solital\Core\Http\Controller\Controller::class, 'input');
+    $class->invoke(Solital\Core\Http\Controller\Controller::class, $index, $defaultValue, $methods);
 }
 
 /**
@@ -73,30 +68,11 @@ function to_route(string $url, ?int $code = null): void
  * @param string $key
  * @param int $limit = 5
  * @param int $seconds = 60
- * 
- * @return bool
  */
-function request_limit(string $key, int $limit = 5, int $seconds = 60): bool
+function request_limit(string $key, int $limit = 5, int $seconds = 60)
 {
-    if (Session::has($key) && $_SESSION[$key]['time'] >= time() && $_SESSION[$key]['requests'] < $limit) {
-        Session::set($key, [
-            'time' => time() + $seconds,
-            'requests' => $_SESSION[$key]['requests'] + 1
-        ]);
-
-        return false;
-    }
-
-    if (Session::has($key) && $_SESSION[$key]['time'] >= time() && $_SESSION[$key]['requests'] >= $limit) {
-        return true;
-    }
-
-    Session::set($key, [
-        'time' => time() + $seconds,
-        'requests' => 1
-    ]);
-
-    return false;
+    $class = new \ReflectionMethod(Solital\Core\Http\Controller\Controller::class, 'requestLimit');
+    $class->invoke(Solital\Core\Http\Controller\Controller::class, $key, $limit, $seconds);
 }
 
 /**
@@ -104,17 +80,11 @@ function request_limit(string $key, int $limit = 5, int $seconds = 60): bool
  *
  * @param string $key
  * @param string $value
- * 
- * @return bool
  */
-function request_repeat(string $key, string $value): bool
+function request_repeat(string $key, string $value)
 {
-    if (Session::has($key) && Session::get($key) == $value) {
-        return true;
-    }
-
-    Session::set($key, $value);
-    return false;
+    $class = new \ReflectionMethod(Solital\Core\Http\Controller\Controller::class, 'requestRepeat');
+    $class->invoke(Solital\Core\Http\Controller\Controller::class, $key, $value);
 }
 
 /**
@@ -125,5 +95,10 @@ function request_repeat(string $key, string $value): bool
 function middleware(string $value): string
 {
     $config = Application::getYamlVariables(5, 'middleware.yaml');
-    return $config['middleware'][$value];
+
+    if (array_key_exists($value, $config['middleware']) == true) {
+        return $config['middleware'][$value];
+    }
+
+    throw new RuntimeException("Middleware key '" . $value . "' not exists in middleware.yaml");
 }

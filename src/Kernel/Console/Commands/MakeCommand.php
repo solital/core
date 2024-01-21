@@ -35,10 +35,15 @@ class MakeCommand extends Command implements CommandInterface
      */
     public function handle(object $arguments, object $options): mixed
     {
-        $command_dir = Application::getRootApp('Console/Command/', Application::DEBUG);
+        $command_dir = Application::getRootApp('Console/Command/');
 
         if (isset($options->remove)) {
             $this->removeComponent($command_dir, $arguments->command_name . ".php");
+        }
+
+        if (!isset($arguments->command_name)) {
+            $this->error("Error: Command name not found")->print()->break();
+            return false;
         }
 
         $data = $this->codeGenerated($arguments->command_name);

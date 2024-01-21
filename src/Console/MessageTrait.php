@@ -203,9 +203,9 @@ trait MessageTrait
     {
         if ($this->colorIsSupported() || $this->are256ColorsSupported()) {
             self::$color_reset = Color::RESET;
-            self::$color_success = Color::green();
-            self::$color_info = Color::cyan();
-            self::$color_warning = Color::yellow();
+            self::$color_success = Color::light_green();
+            self::$color_info = Color::light_cyan();
+            self::$color_warning = Color::light_yellow();
             self::$color_error = Color::bg_red();
             self::$color_line = Color::white();
         }

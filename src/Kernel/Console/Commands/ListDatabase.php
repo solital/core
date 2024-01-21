@@ -6,6 +6,7 @@ use Katrina\Sql\KatrinaStatement;
 use Solital\Core\Console\Command;
 use Solital\Core\Console\TableBuilder;
 use Solital\Core\Console\Interface\CommandInterface;
+use Solital\Core\Kernel\Application;
 
 class ListDatabase extends Command implements CommandInterface
 {
@@ -37,6 +38,8 @@ class ListDatabase extends Command implements CommandInterface
      */
     public function handle(object $arguments, object $options): mixed
     {
+        Application::connectionDatabase();
+
         $all_values = [];
 
         if (isset($options->limit)) {
@@ -45,7 +48,11 @@ class ListDatabase extends Command implements CommandInterface
             $this->where = " LIMIT 10";
         }
 
-        $data = KatrinaStatement::executeQuery("SELECT * FROM " . $arguments->name_column . $this->where, true);
+        if (!isset($arguments->name_column)) {
+            $data = KatrinaStatement::executeQuery("SHOW TABLES", true);
+        } else {
+            $data = KatrinaStatement::executeQuery("SELECT * FROM " . $arguments->name_column . $this->where, true);
+        }
 
         foreach ($data as $data) {
             $keys = array_keys((array)$data);
