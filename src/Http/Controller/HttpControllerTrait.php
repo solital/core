@@ -2,9 +2,6 @@
 
 namespace Solital\Core\Http\Controller;
 
-use Solital\Core\Course\Course;
-use Solital\Core\Resource\Session;
-
 trait HttpControllerTrait
 {
     /**
@@ -21,11 +18,8 @@ trait HttpControllerTrait
      */
     public function getRequestParams(string $index = null, string $defaultValue = null, ...$methods): mixed
     {
-        if ($index !== null) {
-            return Course::request()->getInputHandler()->value($index, $defaultValue, ...$methods);
-        }
-
-        return Course::request()->getInputHandler();
+        $reflection = new \ReflectionFunction('input');
+        return $reflection->invoke($index, $defaultValue, $methods);
     }
 
     /**
@@ -36,12 +30,8 @@ trait HttpControllerTrait
      */
     public function redirect(string $url, ?int $code = null): void
     {
-        if ($code !== null) {
-            Course::response()->httpCode($code);
-        }
-
-        Course::response()->redirect($url);
-        exit;
+        $reflection = new \ReflectionFunction('to_route');
+        $reflection->invoke($url, $code);
     }
 
     /**
@@ -53,25 +43,8 @@ trait HttpControllerTrait
      */
     public function requestLimit(string $key, int $limit = 5, int $seconds = 60): bool
     {
-        if (Session::has($key) && $_SESSION[$key]['time'] >= time() && $_SESSION[$key]['requests'] < $limit) {
-            Session::set($key, [
-                'time' => time() + $seconds,
-                'requests' => $_SESSION[$key]['requests'] + 1
-            ]);
-
-            return false;
-        }
-
-        if (Session::has($key) && $_SESSION[$key]['time'] >= time() && $_SESSION[$key]['requests'] >= $limit) {
-            return true;
-        }
-
-        Session::set($key, [
-            'time' => time() + $seconds,
-            'requests' => 1
-        ]);
-
-        return false;
+        $reflection = new \ReflectionFunction('request_limit');
+        return $reflection->invoke($key, $limit, $seconds);
     }
 
     /**
@@ -82,11 +55,7 @@ trait HttpControllerTrait
      */
     public function requestRepeat(string $key, string $value): bool
     {
-        if (Session::has($key) && Session::get($key) == $value) {
-            return true;
-        }
-
-        Session::set($key, $value);
-        return false;
+        $reflection = new \ReflectionFunction('request_repeat');
+        return $reflection->invoke($key, $value);
     }
 }

@@ -21,7 +21,7 @@ use Solital\Core\Container\{
     DefaultServiceContainer
 };
 
-class Application
+abstract class Application
 {
     use KernelTrait;
     use ClassLoaderTrait;
@@ -96,7 +96,7 @@ class Application
     /**
      * @return void
      */
-    private static function getInstance(): void
+    public static function getInstance(): void
     {
         /* LOAD YAML CONFIG */
         $modern_php_exception_config = [];

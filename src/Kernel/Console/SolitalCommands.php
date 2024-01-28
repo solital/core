@@ -3,6 +3,7 @@
 namespace Solital\Core\Kernel\Console;
 
 use Solital\Core\Console\Interface\ExtendCommandsInterface;
+use Solital\Core\Kernel\Application;
 use Solital\Core\Kernel\Console\Commands\{
     AppStatus,
     DumpDatabase,
@@ -34,6 +35,11 @@ class SolitalCommands implements ExtendCommandsInterface
      * @var string
      */
     protected string $type_commands = "Solital Commands";
+
+    public function __construct()
+    {
+        Application::getInstance();
+    }
 
     /**
      * @var array

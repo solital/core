@@ -1,5 +1,24 @@
 # Released Notes
 
+## v4.0.1 - (2024-01-28)
+
+### Changed
+
+- Changed `Application` class to abstract
+- Changed `getInstance` method in `Application` class to public
+- Changed `MiddlewareInterface` and `IpRestrictAccessException` as deprecated
+- Changed `dumper` and `export` as deprecated
+
+### Fixed
+
+- Fixed `BrowserStorage` class
+- Fixed date at Malware Scanner component
+- Fixed `IpRestrictAccess` class not working
+- Fixed Reflection at `http` and `others` helpers
+- Fixed Reflection at `HttpControllerTrait` and `Controller` class
+
+--------------------------------------------------------------------------
+
 ## v4.0.0 - (2024-01-21)
 
 ### Added

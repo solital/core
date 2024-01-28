@@ -2,6 +2,8 @@
 
 namespace Solital\Core\Resource;
 
+use Solital\Core\Resource\Str\Str;
+
 /** @phpstan-consistent-constructor */
 class BrowserStorage
 {
@@ -36,37 +38,64 @@ class BrowserStorage
      */
     public function setItem(string $key, mixed $value): void
     {
+        $cookie = new Cookie($key);
+
         if (is_string($value)) {
+            $cookie->setValue($value);
             $value = "'" . $value . "'";
         }
 
+        if (is_array($value)) {
+            $value = (new JSON)->encode($value);
+            $cookie->setValue($value);
+            $value = "JSON.stringify(" . $value . ")";
+        }
+
+        $cookie->setPath('/');
+        $cookie->save();
+
         if (self::$type === "local") {
             echo "<script>localStorage.setItem('$key', $value);</script>";
-        } elseif (self::$type == "session") {
+        }
+
+        if (self::$type == "session") {
             echo "<script>sessionStorage.setItem('$key', $value);</script>";
         }
     }
 
     /**
      * @param string $key
+     * @param bool   $special_chars
      * 
-     * @return string|null
+     * @return mixed
      */
-    public function getItem(string $key): ?string
+    public function getItem(string $key, bool $special_chars = false): mixed
     {
         if (self::$type == "local") {
-            echo "<script>
-            var value = localStorage.getItem('$key');
-            document.cookie = '$key=' + value + '; expires=Fri, " . date('d M Y') . " 23:59:59 GMT;'</script>";
-        } elseif (self::$type == "session") {
-            echo "<script>
-            var value = sessionStorage.getItem('$key');
-            document.cookie = '$key=' + value + '; expires=Fri, " . date('d M Y') . " 23:59:59 GMT;'</script>";
+            echo "<script>var value = localStorage.getItem('$key');</script>";
         }
 
-        $res = $_COOKIE[$key];
+        if (self::$type == "session") {
+            echo "<script>var value = sessionStorage.getItem('$key');</script>";
+        }
 
-        return htmlspecialchars($res);
+        echo "<script>
+        if (!value) {
+            alert('BrowserStorage: variable \"" . $key . "\" not found');
+        }
+        </script>";
+
+        $value = Cookie::get($key);
+
+        if (str_contains($value, '{')) {
+            $value = (new JSON)->decode($value, true);
+        }
+
+        if ($special_chars == true) {
+            $value = (new Str($value))->specialchars();
+        }
+
+        return $value;
     }
 
     /**
@@ -76,12 +105,15 @@ class BrowserStorage
      */
     public function removeItem(string $key): void
     {
+        $cookie = new Cookie($key);
+        $cookie->delete();
+
         if (self::$type == "local") {
-            echo "<script>localStorage.removeItem('$key');
-            document.cookie = '$key=;expires=Thu, 01 Jan 1970 00:00:00 GMT'</script>";
-        } elseif (self::$type == "session") {
-            echo "<script>sessionStorage.removeItem('$key');
-            document.cookie = '$key=;expires=Thu, 01 Jan 1970 00:00:00 GMT'</script>";
+            echo "<script>localStorage.removeItem('$key');</script>";
+        }
+
+        if (self::$type == "session") {
+            echo "<script>sessionStorage.removeItem('$key');</script>";
         }
     }
 
@@ -90,9 +122,13 @@ class BrowserStorage
      */
     public function clear(): void
     {
+        self::clearCookies();
+
         if (self::$type == "local") {
             echo "<script>localStorage.clear();</script>";
-        } elseif (self::$type == "session") {
+        }
+
+        if (self::$type == "session") {
             echo "<script>sessionStorage.clear();</script>";
         }
     }
@@ -102,7 +138,19 @@ class BrowserStorage
      */
     public static function clearAll(): void
     {
+        self::clearCookies();
         echo "<script>localStorage.clear();</script>";
         echo "<script>sessionStorage.clear();</script>";
+    }
+
+    /**
+     * @return void
+     */
+    private static function clearCookies(): void
+    {
+        $past = time() - 3600;
+        foreach ($_COOKIE as $key => $value) {
+            setcookie($key, $value, $past, '/');
+        }
     }
 }

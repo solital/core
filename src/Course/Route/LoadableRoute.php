@@ -40,6 +40,11 @@ abstract class LoadableRoute extends Route implements LoadableRouteInterface
     public function loadMiddleware(Request $request, Router $router): void
     {
         foreach ($this->getMiddlewares() as $middleware) {
+            /* Without namespace on `middleware.yaml` */
+            if (class_exists('\Solital\Middleware\\' . $middleware)) {
+                $middleware = '\Solital\Middleware\\' . $middleware;
+            }
+            
             $middleware = explode(':', $middleware);
             $class = $router->getClassLoader()->loadClass(array_shift($middleware));
 

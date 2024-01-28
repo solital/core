@@ -4,6 +4,7 @@ use Solital\Core\Course\Course as Course;
 use Solital\Core\Exceptions\RuntimeException;
 use Solital\Core\Http\{Uri, Request, Response};
 use Solital\Core\Kernel\Application;
+use Solital\Core\Resource\Session;
 
 /**
  * @param string|null $name
@@ -44,8 +45,11 @@ function request(): Request
  */
 function input(string $index = null, string $defaultValue = null, ...$methods)
 {
-    $class = new \ReflectionMethod(Solital\Core\Http\Controller\Controller::class, 'input');
-    $class->invoke(Solital\Core\Http\Controller\Controller::class, $index, $defaultValue, $methods);
+    if ($index !== null) {
+        return Course::request()->getInputHandler()->value($index, $defaultValue, ...$methods);
+    }
+
+    return Course::request()->getInputHandler();
 }
 
 /**
@@ -57,10 +61,10 @@ function input(string $index = null, string $defaultValue = null, ...$methods)
 function to_route(string $url, ?int $code = null): void
 {
     if ($code !== null) {
-        response()->httpCode($code);
+        Course::response()->httpCode($code);
     }
 
-    response()->redirect($url);
+    Course::response()->redirect($url);
     exit;
 }
 
@@ -71,8 +75,25 @@ function to_route(string $url, ?int $code = null): void
  */
 function request_limit(string $key, int $limit = 5, int $seconds = 60)
 {
-    $class = new \ReflectionMethod(Solital\Core\Http\Controller\Controller::class, 'requestLimit');
-    $class->invoke(Solital\Core\Http\Controller\Controller::class, $key, $limit, $seconds);
+    if (Session::has($key) && $_SESSION[$key]['time'] >= time() && $_SESSION[$key]['requests'] < $limit) {
+        Session::set($key, [
+            'time' => time() + $seconds,
+            'requests' => $_SESSION[$key]['requests'] + 1
+        ]);
+
+        return false;
+    }
+
+    if (Session::has($key) && $_SESSION[$key]['time'] >= time() && $_SESSION[$key]['requests'] >= $limit) {
+        return true;
+    }
+
+    Session::set($key, [
+        'time' => time() + $seconds,
+        'requests' => 1
+    ]);
+
+    return false;
 }
 
 /**
@@ -83,8 +104,12 @@ function request_limit(string $key, int $limit = 5, int $seconds = 60)
  */
 function request_repeat(string $key, string $value)
 {
-    $class = new \ReflectionMethod(Solital\Core\Http\Controller\Controller::class, 'requestRepeat');
-    $class->invoke(Solital\Core\Http\Controller\Controller::class, $key, $value);
+    if (Session::has($key) && Session::get($key) == $value) {
+        return true;
+    }
+
+    Session::set($key, $value);
+    return false;
 }
 
 /**

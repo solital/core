@@ -17,9 +17,9 @@ class Valid
 
         if ($res == true) {
             return $email;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -33,9 +33,9 @@ class Valid
 
         if ($res == true) {
             return $number;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -49,9 +49,9 @@ class Valid
 
         if ($res == true) {
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
@@ -63,9 +63,9 @@ class Valid
     {
         if (ctype_lower($value)) {
             return $value;
-        } else {
-            return strtolower($value);
         }
+
+        return strtolower($value);
     }
 
     /**
@@ -77,9 +77,9 @@ class Valid
     {
         if (ctype_upper($value)) {
             return $value;
-        } else {
-            return strtoupper($value);
         }
+
+        return strtoupper($value);
     }
 
     /**
@@ -93,9 +93,9 @@ class Valid
 
         if ($res == true) {
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
@@ -110,8 +110,8 @@ class Valid
 
         if ($res == true) {
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 }

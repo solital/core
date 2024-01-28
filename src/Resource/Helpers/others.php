@@ -1,9 +1,10 @@
 <?php
 
 use Respect\Validation\Validator;
-use Solital\Core\Resource\{Session, Str\Str, Collection\ArrayCollection};
+use Solital\Core\Kernel\Application;
 use Solital\Core\Security\Guardian;
 use Solital\Core\Validation\Convertime;
+use Solital\Core\Resource\{Session, Str\Str, Collection\ArrayCollection};
 
 /**
  * Remove all get param
@@ -12,8 +13,30 @@ use Solital\Core\Validation\Convertime;
  */
 function remove_param(): void
 {
-    $class = new \ReflectionMethod(Solital\Core\Http\Controller\Controller::class, 'removeParamsUrl');
-    $class->invoke(Solital\Core\Http\Controller\Controller::class);
+    $config = Application::getYamlVariables(5, 'exceptions.yaml');
+    $http = 'http://';
+
+    if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+        $http = 'https://';
+    }
+
+    $url = $http . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+    $url = parse_url($url);
+
+    if (isset($url['query'])) {
+        if (str_contains($_SERVER["HTTP_HOST"], "localhost") || $config['production_mode'] == false) {
+            $path = $url['scheme'] . "://" . $_SERVER["HTTP_HOST"] . $url['path'];
+        } else {
+            if (isset($url['path'])) {
+                $path = $url['scheme'] . "://" . $url['host'] . $url['path'];
+            }
+
+            $path = $url['scheme'] . "://" . $url['host'];
+        }
+
+        header('Refresh: 0, url =' . $path);
+        die;
+    }
 }
 
 /**
@@ -27,9 +50,9 @@ function is_json($json): bool
 
     if ($res == true) {
         return true;
-    } else {
-        return false;
     }
+
+    return false;
 }
 
 /**

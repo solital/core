@@ -184,7 +184,7 @@ trait PrintTrait
         $this->line((string)date('Y-m-d H:m:s', $start))->print()->break(); */
 
         $this->info('End time: ')->print();
-        $this->line((string)date('Y-m-d H:m:s', $end))->print()->break(true);
+        $this->line((string)date('Y-m-d H:i:s', $end))->print()->break(true);
 
         $this->info('Total execution time: ')->print();
         $this->line(($end - $start))->print()->break();

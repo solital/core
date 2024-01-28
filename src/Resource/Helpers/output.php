@@ -7,6 +7,7 @@ use Symfony\Component\VarDumper\{Cloner\VarCloner, Dumper\CliDumper, Dumper\Abst
 
 /**
  * Show result pre-formatted
+ * 
  * @param mixed $value
  * 
  * @return void
@@ -19,6 +20,8 @@ function pre($value): void
 }
 
 /**
+ * Create an intermediate representation of any PHP variable
+ * 
  * @param mixed $var
  * 
  * @return mixed
@@ -31,6 +34,7 @@ function cloner($var)
 }
 
 /**
+ * @deprecated Use `new VarCloner()` and `new CliDumper()`
  * @param mixed $var
  * @param bool $length
  * 
@@ -57,6 +61,7 @@ function dumper($var, bool $length = false)
 }
 
 /**
+ * @deprecated Use VarExporter::export()
  * @param mixed $value
  * 
  * @return void
@@ -68,6 +73,8 @@ function export($value): void
 }
 
 /**
+ * Encode any value to JSON
+ * 
  * @param mixed $value
  * @param int $constants
  * 
@@ -79,6 +86,8 @@ function encodeJSON($value, int $constants = JSON_UNESCAPED_UNICODE): string
 }
 
 /**
+ * Decode a JSON
+ * 
  * @param mixed $value
  * @param bool $toArray
  * 
@@ -90,6 +99,8 @@ function decodeJSON($value, bool $toArray = false): mixed
 }
 
 /**
+ * Output data in Browser Console
+ * 
  * @param mixed ...$messages
  * 
  * @return void
@@ -107,6 +118,8 @@ function console_log(...$messages): void
 }
 
 /**
+ * Create a message with `Message` class
+ * 
  * @param string $key
  * @param string $msg
  */
