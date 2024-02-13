@@ -3,10 +3,8 @@
 namespace Solital\Core\Wolf;
 
 use Solital\Core\Kernel\Application;
-use Solital\Core\Logger\Logger;
 use Solital\Core\Resource\Collection\ArrayCollection;
 use Solital\Core\Wolf\{WolfCacheTrait, WolfMinifyTrait};
-use Solital\Core\Wolf\Exception\WolfException;
 use Solital\Core\Wolf\Functions\{AssetsTrait, ExtendsTrait};
 
 class Wolf
@@ -108,16 +106,40 @@ class Wolf
      */
     public function setView(string $view): Wolf
     {
-        $view = str_replace(".", DIRECTORY_SEPARATOR, $view);
+        if (str_contains($view, '.php')) {
+            $view = str_replace('.php', '', $view);
+        }
 
-        if (str_contains('.', $view)) {
-            $view = str_replace(".", DIRECTORY_SEPARATOR, $view);
+        if (str_contains($view, '.') || str_contains($view, '/')) {
+            $view = str_replace(['.', '/'], DIRECTORY_SEPARATOR, $view);
         }
 
         $this->view = $this->dir_view . $view . '.php';
-
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    /* public function getTemplate(): ?string
+    {
+        if (!$this->viewExists($this->view)) {
+            Logger::channel('single')->error("Template '" . basename($this->view) . "' not found");
+            throw new WolfException("Template " . basename($this->view) . " not found");
+        }
+
+        $template = $this->convertPhpTags($this->view);
+
+        if (!empty($this->getArgs())) {
+            foreach ($this->getArgs() as $key => $value) {
+                if (str_contains($template, '<?= $' . $key . ' ?>')) {
+                    $template = str_replace('<?= $' . $key . ' ?>', $value, $template);
+                }
+            }
+        }
+
+        return $template;
+    } */
 
     /**
      * @return string
@@ -125,7 +147,7 @@ class Wolf
     public function render(): ?string
     {
         $config = Application::getYamlVariables(5, 'bootstrap.yaml');
-        
+
         if (is_array($config)) {
             $this->setCacheTime($config);
             $this->setMinify($config);
@@ -159,10 +181,12 @@ class Wolf
 
         if (is_array($args)) {
             return array_map(array($this, 'htmlspecialcharsRecursive'), $args);
-        } else if (is_scalar($args)) {
-            return htmlspecialchars($args, ENT_COMPAT | ENT_HTML401, 'UTF-8', false);
-        } else {
-            return $args;
         }
+
+        if (is_scalar($args)) {
+            return htmlspecialchars($args, ENT_COMPAT | ENT_HTML401, 'UTF-8', false);
+        }
+
+        return $args;
     }
 }

@@ -31,6 +31,5 @@
         "psr-4": {
             "Solital\\Core\\Console\\Test\\": "tests/"
         }
-    },
-    "bin": "vinci"
+    }
 }

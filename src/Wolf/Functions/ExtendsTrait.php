@@ -15,33 +15,38 @@ trait ExtendsTrait
      * @param string $view
      * 
      * @return mixed
+     * @throws WolfException
      */
     protected function generateTemplate(string $view): mixed
     {
-        if (file_exists($view)) {
-            ob_start();
-            extract($this->getArgs(), EXTR_SKIP);
-
-            $view_in_temp = $this->generateTempFile($view);
-            include_once $view_in_temp;
-
-            if ($this->time != null) {
-                $result = ob_get_contents();
-                ob_flush();
-                file_put_contents($this->file_cache, $result);
-            }
-
-            return ob_get_clean();
+        if (!$this->viewExists($view)) {
+            Logger::channel('single')->error("Template '" . basename($view) . "' not found");
+            throw new WolfException("Template " . basename($view) . " not found");
         }
 
-        Logger::channel('single')->error("Template '" . basename($view) . "' not found");
-        throw new WolfException("Template " . basename($view) . " not found");
+        ob_start();
+        extract($this->getArgs(), EXTR_SKIP);
+
+        $view_in_temp = $this->generateTempFile($view);
+        include_once $view_in_temp;
+
+        if ($this->time != null) {
+            $result = ob_get_contents();
+            ob_flush();
+            file_put_contents($this->file_cache, $result);
+        }
+
+        clearstatcache(true, $view);
+
+        return ob_get_clean();
     }
 
     /**
      * @param string $view
+     * 
+     * @return void
      */
-    public function extend(string $view)
+    public function extend(string $view): void
     {
         extract(Wolf::getAllArgs(), EXTR_SKIP);
 
@@ -104,22 +109,65 @@ trait ExtendsTrait
      * 
      * @return string
      */
-    private function generateTempFile(string $view): string
+    private function convertPhpTags(string $view): string
     {
         $render = file_get_contents($view);
         $render = $this->checkInternalFunctions($render);
         $render = str_replace(["{{", "}}"], ["<?=", "?>"], $render);
         $render = str_replace(["{%", "%}"], ["<?php", "?>"], $render);
 
+        return $render;
+    }
+
+    /**
+     * @param string $view
+     * 
+     * @return string
+     */
+    private function generateTempFile(string $view): string
+    {
+        $render = $this->convertPhpTags($view);
         $basename_view = basename($view, ".php");
         $view_in_temp = sys_get_temp_dir() . DIRECTORY_SEPARATOR .  $basename_view . ".temp.php";
 
-        if (file_exists($view_in_temp)) {
+        if ($this->viewExists($view_in_temp)) {
             unlink($view_in_temp);
         }
 
         file_put_contents($view_in_temp, $render);
+        clearstatcache(true, $view);
 
         return $view_in_temp;
+    }
+
+    private function viewExists(string $file_path): bool
+    {
+        $file_exists = false;
+
+        //clear cached results
+        clearstatcache(true, $file_path);
+
+        //trim path
+        $file_dir = trim(dirname($file_path));
+
+        //normalize path separator
+        $file_dir = str_replace('/', DIRECTORY_SEPARATOR, $file_dir) . DIRECTORY_SEPARATOR;
+
+        //trim file name
+        $file_name = trim(basename($file_path));
+
+        //rebuild path
+        $file_path = $file_dir . "{$file_name}";
+
+        //If you simply want to check that some file (not directory) exists, 
+        //and concerned about performance, try is_file() instead.
+        //It seems like is_file() is almost 2x faster when a file exists 
+        //and about the same when it doesn't.
+
+        $file_exists = is_file($file_path);
+
+        //$file_exists=file_exists($file_path);
+
+        return $file_exists;
     }
 }

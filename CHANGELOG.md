@@ -1,5 +1,23 @@
 # Released Notes
 
+## v4.0.2 - (2024-02-13)
+
+### Fixed
+
+- Fixed get empty data in DB with `db:list` command
+- Fixed separator ("." or "/") in Wolf template
+- Fixed cache in Wolf template if file exists
+
+### Changed
+
+- Changed `Crypt` class as deprecated
+
+### Removed
+
+- Removed `vinci` file in `composer.json`
+
+--------------------------------------------------------------------------
+
 ## v4.0.1 - (2024-01-28)
 
 ### Changed

@@ -2,6 +2,9 @@
 
 namespace Solital\Core\Security\Encrypt;
 
+/**
+ * @deprecated Use `Hash` class
+ */
 class Crypt
 {
     /**

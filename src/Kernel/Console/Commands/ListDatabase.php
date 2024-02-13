@@ -54,6 +54,10 @@ class ListDatabase extends Command implements CommandInterface
             $data = KatrinaStatement::executeQuery("SELECT * FROM " . $arguments->name_column . $this->where, true);
         }
 
+        if (empty($data)) {
+            $this->success('Table "' . $arguments->name_column . '" is empty')->print()->exit();
+        }
+
         foreach ($data as $data) {
             $keys = array_keys((array)$data);
             $values = array_values((array)$data);
