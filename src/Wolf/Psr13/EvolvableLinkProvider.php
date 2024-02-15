@@ -23,6 +23,7 @@ class EvolvableLinkProvider extends LinkProvider implements EvolvableLinkProvide
      *   A link object that should be included in this collection.
      * @return static
      */
+    #[\Override]
     public function withLink(LinkInterface $link): static
     {
         $that = clone $this;
@@ -42,6 +43,7 @@ class EvolvableLinkProvider extends LinkProvider implements EvolvableLinkProvide
      *   The link to remove.
      * @return static
      */
+    #[\Override]
     public function withoutLink(LinkInterface $link): static
     {
         $that = clone $this;

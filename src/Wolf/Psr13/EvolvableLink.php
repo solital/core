@@ -28,6 +28,7 @@ class EvolvableLink extends Link implements EvolvableLinkInterface
      *
      * @return static
      */
+    #[\Override]
     public function withHref(string|\Stringable $href): static
     {
         if ($href instanceof \Stringable) {
@@ -50,6 +51,7 @@ class EvolvableLink extends Link implements EvolvableLinkInterface
      *   The relationship value to add.
      * @return static
      */
+    #[\Override]
     public function withRel(string $rel): static
     {
         if (array_key_exists($rel, $this->rels)) {
@@ -72,6 +74,7 @@ class EvolvableLink extends Link implements EvolvableLinkInterface
      *   The relationship value to exclude.
      * @return static
      */
+    #[\Override]
     public function withoutRel(string $rel): static
     {
         if (!array_key_exists($rel, $this->rels)) {
@@ -96,6 +99,7 @@ class EvolvableLink extends Link implements EvolvableLinkInterface
      *   The value of the attribute to set.
      * @return static
      */
+    #[\Override]
     public function withAttribute(string $attribute, string|\Stringable|int|float|bool|array $value): static
     {
         $that = clone $this;
@@ -114,6 +118,7 @@ class EvolvableLink extends Link implements EvolvableLinkInterface
      *   The attribute to remove.
      * @return static
      */
+    #[\Override]
     public function withoutAttribute(string $attribute): static
     {
         if (!array_key_exists($attribute, $this->attributes)) {

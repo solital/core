@@ -29,6 +29,7 @@ class CallbackExceptionHandler implements ExceptionHandlerInterface
      * @param Request $request
      * @param \Exception $error
      */
+    #[\Override]
     public function handleError(Request $request, \Exception $error): void
     {
         /* Fire exceptions */

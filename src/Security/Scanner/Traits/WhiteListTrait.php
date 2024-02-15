@@ -114,7 +114,7 @@ trait WhiteListTrait
         }
 
         $content = gzdecode(file_get_contents($file));
-        $this->combined_whitelist = array();
+        $this->combined_whitelist = [];
         $this->combined_whitelist_count = 0;
 
         foreach (explode("\n", $content) as $line) { // faster than strtok, but needs more memory

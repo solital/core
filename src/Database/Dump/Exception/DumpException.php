@@ -10,6 +10,7 @@ class DumpException extends \Exception implements SolutionInterface
     /**
      * @return Solution
      */
+    #[\Override]
     public function getSolution(): Solution
     {
         return Solution::createSolution("Verify '.env' file")

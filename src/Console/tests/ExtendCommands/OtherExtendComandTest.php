@@ -13,11 +13,13 @@ class OtherExtendComandTest implements ExtendCommandsInterface
         \Solital\Core\Console\tests\MyCommandsTest::class
     ];
 
+    #[\Override]
     public function getCommandClass(): array
     {
         return $this->command_class;
     }
 
+    #[\Override]
     public function getTypeCommands(): string
     {
         return "Other Extend Commands Test";

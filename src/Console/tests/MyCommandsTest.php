@@ -11,6 +11,7 @@ class MyCommandsTest extends Command implements CommandInterface
     protected array $arguments = ["argument_test"];
     protected string $description = "Description user command";
 
+    #[\Override]
     public function handle(object $arguments, object $options): mixed
     {
         return $this->getCommand() . " - Command OK";

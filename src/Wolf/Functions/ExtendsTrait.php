@@ -113,7 +113,7 @@ trait ExtendsTrait
     {
         $render = file_get_contents($view);
         $render = $this->checkInternalFunctions($render);
-        $render = str_replace(["{{", "}}"], ["<?=", "?>"], $render);
+        $render = str_replace(["{{", "}}"], ["<?=", "?>"], (string) $render);
         $render = str_replace(["{%", "%}"], ["<?php", "?>"], $render);
 
         return $render;

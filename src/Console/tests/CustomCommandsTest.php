@@ -13,6 +13,7 @@ class CustomCommandsTest extends Command implements CommandInterface
     ];
     protected string $description = "Description command";
 
+    #[\Override]
     public function handle(object $arguments, object $options): mixed
     {
         return $options->option;

@@ -48,7 +48,6 @@ class MakeSchedule extends Command implements CommandInterface
     public function __construct()
     {
         //$this->handle = new HandleFiles;
-        $this->handle = Application::provider('handler-file');
     }
 
     /**
@@ -59,23 +58,22 @@ class MakeSchedule extends Command implements CommandInterface
      */
     public function handle(object $arguments, object $options): mixed
     {
+        $this->handle = Application::provider('handler-file');
         $this->schedule_dir = Application::getRootApp('Schedule/', Application::DEBUG);
         
         if (isset($options->remove)) {
             $this->removeComponent($this->schedule_dir, $arguments->schedule_name . ".php");
         }
 
-        if (!isset($arguments->schedule_name)) {
-            $this->error("Error: Schedule name not found")->print()->break();
-            return false;
-        }
-
         if (isset($arguments->schedule_name)) {
             return $this->createSchedule(ucfirst($arguments->schedule_name));
         }
 
-        if (isset($options->work) || isset($options->run)) {
+        if (!isset($arguments->schedule_name) && isset($options->work) || isset($options->run)) {
             $this->startSchedule($options);
+        } else {
+            $this->error("Error: Schedule name not found")->print()->break();
+            return false;
         }
 
         return $this;

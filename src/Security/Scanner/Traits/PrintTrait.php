@@ -138,7 +138,7 @@ trait PrintTrait
         }
 
         if ($this->outputFormat) {
-            $map = array(
+            $map = [
                 '%S' => $state,
                 '%T' => $ctime,
                 '%M' => $hash,
@@ -146,9 +146,9 @@ trait PrintTrait
                 '%P' => $pattern,
                 '%C' => $comment,
                 '%L' => $lineNumber,
-            );
+            ];
         } else {
-            $map = array(
+            $map = [
                 '%S' => $state_color . '# ' . $state . $this->ANSI_OFF,
                 '%T' => $this->ANSI_BLUE . $ctime . $this->ANSI_OFF,
                 '%M' => $this->ANSI_BLUE . $hash . $this->ANSI_OFF,
@@ -156,7 +156,7 @@ trait PrintTrait
                 '%P' => $state_color . '#' . $pattern . $this->ANSI_OFF,
                 '%C' => $this->ANSI_BLUE . $comment . $this->ANSI_OFF,
                 '%L' => $lineNumber,
-            );
+            ];
         }
 
         if ($this->outputFormat) {
@@ -165,7 +165,7 @@ trait PrintTrait
             $format = trim($default_format);
         }
 
-        $this->found_malwawre[] = str_replace(array_keys($map), array_values($map), $format) . PHP_EOL;
+        $this->found_malwawre[] = str_replace(array_keys($map), array_values($map), (string) $format) . PHP_EOL;
     }
 
     /**

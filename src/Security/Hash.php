@@ -63,7 +63,7 @@ final class Hash
      * 
      * @return new static
      */
-    public static function decrypt(string $key)
+    public static function decrypt(string $key): ?static
     {
         self::checkSecrets();
 

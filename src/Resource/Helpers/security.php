@@ -39,10 +39,10 @@ function pass_hash(string $value, bool $info = false): string
 }
 
 /**
- * @param $value
+ * @param string $value
  * @param string $hash
  */
-function pass_verify($value, string $hash)
+function pass_verify(string $value, string $hash)
 {
     return (new Password())->verify($value, $hash);
 }

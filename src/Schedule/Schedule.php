@@ -60,24 +60,25 @@ class Schedule extends Scheduler
                 throw new ScheduleException("Time '" . $time . "' is not valid in " . $class::class);
             }
 
-            $this->warning("[" . date('Y-m-d H:i:s') . "] Processing job: " . get_class($class))->print()->break();
+            //$this->warning("[" . date('Y-m-d H:i:s') . "] Processing job: " . get_class($class))->print()->break();
+            $this->warning("[" . date('Y-m-d H:i:s') . "] Processing job: " . $class::class)->print()->break();
 
             $this->scheduler->call($method_handle)->{$time}()
                 ->before(function () use ($class) {
                     if (method_exists($class::class, 'before')) {
-                        $this->warning("[" . date('Y-m-d H:i:s') . "] Processing 'before' job: " . get_class($class))->print()->break();
+                        $this->warning("[" . date('Y-m-d H:i:s') . "] Processing 'before' job: " . $class::class)->print()->break();
                         $class->before();
-                        $this->success("[" . date('Y-m-d H:i:s') . "] Job 'before' processed: " . get_class($class))->print()->break();
+                        $this->success("[" . date('Y-m-d H:i:s') . "] Job 'before' processed: " . $class::class)->print()->break();
                     }
                 })->then(function () use ($class) {
                     if (method_exists($class::class, 'after')) {
-                        $this->warning("[" . date('Y-m-d H:i:s') . "] Processing 'after' job: " . get_class($class))->print()->break();
+                        $this->warning("[" . date('Y-m-d H:i:s') . "] Processing 'after' job: " . $class::class)->print()->break();
                         $class->after();
-                        $this->success("[" . date('Y-m-d H:i:s') . "] Job 'after' processed: " . get_class($class))->print()->break();
+                        $this->success("[" . date('Y-m-d H:i:s') . "] Job 'after' processed: " . $class::class)->print()->break();
                     }
-                })->output($this->schedule_log_dir . basename(get_class($class), '.php') . '.log', true);
+                })->output($this->schedule_log_dir . basename((string) $class::class, '.php') . '.log', true);
 
-            $this->success("[" . date('Y-m-d H:i:s') . "] Job processed: " . get_class($class))->print()->break();
+            $this->success("[" . date('Y-m-d H:i:s') . "] Job processed: " . $class::class)->print()->break();
         }
 
         return $this;

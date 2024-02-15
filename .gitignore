@@ -5,3 +5,4 @@ tests/files_test/Database/*
 /nbproject/
 .phpunit.result.cache
 .phpunit.cache
+rector.php

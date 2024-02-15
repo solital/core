@@ -1,6 +1,6 @@
 <?php
 
-namespace Solital\Core\Container\tests;
+namespace Solital\Test\Container;
 
 use PHPUnit\Framework\TestCase;
 use Solital\Core\Container\Container;
@@ -18,7 +18,7 @@ class ContainerTest extends TestCase
 	/**
 	 * Provides an invokable class.
 	 */
-	public function invokableProvider()
+	public static function invokableProvider()
 	{
 		return [
 			[new class

@@ -93,6 +93,7 @@ class Container implements ContainerInterface
 	 * 
 	 * @return mixed      Service instance or parameter value.
 	 */
+	#[\Override]
 	public function get($id)
 	{
 		if (!isset($this->keys[$id])) {
@@ -143,6 +144,7 @@ class Container implements ContainerInterface
 	 * 
 	 * @return boolean     True if found, false otherwise.
 	 */
+	#[\Override]
 	public function has($id): bool
 	{
 		return isset($this->keys[$id]);
@@ -162,7 +164,8 @@ class Container implements ContainerInterface
 	 * 
 	 * @throws ImmutableException
 	 */
-	public function add(string $id, $value)
+	#[\Override]
+	public function add(string $id, mixed $value)
 	{
 		if (isset($this->resolved[$id])) {
 			throw new ImmutableException($id);
@@ -185,6 +188,7 @@ class Container implements ContainerInterface
 	 * 
 	 * @param string $id Entry identifier.
 	 */
+	#[\Override]
 	public function remove(string $id)
 	{
 		if (isset($this->keys[$id])) {
@@ -212,6 +216,7 @@ class Container implements ContainerInterface
 	 * 
 	 * @return mixed           The original invokable.
 	 */
+	#[\Override]
 	public function factory(mixed $callback): mixed
 	{
 		if (!is_callable($callback)) {
@@ -237,6 +242,7 @@ class Container implements ContainerInterface
 	 * 
 	 * @return mixed           The original invokable.
 	 */
+	#[\Override]
 	public function protect(mixed $callback): mixed
 	{
 		if (!is_callable($callback)) {
@@ -267,6 +273,7 @@ class Container implements ContainerInterface
 	 * 
 	 * @return void
 	 */
+	#[\Override]
 	public function extend(string $id, mixed $callback = null)
 	{
 		if ($callback === null) {
@@ -304,9 +311,10 @@ class Container implements ContainerInterface
 			throw new ExpectedInvokableException(sprintf('Invalid extend callback supplied'));
 		}
 
-		$callback = function ($container) use ($callback, $definition, $id) {
+		/* $callback = function ($container) use ($callback, $definition, $id) {
 			return $callback($definition($container), $container);
-		};
+		}; */
+		$callback = fn($container) => $callback($definition($container), $container);
 
 		if (isset($this->factories[$definition])) {
 			$this->factories->detach($definition);
@@ -321,6 +329,7 @@ class Container implements ContainerInterface
 	 * 
 	 * @return array Entry names.
 	 */
+	#[\Override]
 	public function keys(): array
 	{
 		return array_keys($this->keys);
@@ -344,6 +353,7 @@ class Container implements ContainerInterface
 	 * 
 	 * @return ContainerInterface        The container instance.        
 	 */
+	#[\Override]
 	public function register(ServiceProviderInterface $provider): self
 	{
 		$provider->register($this);
@@ -362,7 +372,7 @@ class Container implements ContainerInterface
 	 * 
 	 * @return boolean         True if invokable, false otherwise.
 	 */
-	private function invokable($callback): bool
+	private function invokable(mixed $callback): bool
 	{
 		if (is_callable($callback)) {
 			return true;
@@ -382,7 +392,7 @@ class Container implements ContainerInterface
 	 * 
 	 * @return void
 	 */
-	private function callGlobals($value = null)
+	private function callGlobals(mixed $value = null)
 	{
 		if (!empty($this->globals)) {
 			foreach ($this->globals as $callback) {
@@ -398,6 +408,7 @@ class Container implements ContainerInterface
 	 * 
 	 * @return bool
 	 */
+	#[\Override]
 	public function offsetExists(mixed $offset): bool
 	{
 		return $this->has($offset);
@@ -410,6 +421,7 @@ class Container implements ContainerInterface
 	 * 
 	 * @return mixed
 	 */
+	#[\Override]
 	public function offsetGet(mixed $offset): mixed
 	{
 		return $this->get($offset);
@@ -423,6 +435,7 @@ class Container implements ContainerInterface
 	 * 
 	 * @return void
 	 */
+	#[\Override]
 	public function offsetSet(mixed $offset, mixed $value): void
 	{
 		$this->add($offset, $value);
@@ -435,6 +448,7 @@ class Container implements ContainerInterface
 	 * 
 	 * @return void
 	 */
+	#[\Override]
 	public function offsetUnset(mixed $offset): void
 	{
 		$this->remove($offset);

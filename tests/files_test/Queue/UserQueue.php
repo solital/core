@@ -1,10 +1,16 @@
 <?php 
 
+namespace Solital\Queue;
+
+use Solital\Core\Queue\Queue;
+
 /**
  * @generated class generated using Vinci Console
  */
-class UserQueue extends Solital\Core\Queue\Queue
+class UserQueue extends Queue
 {
+	protected float $sleep = 1;
+	
 	/**
 	 * dispatch
 	 */

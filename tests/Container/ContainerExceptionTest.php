@@ -1,6 +1,6 @@
 <?php
 
-namespace Solital\Core\Container\tests;
+namespace Solital\Test\Container;
 
 use PHPUnit\Framework\TestCase;
 use Solital\Core\Container\Container;

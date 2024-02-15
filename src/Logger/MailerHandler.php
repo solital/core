@@ -37,6 +37,7 @@ class MailerHandler extends MailHandler
      *
      * @return void
      */
+    #[\Override]
     protected function send(string $content, array $records): void
     {
         $mailer = $this->buildMessage($content, $records);
@@ -57,7 +58,7 @@ class MailerHandler extends MailHandler
 
         $mailer = clone $this->mailer;
 
-        if (substr($content, 0, 1) == '<') {
+        if (str_starts_with($content, '<')) {
             $mailer->ContentType = $mailer::CONTENT_TYPE_TEXT_HTML;
             $mailer->isHTML(true);
         }

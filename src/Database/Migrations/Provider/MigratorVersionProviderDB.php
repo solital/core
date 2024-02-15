@@ -28,7 +28,9 @@ class MigratorVersionProviderDB extends Katrina
                     ->varchar("name", 100)->notNull()
                     ->createdUpdateAt()
                     ->closeTable();
-            } elseif (DB_CONFIG['DRIVE'] == "pgsql") {
+            }
+            
+            if (DB_CONFIG['DRIVE'] == "pgsql") {
                 $res = self::createTable("migrations")
                     ->serial('id')->primary()
                     ->varchar("name", 100)->notNull()
@@ -37,15 +39,18 @@ class MigratorVersionProviderDB extends Katrina
 
             if (!isset($res)) {
                 return $this;
-            } else {
-                return $res;
             }
+
+            return $res;
         }
 
         return $this;
     }
 
-    public function getVersion()
+    /**
+     * @return void
+     */
+    public function getVersion(): void
     {
         $this->initDB();
     }

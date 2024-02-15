@@ -39,7 +39,7 @@ class InputOutput
     public function __construct(string $color = '')
     {
         if ($color != '') {
-            switch ($color) {
+            /* switch ($color) {
                 case 'green':
                     $this->color = 'green';
                     break;
@@ -55,7 +55,14 @@ class InputOutput
                 default:
                     throw new CommandException("Color '" . $color . "' not exists");
                     break;
-            }
+            } */
+
+            $this->color = match ($color) {
+                'green' => 'green',
+                'yellow' => 'yellow',
+                'blue' => 'blue',
+                default => throw new CommandException("Color '" . $color . "' not exists")
+            };
         }
     }
 
@@ -82,7 +89,7 @@ class InputOutput
             $read_message = $this->line($read_message)->getMessage();
         }
 
-        $this->message_console = $this->readline_with_unicode_support($read_message);
+        $this->message_console = $this->readlineWithUnicodeSupport($read_message);
         $this->confirm = $confirm;
         $this->refuse = $refuse;
         $this->case_sensitive = $case_sensitive;
@@ -109,7 +116,7 @@ class InputOutput
             $message = $this->line($message)->getMessage();
         }
 
-        $this->message_console = $this->readline_with_unicode_support($message);
+        $this->message_console = $this->readlineWithUnicodeSupport($message);
         return $this;
     }
 
@@ -173,9 +180,9 @@ class InputOutput
      *
      * @param string|null $prompt
      * 
-     * @return mixed
+     * @return string|false
      */
-    private function readline_with_unicode_support(?string $prompt = null): mixed /*: string|false*/
+    private function readlineWithUnicodeSupport(?string $prompt = null): string|false /*: string|false*/
     {
         if ($prompt !== null && $prompt !== '') {
             echo $prompt;
@@ -185,7 +192,11 @@ class InputOutput
 
         // readline() removes the trailing newline, fgets does not,
         // to emulate the real readline(), we also need to remove it
-        if ($line !== false && strlen($line) >= strlen(PHP_EOL) && substr_compare($line, PHP_EOL, -strlen(PHP_EOL), strlen(PHP_EOL), true) === 0) {
+        /* if ($line !== false && strlen($line) >= strlen(PHP_EOL) && substr_compare($line, PHP_EOL, -strlen(PHP_EOL), strlen(PHP_EOL), true) === 0) {
+            $line = substr($line, 0, -strlen(PHP_EOL));
+        } */
+
+        if ($line !== false && strlen($line) >= strlen(PHP_EOL) && str_ends_with($line, PHP_EOL)) {
             $line = substr($line, 0, -strlen(PHP_EOL));
         }
 

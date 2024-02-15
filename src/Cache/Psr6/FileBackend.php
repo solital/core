@@ -8,18 +8,12 @@ use Solital\Core\Kernel\Application;
 class FileBackend implements CacheAdapterInterface
 {
     /**
-     * @var string
-     */
-    //private string $directory;
-
-    /**
      * @param string $directory
      */
     public function __construct(
         private string $directory
     ) {
         $this->directory = Application::getRootApp("Storage/cache/");
-        //$this->directory = $directory;
     }
 
     /**

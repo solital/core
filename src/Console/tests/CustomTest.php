@@ -11,6 +11,7 @@ class CustomTest extends Command implements CommandInterface
     protected array $arguments = ["name"];
     protected string $description = "Description second command";
 
+    #[\Override]
     public function handle(object $arguments, object $options): mixed
     {
         return $arguments->name;

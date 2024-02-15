@@ -77,7 +77,6 @@ class Seeder
      */
     public function executeSeeds(object $options): Seeder
     {
-
         $start_time = microtime(true);
 
         if (isset($options->class)) {
@@ -96,12 +95,12 @@ class Seeder
                 $this->success("No seeds found")->print()->break();
             } else {
                 foreach ($seeder as $seeder) {
-                    $this->warning("Running seeder: " . basename($seeder))->print()->break();
+                    $this->warning("Running seeder: " . basename((string) $seeder))->print()->break();
 
                     $instance = $this->initiateSeeder($seeder);
                     $instance->run();
 
-                    $this->success("Seeder executed: " . basename($seeder))->print()->break();
+                    $this->success("Seeder executed: " . basename((string) $seeder))->print()->break();
                 }
             }
         }

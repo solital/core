@@ -60,8 +60,10 @@ class Wolf
 
     /**
      * @param array $args
+     * 
+     * @return void
      */
-    public static function setAllArgs(array $args)
+    public static function setAllArgs(array $args): void
     {
         self::$allArgs = $args;
     }
@@ -180,7 +182,8 @@ class Wolf
         }
 
         if (is_array($args)) {
-            return array_map(array($this, 'htmlspecialcharsRecursive'), $args);
+            //return array_map(array($this, 'htmlspecialcharsRecursive'), $args);
+            return array_map($this->htmlspecialcharsRecursive(...), $args);
         }
 
         if (is_scalar($args)) {

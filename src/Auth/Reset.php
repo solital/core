@@ -61,7 +61,7 @@ abstract class Reset
      * Construct
      */
     public function __construct(
-        private Mailer $mailer = new Mailer()
+        private readonly Mailer $mailer = new Mailer()
     ) {
     }
 
@@ -130,7 +130,7 @@ abstract class Reset
             $stmt->execute();
 
             return true;
-        } catch (\PDOException $e) {
+        } catch (\PDOException) {
             return false;
         }
 

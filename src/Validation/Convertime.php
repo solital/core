@@ -2,15 +2,12 @@
 
 namespace Solital\Core\Validation;
 
-use Solital\Core\Kernel\Application;
-use Symfony\Component\Yaml\Yaml;
-
 class Convertime
 {
     /**
      * @var DateTime
      */
-    private \DateTime $datetime;
+    private readonly \DateTime $datetime;
 
     /**
      * @param string $datetime
@@ -119,8 +116,8 @@ class Convertime
 
         if (date('N', strtotime($date)) > 5) {
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 }

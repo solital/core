@@ -8,7 +8,7 @@
         "ext-json": "*",
         "ext-pdo": "*",
         "brenno-duarte/modern-php-exception": "3.*",
-        "brenno-duarte/php-secure-password": "2.*",
+        "brenno-duarte/php-secure-password": "3.*",
         "codedungeon/php-cli-colors": "1.*",
         "delight-im/http": "2.*",
         "egulias/email-validator": "4.*",

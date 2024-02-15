@@ -1,6 +1,6 @@
 <?php
 
-namespace Solital\Core\Container\tests;
+namespace Solital\Test\Container;
 
 class MailTest
 {

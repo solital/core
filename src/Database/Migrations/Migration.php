@@ -131,12 +131,12 @@ class Migration
         $dts = date('Ymd_His');
 
         if ($migration_name == null) {
-            $migration_name = "";
+            $migration_name = '_' . 'generate';
         } else {
-            $migration_name = "_" . $migration_name;
+            $migration_name = '_' . $migration_name;
         }
 
-        $migration_explode = explode("_", $migration_name);
+        $migration_explode = explode('_', $migration_name);
 
         $file_name = $dts . $migration_name . '.php';
         $file_name = strtolower($file_name);
@@ -146,8 +146,8 @@ class Migration
 
         $file_name = $this->warning($file_name)->getMessage();
         $file_path = $this->success($file_path)->getMessage();
-        $msg1 = $this->line("Created migration ")->getMessage();
-        $msg2 = $this->line(" at ")->getMessage();
+        $msg1 = $this->line('Created migration ')->getMessage();
+        $msg2 = $this->line(' at ')->getMessage();
 
         echo $msg1 . $file_name . $msg2 . $file_path . PHP_EOL;
     }

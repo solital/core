@@ -3,6 +3,7 @@
 namespace Solital\Core\Auth;
 
 use Solital\Core\Kernel\Application;
+use Solital\Core\Exceptions\NotFoundException;
 use SecurePassword\{SecurePassword, HashAlgorithm};
 
 class Password
@@ -15,7 +16,7 @@ class Password
     /**
      * @var mixed
      */
-    private $algo;
+    private mixed $algo;
 
     /**
      * @var string
@@ -43,6 +44,16 @@ class Password
     private string $threads;
 
     /**
+     * @var int
+     */
+    private int $wait_microseconds = 250000;
+
+    /**
+     * @var string
+     */
+    private string $crypt_type = 'openssl';
+
+    /**
      * Construct
      */
     public function __construct()
@@ -56,8 +67,7 @@ class Password
             'time_cost' => $this->time_cost,
             'threads' => $this->threads
         ]);
-
-        $this->password->setPepper($this->pepper);
+        $this->password->setPepper($this->pepper, $this->crypt_type);
     }
 
     /**
@@ -70,11 +80,9 @@ class Password
     {
         if ($info == true) {
             return $this->password->createHash($password)->getHashInfo();
-        } elseif ($info == false) {
-            return $this->password->createHash($password)->getHash();
         }
 
-        return $this;
+        return $this->password->createHash($password)->getHash();
     }
 
     /**
@@ -85,7 +93,7 @@ class Password
      */
     public function verify(string $password, string $hash): mixed
     {
-        return $this->password->verifyHash($password, $hash);
+        return $this->password->verifyHash($password, $hash, $this->wait_microseconds);
     }
 
     /**
@@ -107,19 +115,26 @@ class Password
         $config = Application::getYamlVariables(5, 'auth.yaml');
         $algo = $config['password']['algorithm'];
 
-        if ($algo == 'default') {
-            $this->algo = HashAlgorithm::DEFAULT;
-        } else if ($algo == 'argon2') {
-            $this->algo = HashAlgorithm::ARGON2I;
-        } elseif ($algo == 'argon2d') {
-            $this->algo = HashAlgorithm::ARGON2ID;
-        }
+        $this->algo = match ($algo) {
+            'default' => HashAlgorithm::DEFAULT,
+            'argon2' => HashAlgorithm::ARGON2I,
+            'argon2d' => HashAlgorithm::ARGON2ID,
+            default => throw new NotFoundException('Password: hash algorithm not found')
+        };
 
         $this->pepper = $config['password']['pepper'];
         $this->cost = $config['password']['cost'];
         $this->memory_cost = $config['password']['memory_cost'];
         $this->time_cost = $config['password']['time_cost'];
         $this->threads = $config['password']['threads'];
+
+        if (isset($config['password']['wait_microseconds'])) {
+            $this->wait_microseconds = $config['password']['wait_microseconds'];
+        }
+
+        if (isset($config['password']['crypt_type'])) {
+            $this->crypt_type = $config['password']['crypt_type'];
+        }
 
         return $this;
     }

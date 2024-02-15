@@ -18,7 +18,7 @@ interface ContainerInterface extends PsrContainerInterface, \ArrayAccess
 	 * @param string $id
 	 * @param mixed $value
 	 */
-	public function add(string $id, $value);
+	public function add(string $id, mixed $value);
 
 	/**
 	 * Remove an entry.

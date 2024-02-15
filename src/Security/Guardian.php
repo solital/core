@@ -21,19 +21,9 @@ class Guardian
     private string $table;
 
     /**
-     * @var Password
-     */
-    private Password $password;
-
-    /**
      * @var Mailer
      */
     private static Mailer $mailer;
-
-    public function __construct()
-    {
-        $this->password = new Password();
-    }
 
     /**
      * Verify login
@@ -74,7 +64,7 @@ class Guardian
             return false;
         }
 
-        if ($this->password->verify($password, $res->$pass_column)) {
+        if ((new Password())->verify($password, $res->$pass_column)) {
             return $res;
         }
 

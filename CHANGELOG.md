@@ -1,5 +1,19 @@
 # Released Notes
 
+## v4.0.3 - (2024-02-15)
+
+### Fixed
+
+- Fixed `Password` class and tests
+
+### Changed
+
+- Changed `SecurePassword` to version 3
+- Changed `secure.php` helper
+- Changed project with `Rector`
+
+--------------------------------------------------------------------------
+
 ## v4.0.2 - (2024-02-13)
 
 ### Fixed

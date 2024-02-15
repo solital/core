@@ -26,7 +26,7 @@ trait DefaultCommandsTrait
     public function verifyDefaultCommand(string $command, array $arguments = [], object $options = null): void
     {
         foreach ($this->default_commands as $method => $class) {
-            if (strcmp($command, $method) === 0) {
+            if (strcmp($command, (string) $method) === 0) {
                 if (method_exists(__TRAIT__, $command)) {
                     $this->$method($command, $arguments, $options);
                     exit;

@@ -90,7 +90,7 @@ trait PatternTrait
      */
     protected function pathMatches(string $path, string $pattern, bool $ignoreCase = false): bool
     {
-        $expr = preg_replace_callback(
+        /* $expr = preg_replace_callback(
             '/[\\\\^$.[\\]|()?*+{}\\-\\/]/',
             function ($matches) {
                 switch ($matches[0]) {
@@ -101,6 +101,16 @@ trait PatternTrait
                     default:
                         return '\\' . $matches[0];
                 }
+            },
+            $pattern
+        ); */
+
+        $expr = preg_replace_callback(
+            '/[\\\\^$.[\\]|()?*+{}\\-\\/]/',
+            fn ($matches) => match ($matches[0]) {
+                '*' => '.*',
+                '?' => '.',
+                default => '\\' . $matches[0]
             },
             $pattern
         );

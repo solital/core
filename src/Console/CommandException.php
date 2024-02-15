@@ -17,8 +17,10 @@ class CommandException extends \Exception
     /**
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
-        return __CLASS__ . ": {$this->message}\n";
+        //return __CLASS__ . ": {$this->message}\n";
+        return self::class . ": {$this->message}\n";
     }
 }

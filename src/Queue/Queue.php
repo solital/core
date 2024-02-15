@@ -104,14 +104,14 @@ class Queue
 
             foreach ($queue as $queue) {
                 $loop->defer(function () use ($loop, $queue) {
-                    $this->warning("[" . date('Y-m-d H:i:s') . "] Processing queue: " . basename($queue))->print()->break();
+                    $this->warning("[" . date('Y-m-d H:i:s') . "] Processing queue: " . basename((string)$queue))->print()->break();
 
                     $instance = $this->initiateQueue($queue);
                     $sleep_time = $instance->getSleep();
                     $loop->sleep($sleep_time);
                     $instance->dispatch();
 
-                    $this->success("[" . date('Y-m-d H:i:s') . "] Queue executed: " . basename($queue))->print()->break();
+                    $this->success("[" . date('Y-m-d H:i:s') . "] Queue executed: " . basename((string)$queue))->print()->break();
 
                     $loop->next();
                 });

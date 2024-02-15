@@ -125,7 +125,7 @@ class Mailer extends QueueMail
             $this->mail->send();
 
             return true;
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return false;
         }
     }

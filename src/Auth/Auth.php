@@ -332,7 +332,8 @@ final class Auth extends Reset
 
         if ($username != '') {
             if (!is_null($users)) {
-                return (array_key_exists($username, $users)) ? $users[$username] : null;
+                //return (array_key_exists($username, $users)) ? $users[$username] : null;
+                return $users[$username] ?? null;
             }
         }
 

@@ -57,7 +57,7 @@ class Dump
     private function getDatabaseDrive(): Dump
     {
         if (defined("DB_CONFIG")) {
-            switch (DB_CONFIG['DRIVE']) {
+            /* switch (DB_CONFIG['DRIVE']) {
                 case 'mysql':
                     $this->dump = MySql::create();
                     break;
@@ -73,7 +73,14 @@ class Dump
                 default:
                     throw new DumpException("Database drive not valid");
                     break;
-            }
+            } */
+
+            $this->dump = match (DB_CONFIG['DRIVE']) {
+                'mysql' => MySql::create(),
+                'pgsql' => PostgreSql::create(),
+                'sqlite' => Sqlite::create(),
+                default => throw new DumpException("Database drive not valid")
+            };
 
             return $this;
         }

@@ -50,6 +50,7 @@ class Link implements LinkInterface
      *
      * @return string
      */
+    #[\Override]
     public function getHref(): string
     {
         return $this->href;
@@ -61,6 +62,7 @@ class Link implements LinkInterface
      * @return bool
      *   True if this link object is templated, False otherwise.
      */
+    #[\Override]
     public function isTemplated(): bool
     {
         return str_contains($this->href, '{') && str_contains($this->href, '}');
@@ -74,6 +76,7 @@ class Link implements LinkInterface
      *
      * @return string[]
      */
+    #[\Override]
     public function getRels(): array
     {
         return array_values($this->rels);
@@ -87,6 +90,7 @@ class Link implements LinkInterface
      *  is either a PHP primitive or an array of PHP strings. If no values are
      *  found an empty array MUST be returned.
      */
+    #[\Override]
     public function getAttributes(): array
     {
         return $this->attributes;

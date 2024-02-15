@@ -32,6 +32,7 @@ class LinkProvider implements LinkProviderInterface
      *
      * @return iterable<LinkInterface>
      */
+    #[\Override]
     public function getLinks(): iterable
     {
         return array_values($this->links);
@@ -48,6 +49,7 @@ class LinkProvider implements LinkProviderInterface
      *
      * @return iterable<LinkInterface>
      */
+    #[\Override]
     public function getLinksByRel(string $rel): iterable
     {
         foreach ($this->links as $link) {

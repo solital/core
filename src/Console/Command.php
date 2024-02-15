@@ -11,9 +11,9 @@ class Command
     use DefaultCommandsTrait;
     use MessageTrait;
 
-    const VERSION = "4.0.0";
-    const DATE_VERSION = "Jan 21 2024";
-    const SITE_DOC = "https://solital.github.io/site/docs/4.x/vinci-console/";
+    public const VERSION = "4.0.0";
+    public const DATE_VERSION = "Jan 21 2024";
+    public const SITE_DOC = "https://solital.github.io/site/docs/4.x/vinci-console/";
 
     /**
      * @var string
@@ -127,7 +127,8 @@ class Command
                         $args = $instance->getAllArguments();
                         $cmd = $instance->getCommand();
 
-                        $this->repeatedCommands($cmd, get_class($instance));
+                        //$this->repeatedCommands($cmd, get_class($instance));
+                        $this->repeatedCommands($cmd, $instance::class);
 
                         if ($cmd == $this->command) {
                             $this->instance = $instance;
@@ -253,9 +254,9 @@ class Command
     private function filterOptions(array $args): ?array
     {
         foreach ($args as $options) {
-            if (str_starts_with($options, "--")) {
+            if (str_starts_with((string) $options, "--")) {
                 $this->raw_options[] = $options;
-                $options_replace = str_replace("--", "", $options);
+                $options_replace = str_replace("--", "", (string) $options);
                 $options_replace = explode("=", $options_replace);
                 $this->options[$options_replace[0]] = ($options_replace[1] ?? true);
             }

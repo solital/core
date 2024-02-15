@@ -11,5 +11,4 @@ interface ExceptionHandlerInterface
      * @param \Exception $error
      */
     public function handleError(Request $request, \Exception $error): void;
-
 }

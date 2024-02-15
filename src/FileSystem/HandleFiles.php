@@ -151,9 +151,9 @@ class HandleFiles
      * @param string $file_name
      * @param string $dir_name
      * 
-     * @return mixed
+     * @return int|false
      */
-    public function getAndPutContents(string $file_name, string $dir_name)
+    public function getAndPutContents(string $file_name, string $dir_name): int|false
     {
         $file = file_get_contents($file_name);
         $res = file_put_contents($dir_name, $file);

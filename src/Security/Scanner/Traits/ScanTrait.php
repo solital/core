@@ -270,8 +270,8 @@ trait ScanTrait
                     $lineNumber = 0;
 
                     if ($this->flagLineNumber) {
-                        if ($pos = strrpos(substr($fileContent, 0, $position), "\n")) {
-                            $lineNumber = substr_count(substr($fileContent, 0, $pos + 1), "\n") + 1;
+                        if ($pos = strrpos(substr((string) $fileContent, 0, $position), "\n")) {
+                            $lineNumber = substr_count(substr((string) $fileContent, 0, $pos + 1), "\n") + 1;
                         }
                     }
 
@@ -304,7 +304,7 @@ trait ScanTrait
             $mid = (int)floor(($high + $low) / 2);
             // Compare the middle of the range with the needle. This should return <0 if it's in the first part of the range,
             // or >0 if it's in the second part of the range. It will return 0 if there is a match.
-            $cmp = strcmp($needle, $haystack[$mid]);
+            $cmp = strcmp($needle, (string) $haystack[$mid]);
             // Adjust the range based on the above logic, so the next loop iteration will use the narrowed range
             if ($cmp < 0) {
                 $high = $mid - 1;
