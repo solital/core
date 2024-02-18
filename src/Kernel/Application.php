@@ -57,8 +57,41 @@ abstract class Application
     private static mixed $container;
 
     /**
+     * Returns variables by YAML file
+     *
+     * @param string $yaml_file       YAML file name
+     * @param bool   $return_dir_name If TRUE, get directory of the YAML files
+     * 
+     * @return mixed
+     * @throws ApplicationException
+     */
+    public static function yamlParse(string $yaml_file, bool $return_dir_name = false): mixed
+    {
+        if (!defined('SITE_ROOT')) {
+            throw new ApplicationException("SITE_ROOT constant not defined");
+        }
+
+        if (self::DEBUG == true) {
+            $yaml_dir_file = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Kernel' . DIRECTORY_SEPARATOR . 'Console' . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR . $yaml_file;
+        } else {
+            $yaml_dir_file = constant('SITE_ROOT') . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR;
+        }
+
+        if (!file_exists($yaml_dir_file)) {
+            throw new ApplicationException('YAML file "' . $yaml_file . '" not found');
+        }
+
+        if ($return_dir_name == true) {
+            return $yaml_dir_file;
+        }
+
+        return Yaml::parseFile($yaml_dir_file);
+    }
+
+    /**
      * Get directory of the YAML files
      * 
+     * @deprecated Use Application::yamlParse()
      * @param int $dir_number
      * 
      * @return string
@@ -77,6 +110,7 @@ abstract class Application
     /**
      * Returns variables by YAML file
      * 
+     * @deprecated Use Application::yamlParse()
      * @param int $dir_number
      * @param string $yaml_file
      * 
@@ -98,10 +132,11 @@ abstract class Application
      */
     public static function getInstance(): void
     {
-        /* LOAD YAML CONFIG */
         $modern_php_exception_config = [];
-        $exception_config = self::getDirConfigFiles(5) . 'exceptions.yaml';
-        $bootstrap_config = self::getYamlVariables(5, 'bootstrap.yaml');
+
+        /* LOAD YAML CONFIG */
+        $exception_config = self::yamlParse('exceptions.yaml', true);
+        $bootstrap_config = self::yamlParse('bootstrap.yaml');
 
         /* LOAD SERVICE PROVIDER */
         self::$container = new Container();
@@ -124,7 +159,6 @@ abstract class Application
 
         /* LOAD PROVIDER HANDLE FILES */
         self::$handle = self::provider('handler-file');
-        //self::$handle = new HandleFiles();
     }
 
     /**
@@ -162,7 +196,7 @@ abstract class Application
     public static function connectionDatabase(): void
     {
         $db_config = self::$db;
-        $database_connection = self::getYamlVariables(5, 'database.yaml');
+        $database_connection = self::yamlParse('database.yaml');
 
         if ($database_connection != false) {
             $db_config = self::setDatabaseConnection($database_connection);
@@ -303,7 +337,7 @@ abstract class Application
      */
     public static function loadCsrfVerifier(): void
     {
-        $custom_csrf = self::getYamlVariables(5, 'bootstrap.yaml');
+        $custom_csrf = self::yamlParse('bootstrap.yaml');
 
         $class = 'Solital\Core\Http\Middleware\\' . $custom_csrf['custom_csrf'];
 

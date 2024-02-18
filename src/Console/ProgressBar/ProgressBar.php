@@ -72,11 +72,9 @@ class ProgressBar
     private function constructProgressbar(): string
     {
         //Get predefined variables
-        //list($length, $progress) = [$this->style->getLength(), $this->calculateProgress()];
         [$length, $progress] = [$this->style->getLength(), $this->calculateProgress()];
 
         //Calculate variables
-        //list($wholewidth, $remainderwidth) = [floor($progress * $length), floatval("0." . explode(".", number_format($progress * $length, 2))[1])];
         [$wholewidth, $remainderwidth] = [floor($progress * $length), floatval("0." . explode(".", number_format($progress * $length, 2))[1])];
 
         //Get the desired char depending on the current progress.
@@ -111,8 +109,6 @@ class ProgressBar
     {
         $time_elapsed = time() - $this->starttime;
         $eta = intdiv($time_elapsed, $this->value) * $this->initialmax;
-        /* list($hours_eta, $mins_eta, $secs_eta) = [intdiv($eta, 3600), intdiv($eta, 60) % 60, $eta % 60];
-        list($hours, $mins, $secs) = [intdiv($time_elapsed, 3600), intdiv($time_elapsed, 60) % 60, $time_elapsed % 60]; */
 
         [$hours_eta, $mins_eta, $secs_eta] = [intdiv($eta, 3600), intdiv($eta, 60) % 60, $eta % 60];
         [$hours, $mins, $secs] = [intdiv($time_elapsed, 3600), intdiv($time_elapsed, 60) % 60, $time_elapsed % 60];
@@ -148,7 +144,6 @@ class ProgressBar
      */
     public function stepBy(float $step, bool $autoupdate = true): void
     {
-        //var_dump();exit;
         if ($step > 0) {
             if ($step <= abs($this->initialmax - $this->value)) {
                 $this->value += $step;

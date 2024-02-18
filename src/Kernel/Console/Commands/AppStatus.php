@@ -3,12 +3,8 @@
 namespace Solital\Core\Kernel\Console\Commands;
 
 use Solital\Core\Console\{Interface\CommandInterface, Command};
-use Solital\Core\Console\Interface\ExtendCommandsInterface;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Kernel\Console\HelpersTrait;
-use Solital\Core\Mail\Mailer;
-use Solital\Core\FileSystem\HandleFiles;
-use Nette\PhpGenerator\{ClassType, Method, PhpNamespace, Property};
 
 class AppStatus extends Command implements CommandInterface
 {

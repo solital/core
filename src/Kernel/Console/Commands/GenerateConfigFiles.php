@@ -2,14 +2,13 @@
 
 namespace Solital\Core\Kernel\Console\Commands;
 
+use Solital\Core\Mail\Mailer;
+use Solital\Core\Queue\Queue;
 use Solital\Core\Console\Command;
 use Solital\Core\Console\Interface\{ExtendCommandsInterface, CommandInterface};
 use Solital\Core\Kernel\{Application, Console\HelpersTrait};
-use Solital\Core\Mail\Mailer;
-use Solital\Core\FileSystem\HandleFiles;
 use Nette\PhpGenerator\{ClassType, Method, PhpNamespace, Property};
 use Solital\Core\Container\Interface\{ContainerInterface, ServiceProviderInterface};
-use Solital\Core\Queue\Queue;
 
 class GenerateConfigFiles extends Command implements CommandInterface
 {
@@ -200,7 +199,6 @@ class GenerateConfigFiles extends Command implements CommandInterface
     private function copyFiles(string $config_core_dir, string $template_dir): void
     {
         $handle_files = Application::provider('handler-file');
-        //$handle_files = new HandleFiles();
         $files = $handle_files->folder($config_core_dir)->files();
         $handle_files->create($template_dir);
 

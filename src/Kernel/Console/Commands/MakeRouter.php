@@ -4,7 +4,6 @@ namespace Solital\Core\Kernel\Console\Commands;
 
 use Solital\Core\Console\Command;
 use Solital\Core\Console\Interface\CommandInterface;
-use Solital\Core\FileSystem\HandleFiles;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Kernel\Console\HelpersTrait;
 
@@ -65,9 +64,12 @@ class MakeRouter extends Command implements CommandInterface
      * @param  mixed $replace
      * @return bool
      */
-    public function generateComponent(string $component_template, string $component_dir, string $argument_name, ?array $replace = null): bool
-    {
-        //$folder = new HandleFiles();
+    public function generateComponent(
+        string $component_template,
+        string $component_dir,
+        string $argument_name,
+        ?array $replace = null
+    ): bool {
         $folder = Application::provider('handler-file');
 
         $output_template = file_get_contents($component_template);
@@ -87,6 +89,10 @@ class MakeRouter extends Command implements CommandInterface
         $file_exists = $component_dir . $argument_name . ".php";
 
         if (!file_exists($file_exists)) {
+            if (!is_dir($component_dir)) {
+                $folder->create($component_dir);
+            }
+
             file_put_contents($component_dir . $argument_name . ".php", $output_template);
             $this->success("Router successfully created!")->print()->break();
             return true;

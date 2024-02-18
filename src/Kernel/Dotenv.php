@@ -12,15 +12,20 @@ abstract class Dotenv
     private static array $env = [];
 
     /**
+     * @var string
+     */
+    private static string $env_path;
+
+    /**
      * @param string $path_to_env
      * 
      * @return void
      */
     public static function env(string $path_to_env): void
     {
-        $path = $path_to_env . DIRECTORY_SEPARATOR . ".env";
-        $file = file_get_contents($path);
-        $lines = file($path);
+        self::$env_path = $path_to_env . DIRECTORY_SEPARATOR . ".env";
+        $file = file_get_contents(self::$env_path);
+        $lines = file(self::$env_path);
         $env_to_array = [];
         $array_multi = [];
 
@@ -73,6 +78,47 @@ abstract class Dotenv
         $fields = strtoupper($fields);
 
         if (isset($_ENV[$fields]) && isset($_SERVER[$fields]) && getenv($fields) == true) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Add a variable at .env file
+     * 
+     * @param string $key
+     * @param string $value
+     * @param string $comment
+     * 
+     * @return bool
+     * @throws DotenvException
+     */
+    public static function add(string $key, string $value, string $comment = ''): bool
+    {
+        $key = strtoupper($key);
+        $file = fopen(self::$env_path, "a+");
+
+        if (!$file) {
+            throw new DotenvException("Failed to open '.env' file");
+        }
+
+        if ($comment != '') {
+            $comment = "\n\n# " . $comment;
+        }
+
+        if (!self::isset($key)) {
+            fwrite($file, $comment . "\n" . $key . '=' . $value);
+
+            while (($line = fgets($file)) !== false) {
+                echo $line;
+            }
+
+            if (!feof($file)) {
+                throw new DotenvException("fgets() unexpected failure");
+            }
+
+            fclose($file);
             return true;
         }
 

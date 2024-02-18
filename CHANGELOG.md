@@ -1,5 +1,25 @@
 # Released Notes
 
+## v4.0.4 - (2024-02-18)
+
+### Added
+
+- Added `Password` and `Wolf` providers
+- Added `yamlParse` method
+- Added `add` method in `DotEnv` class
+
+### Fixed
+
+- Fixed namespace at Commands
+- Fixed `MakeRouter` class command
+- Fixed `ApplicationException` class
+
+### Changed
+
+- Changed `getYamlVariables` and `getDirConfigFiles` to deprecated
+
+--------------------------------------------------------------------------
+
 ## v4.0.3 - (2024-02-15)
 
 ### Fixed

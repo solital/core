@@ -3,11 +3,10 @@
 namespace Solital\Core\Kernel\Console\Commands;
 
 use Katrina\Katrina;
-use Solital\Core\Console\Command;
 use Solital\Core\Kernel\Console\HelpersTrait;
 use Solital\Core\Console\Interface\CommandInterface;
-use Solital\Core\Console\TableBuilder;
 use Solital\Core\Kernel\Application;
+use Solital\Core\Console\{Command, TableBuilder};
 
 class Version extends Command implements CommandInterface
 {

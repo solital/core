@@ -1,6 +1,6 @@
 <?php
 
-use Solital\Core\Wolf\Wolf;
+use Solital\Core\Kernel\Application;
 
 /**
  * @param string $view
@@ -8,7 +8,7 @@ use Solital\Core\Wolf\Wolf;
  */
 function view(string $view, array $args = null)
 {
-    $wolf = new Wolf();
+    $wolf = Application::provider('solital-wolf');
     $wolf->setArgs($args);
     $wolf->setView($view);
     echo $wolf->render();
@@ -21,7 +21,7 @@ function view(string $view, array $args = null)
  */
 function load_css(string $asset): string
 {
-    return (new Wolf)->css($asset);
+    return Application::provider('solital-wolf')->css($asset);
 }
 
 /**
@@ -29,7 +29,7 @@ function load_css(string $asset): string
  */
 function load_min_css(): string
 {
-    return (new Wolf)->css('style.min.css');
+    return Application::provider('solital-wolf')->css('style.min.css');
 }
 
 /**
@@ -39,7 +39,7 @@ function load_min_css(): string
  */
 function load_js(string $asset): string
 {
-    return (new Wolf)->js($asset);
+    return Application::provider('solital-wolf')->js($asset);
 }
 
 /**
@@ -47,7 +47,7 @@ function load_js(string $asset): string
  */
 function load_min_js(): string
 {
-    return (new Wolf)->js('script.min.js');
+    return Application::provider('solital-wolf')->js('script.min.js');
 }
 
 /**
@@ -57,7 +57,7 @@ function load_min_js(): string
  */
 function load_img(string $asset): string
 {
-    return (new Wolf)->img($asset);
+    return Application::provider('solital-wolf')->img($asset);
 }
 
 /**
@@ -67,7 +67,7 @@ function load_img(string $asset): string
  */
 function load_file(string $asset): string
 {
-    return (new Wolf)->file($asset);
+    return Application::provider('solital-wolf')->file($asset);
 }
 
 /**
@@ -75,7 +75,7 @@ function load_file(string $asset): string
  */
 function extend(string $view)
 {
-    (new Wolf)->extend($view);
+    Application::provider('solital-wolf')->extend($view);
 }
 
 /**

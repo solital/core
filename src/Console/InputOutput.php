@@ -39,24 +39,6 @@ class InputOutput
     public function __construct(string $color = '')
     {
         if ($color != '') {
-            /* switch ($color) {
-                case 'green':
-                    $this->color = 'green';
-                    break;
-
-                case 'yellow':
-                    $this->color = 'yellow';
-                    break;
-
-                case 'blue':
-                    $this->color = 'blue';
-                    break;
-
-                default:
-                    throw new CommandException("Color '" . $color . "' not exists");
-                    break;
-            } */
-
             $this->color = match ($color) {
                 'green' => 'green',
                 'yellow' => 'yellow',
@@ -192,10 +174,6 @@ class InputOutput
 
         // readline() removes the trailing newline, fgets does not,
         // to emulate the real readline(), we also need to remove it
-        /* if ($line !== false && strlen($line) >= strlen(PHP_EOL) && substr_compare($line, PHP_EOL, -strlen(PHP_EOL), strlen(PHP_EOL), true) === 0) {
-            $line = substr($line, 0, -strlen(PHP_EOL));
-        } */
-
         if ($line !== false && strlen($line) >= strlen(PHP_EOL) && str_ends_with($line, PHP_EOL)) {
             $line = substr($line, 0, -strlen(PHP_EOL));
         }

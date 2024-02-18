@@ -1,5 +1,23 @@
 # Released Notes
 
+## v4.1.0 - (2024-02-18)
+
+### Added
+
+- Added `Table` class
+- Added `Override` attribute in `CommandException` class
+
+### Fixed
+
+- Fixed `DefaultCommandsTrait` trait
+
+### Changed
+
+- Changed `TableBuilder` class to deprecated
+- Changed `InputOutput` and `ProgressBar` class
+
+----------------------------------------------------------------------
+
 ## v4.0.1 - (2024-02-06)
 
 ### Removed

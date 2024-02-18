@@ -4,6 +4,9 @@ namespace Solital\Core\Console;
 
 use Codedungeon\PHPCliColors\Color;
 
+/**
+ * @deprecated Use Solital\Core\Console\Table
+ */
 class TableBuilder
 {
     /**

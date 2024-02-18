@@ -136,7 +136,7 @@ trait DefaultCommandsTrait
             $this->warning($all['type'][$i])->print()->break();
 
             if (isset($all_commands[$i])) {
-                TableBuilder::formattedArray($all_commands[$i], margin: true);
+                Table::formattedRowData($all_commands[$i], margin: true);
             }
         }
     }

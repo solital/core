@@ -100,30 +100,14 @@ class Guardian
      */
     public static function validateDomain(): void
     {
-        $config = Application::getYamlVariables(5, 'bootstrap.yaml');
+        $config = Application::yamlParse('bootstrap.yaml');
 
         if ($config['verify_domain']['enable_verification'] == true) {
             self::checkEnvMail();
             self::$mailer = new Mailer();
 
             if (Application::DEBUG == false &&  Dotenv::isset('APP_DOMAIN') == false) {
-                $file = fopen(dirname(__DIR__, 5) . DIRECTORY_SEPARATOR . ".env", "a+");
-
-                if (!$file) {
-                    throw new \Exception("Failed to open '.env' file");
-                }
-
-                fwrite($file, "\n\n# APP DOMAIN\n" . 'APP_DOMAIN="' . self::getUrl() . '"');
-
-                while (($line = fgets($file)) !== false) {
-                    echo $line;
-                }
-
-                if (!feof($file)) {
-                    throw new \Exception("fgets() unexpected failure");
-                }
-
-                fclose($file);
+                Dotenv::add('APP_DOMAIN', self::getUrl(), 'APP DOMAIN');
             }
 
             self::sendTo(

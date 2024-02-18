@@ -11,8 +11,8 @@ class Command
     use DefaultCommandsTrait;
     use MessageTrait;
 
-    public const VERSION = "4.0.0";
-    public const DATE_VERSION = "Jan 21 2024";
+    public const VERSION = "4.1.0";
+    public const DATE_VERSION = "Feb 18 2024";
     public const SITE_DOC = "https://solital.github.io/site/docs/4.x/vinci-console/";
 
     /**
@@ -127,7 +127,6 @@ class Command
                         $args = $instance->getAllArguments();
                         $cmd = $instance->getCommand();
 
-                        //$this->repeatedCommands($cmd, get_class($instance));
                         $this->repeatedCommands($cmd, $instance::class);
 
                         if ($cmd == $this->command) {

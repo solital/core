@@ -3,7 +3,6 @@
 namespace Solital\Core\Kernel\Console\Commands;
 
 use Solital\Core\Auth\AuthDatabase;
-use Solital\Core\FileSystem\HandleFiles;
 use Solital\Core\Console\{Command, Interface\CommandInterface};
 use Solital\Core\Kernel\{Application, Console\HelpersTrait};
 
@@ -63,7 +62,6 @@ class MakeAuth extends Command implements CommandInterface
         $this->getAuthFolders();
 
         $handle_files = Application::provider('handler-file');
-        //$handle_files = new HandleFiles;
 
         $this->createUserAuth();
 

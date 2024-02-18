@@ -2,16 +2,12 @@
 
 namespace Solital\Core\Kernel\Console\Commands;
 
-use Nette\PhpGenerator\ClassType;
-use Nette\PhpGenerator\Method;
-use Nette\PhpGenerator\PhpNamespace;
 use Solital\Core\Console\Command;
 use Solital\Core\Console\Interface\CommandInterface;
-use Solital\Core\FileSystem\HandleFiles;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Kernel\Console\HelpersTrait;
-use Solital\Core\Schedule\Schedule;
-use Solital\Core\Schedule\ScheduleInterface;
+use Nette\PhpGenerator\{ClassType, Method, PhpNamespace};
+use Solital\Core\Schedule\{Schedule, ScheduleInterface};
 
 class MakeSchedule extends Command implements CommandInterface
 {
@@ -41,14 +37,6 @@ class MakeSchedule extends Command implements CommandInterface
      * @var string
      */
     private string $schedule_dir = '';
-
-    /**
-     * Construct
-     */
-    public function __construct()
-    {
-        //$this->handle = new HandleFiles;
-    }
 
     /**
      * @param object $arguments
