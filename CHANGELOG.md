@@ -1,5 +1,18 @@
 # Released Notes
 
+## v4.0.5 - (2024-02-20)
+
+### Added
+
+- Added `.gitattributes` file
+
+### Fixed
+
+- Fixed `ModernPHPException` without config file
+- Fixed type on `autoload` method
+
+--------------------------------------------------------------------------
+
 ## v4.0.4 - (2024-02-18)
 
 ### Added

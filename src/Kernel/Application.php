@@ -132,7 +132,7 @@ abstract class Application
      */
     public static function getInstance(): void
     {
-        $modern_php_exception_config = [];
+        $modern_php_exception_config = '';
 
         /* LOAD YAML CONFIG */
         $exception_config = self::yamlParse('exceptions.yaml', true);

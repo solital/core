@@ -33,11 +33,11 @@ trait ClassLoaderTrait
     /**
      * Recursively loads all php files in all subdirectories of the given path
      *
-     * @param $directory
+     * @param string $directory
      *
      * @throws \Exception
      */
-    public static function autoload($directory)
+    public static function autoload(string $directory)
     {
         // Ensure this path exists
         if (!is_dir($directory)) {
