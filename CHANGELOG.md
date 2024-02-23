@@ -1,5 +1,44 @@
 # Released Notes
 
+## v4.1.0 - (2024-02-23)
+
+### Added
+
+- Added `uniquid_real` helper
+- Added `crypt_type` option at `auth.yaml`
+- Added `cache` helper to return a `SimpleCache` instance
+- Added `memorize` component
+- Added `getTemplate` at Wolf
+- Added APCu and memcached support in cache
+- Added option to disable the escape special chars at Wolf
+- Added tests to `Application` class
+- Added new command: schedule
+- Added support to Katrina ORM 2.4
+
+### Changed
+
+- Changed `FileBackend` to `FileBackendAdapter`
+- Changed `yamlParse` methods at all classes
+
+### Fixed
+
+- Fixed comments in helpers
+- Fixed methods interface at `ServerRequest` and `UploadedFile` classes
+- Fixed database connection on tests
+- Fixed table at `ListDatabase` and `CourseList` class
+- Fixed Override on all comamnd classes
+- Fixed directory not found on `database.yaml`
+- Fixed connection test on `Dump` class
+
+### Removed
+
+- Removed `symfony/var-exporter` component
+- Removed `is_json`, `dumper`, `export` and `is_json` helpers
+- Removed classes: `Cache`, `Crypt`, `InputJson`, 
+    `MiddlewareInterface` and `IpRestrictAccessException` classes
+
+--------------------------------------------------------------------------
+
 ## v4.0.5 - (2024-02-20)
 
 ### Added

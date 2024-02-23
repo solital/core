@@ -7,27 +7,17 @@ use Solital\Core\Kernel\Application;
 trait KernelTrait
 {
     /**
-     * @var array
-     */
-    protected static array $db = [
-        'drive'      => '',
-        'host'       => '',
-        'name'       => '',
-        'user'       => '',
-        'pass'       => '',
-        'sqlite_dir' => ''
-    ];
-
-    /**
      * That variables must be changed manually
      */
-    const SOLITAL_VERSION   = "4.0.4";
+    const SOLITAL_VERSION   = "4.1.0";
     const SITE_DOC_DOMAIN   = "https://solital.github.io/site/";
     const DEBUG             = false;
     const DEBUG_DATABASE    = false;
     const MAILER_TEST_UNIT  = false;
 
     /**
+     * Get an component template on Kernel folder
+     * 
      * @param string $component_name
      * 
      * @return null|string
@@ -73,33 +63,5 @@ trait KernelTrait
         }
 
         return false;
-    }
-
-    /**
-     * @param array $database_connection
-     * 
-     * @return array
-     */
-    protected static function setDatabaseConnection(array $database_connection): array
-    {
-        if ($database_connection['enable_test'] == true) {
-            self::$db['drive']      = $database_connection['db_test']['drive'];
-            self::$db['host']       = $database_connection['db_test']['host'];
-            self::$db['name']       = $database_connection['db_test']['name'];
-            self::$db['user']       = $database_connection['db_test']['user'];
-            self::$db['pass']       = $database_connection['db_test']['pass'];
-            self::$db['sqlite_dir'] = $database_connection['db_test']['sqlite'];
-
-            return self::$db;
-        }
-
-        self::$db['drive']      = getenv('DB_DRIVE');
-        self::$db['host']       = getenv('DB_HOST');
-        self::$db['name']       = getenv('DB_NAME');
-        self::$db['user']       = getenv('DB_USER');
-        self::$db['pass']       = getenv('DB_PASS');
-        self::$db['sqlite_dir'] = getenv('SQLITE_DIR');
-
-        return self::$db;
     }
 }

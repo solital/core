@@ -1,5 +1,7 @@
 <?php
 
+require_once dirname(__DIR__) . '/bootstrap.php';
+
 use PHPUnit\Framework\TestCase;
 use Solital\Core\Cache\Psr6\CachePool;
 

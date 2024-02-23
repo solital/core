@@ -18,7 +18,7 @@ trait AssetsTrait
      */
     protected static function getConfigYaml(): mixed
     {
-        return Application::getYamlVariables(5, 'exceptions.yaml');
+        return Application::yamlParse('exceptions.yaml');
     }
 
     /**

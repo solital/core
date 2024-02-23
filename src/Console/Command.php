@@ -11,8 +11,8 @@ class Command
     use DefaultCommandsTrait;
     use MessageTrait;
 
-    public const VERSION = "4.1.0";
-    public const DATE_VERSION = "Feb 18 2024";
+    public const VERSION = "4.2.0";
+    public const DATE_VERSION = "Mar xx 2024";
     public const SITE_DOC = "https://solital.github.io/site/docs/4.x/vinci-console/";
 
     /**
@@ -49,6 +49,11 @@ class Command
      * @var array
      */
     private array $all_arguments = [];
+
+    /**
+     * @var array
+     */
+    protected array $all_options = [];
 
     /**
      * @var array
@@ -93,8 +98,10 @@ class Command
     }
 
     /**
-     * @param string|array $command
-     * @param array        $arguments
+     * Read the command
+     * 
+     * @param string|array $command Command to execute
+     * @param array        $arguments Arguments as an array
      * 
      * @return mixed
      */
@@ -102,16 +109,17 @@ class Command
     {
         if (is_array($command)) {
             $this->command = $command[1];
+            $arguments = array_slice($command, 2);
         }
 
         if (is_string($command)) {
             $this->command = $command;
+            $arguments = array_slice($arguments, 2);
         }
 
         $this->arguments = $arguments;
-
         $this->filter($this->arguments);
-        $this->verifyDefaultCommand($this->command, $this->arguments, (object)$this->options);
+        $this->verifyDefaultCommand($this->command, $this->arguments, (object)$this->all_options);
 
         $command_class = $this->getCommandClass();
 
@@ -121,23 +129,7 @@ class Command
                     if (!class_exists($class)) {
                         array_push($this->not_found_class, $class);
                     } else {
-                        $reflection = new \ReflectionClass($class);
-                        $instance = $reflection->newInstanceWithoutConstructor();
-                        
-                        $args = $instance->getAllArguments();
-                        $cmd = $instance->getCommand();
-
-                        $this->repeatedCommands($cmd, $instance::class);
-
-                        if ($cmd == $this->command) {
-                            $this->instance = $instance;
-
-                            if (count($args) == count($this->arguments) && !empty($this->arguments)) {
-                                $this->all_arguments = array_combine($args, $this->arguments);
-                            } else {
-                                $this->all_arguments = $this->arguments;
-                            }
-                        }
+                        $this->validateArguments($class);
                     }
                 }
             }
@@ -146,11 +138,11 @@ class Command
         $this->notFoundClass();
 
         if (isset($this->instance)) {
-            return $this->instance->handle((object)$this->all_arguments, (object)$this->options);
+            $this->validateAttribute($this->instance);
+            return $this->instance->handle((object)$this->all_arguments, (object)$this->all_options);
         }
 
         $this->error("Command '" . $this->command . "' not found")->print()->break()->exit();
-
         return $this;
     }
 
@@ -180,6 +172,16 @@ class Command
     public function getAllArguments(): ?array
     {
         return $this->arguments;
+    }
+
+    /**
+     * Get the value of options
+     * 
+     * @return null|array
+     */
+    public function getAllOptions(): ?array
+    {
+        return $this->options;
     }
 
     /**
@@ -257,11 +259,11 @@ class Command
                 $this->raw_options[] = $options;
                 $options_replace = str_replace("--", "", (string) $options);
                 $options_replace = explode("=", $options_replace);
-                $this->options[$options_replace[0]] = ($options_replace[1] ?? true);
+                $this->all_options[$options_replace[0]] = ($options_replace[1] ?? true);
             }
         }
 
-        return $this->options;
+        return $this->all_options;
     }
 
     /**
@@ -272,14 +274,112 @@ class Command
     private function filterArgs(array $args): ?array
     {
         if (isset($args)) {
-            unset($args[0]);
-            unset($args[1]);
             $this->arguments = array_diff($args, $this->raw_options);
-
             return $this->arguments;
         }
 
         return null;
+    }
+
+    /**
+     * Validate arguments if isset at classe
+     * 
+     * @param object|string $class
+     * 
+     * @return void
+     */
+    private function validateArguments(object|string $class): void
+    {
+        $reflection = new \ReflectionClass($class);
+        $instance = $reflection->newInstanceWithoutConstructor();
+
+        $args = $instance->getAllArguments();
+        $options = $instance->getAllOptions();
+        $cmd = $instance->getCommand();
+
+        $this->repeatedCommands($cmd, $instance::class);
+
+        if ($cmd == $this->command) {
+            if (!empty($options)) {
+                $this->validateOptions($options, $this->command);
+            }
+
+            if (count($this->arguments) > count($args)) {
+                $this->error("This command (" . $this->command . ") only accepts " . count($args) . " argument(s)")->print()->exit();
+            }
+
+            $this->instance = $instance;
+
+            if (count($args) == count($this->arguments) && !empty($this->arguments)) {
+                $this->all_arguments = array_combine($args, $this->arguments);
+            } else {
+                $this->all_arguments = $this->arguments;
+            }
+
+            if (!empty($args) && empty($this->all_arguments)) {
+                $this->error("Argument required for this command: " . $this->command)->print()->exit();
+            }
+        }
+    }
+
+    /**
+     * Validade options if options isset at class command
+     * 
+     * @param array $options
+     * 
+     * @return void
+     */
+    private function validateOptions(array $options, string $command): void
+    {
+        if (empty($this->all_options)) {
+            $this->error("Error:")->print();
+            $this->line(" This command (" . $command . ") require an option:")->print()->break(true);
+            Table::formattedRowData(array_fill_keys($options, ''), margin: true);
+            exit;
+        }
+
+        $options_without_char = [];
+
+        foreach ($options as $opt) {
+            $opt = str_replace('--', '', $opt);
+            $options_without_char[] = $opt;
+        }
+
+        foreach ($this->all_options as $key => $opt) {
+            if (in_array($key . '=', $options_without_char)) {
+                if ($opt === true) {
+                    $this->error("Value to option '--" . $key . "' is required")->print()->exit();
+                }
+            }
+
+            if (!in_array($key, $options_without_char)) {
+                $this->error("Option '--" . $key . "' is invalid")->print()->exit();
+            }
+        }
+    }
+
+    /**
+     * Validate if attribute `Override` exists on method `handle`
+     *
+     * @param mixed $instance
+     * 
+     * @return void
+     */
+    private function validateAttribute(mixed $instance): void
+    {
+        $class = new \ReflectionClass($instance);
+        $attributes = $class->getMethod('handle')->getAttributes();
+        $attr_exists = false;
+
+        foreach ($attributes as $attr) {
+            if ($attr->getName() == 'Override') {
+                $attr_exists = true;
+            }
+        }
+
+        if ($attr_exists == false) {
+            $this->error("'Override' attribute not found in 'handle' method at '" . basename($instance::class) . "' class")->print()->exit();
+        }
     }
 
     /**

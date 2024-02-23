@@ -32,6 +32,7 @@ class Queues extends Command implements CommandInterface
      * 
      * @return mixed
      */
+    #[\Override]
     public function handle(object $arguments, object $options): mixed
     {
         (new Queue)->executeQueues($options);

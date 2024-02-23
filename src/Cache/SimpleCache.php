@@ -8,11 +8,16 @@ use Solital\Core\Cache\Psr6\CachePool;
 class SimpleCache implements CacheInterface
 {
     /**
-     * @param CachePool $pool
+     * @var CachePool
      */
-    public function __construct(
-        private CachePool $pool
-    ) {
+    private CachePool $pool;
+
+    /**
+     * @param string|null $drive 
+     */
+    public function __construct(?string $drive = null)
+    {
+        $this->pool = new CachePool($drive);
     }
 
     /**

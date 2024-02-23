@@ -16,7 +16,7 @@ class MakeSchedule extends Command implements CommandInterface
     /**
      * @var string
      */
-    protected string $command = "schedule";
+    protected string $command = "create:schedule";
 
     /**
      * @var array
@@ -44,24 +44,18 @@ class MakeSchedule extends Command implements CommandInterface
      * 
      * @return mixed
      */
+    #[\Override]
     public function handle(object $arguments, object $options): mixed
     {
         $this->handle = Application::provider('handler-file');
         $this->schedule_dir = Application::getRootApp('Schedule/', Application::DEBUG);
-        
+
         if (isset($options->remove)) {
             $this->removeComponent($this->schedule_dir, $arguments->schedule_name . ".php");
         }
 
         if (isset($arguments->schedule_name)) {
             return $this->createSchedule(ucfirst($arguments->schedule_name));
-        }
-
-        if (!isset($arguments->schedule_name) && isset($options->work) || isset($options->run)) {
-            $this->startSchedule($options);
-        } else {
-            $this->error("Error: Schedule name not found")->print()->break();
-            return false;
         }
 
         return $this;
@@ -122,36 +116,5 @@ class MakeSchedule extends Command implements CommandInterface
 
         $this->error("Error: Schedule already exists!")->print()->break();
         return false;
-    }
-
-    /**
-     * @param mixed $options
-     * 
-     * @return void
-     */
-    private function startSchedule(mixed $options): void
-    {
-        Application::classLoaderInDirectory($this->schedule_dir);
-
-        $schedule_files_class = $this->handle->folder($this->schedule_dir)->files();
-
-        foreach ($schedule_files_class as $class) {
-            $class = "\Solital\Schedule\\" . basename($class, '.php');
-
-            $reflection_schedule = new \ReflectionClass($class);
-            $instance = $reflection_schedule->newInstance();
-            $schedules[] = $instance;
-        }
-
-        $schedule = new Schedule();
-        $schedule->add($schedules);
-
-        if (isset($options->work)) {
-            $schedule->execute(true);
-        }
-
-        if (isset($options->run)) {
-            $schedule->execute();
-        }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Solital\Core\Process;
 
-class Process
+final class Process
 {
     /**
      * @var mixed

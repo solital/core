@@ -52,11 +52,13 @@ trait MessageTrait
     }
 
     /**
+     * Print a single message on CLI
+     * 
      * @param string $message
      * 
      * @return self
      */
-    public function printMessage(string $message): self
+    public function printMessage(mixed $message): self
     {
         self::$message = $message;
         echo self::$message;
@@ -65,11 +67,14 @@ trait MessageTrait
     }
 
     /**
+     * Create a success message
+     *
+     * @param mixed $message
      * @param bool $space
      * 
-     * @return self
+     * @return self 
      */
-    public function success(string $message, bool $space = false): self
+    public function success(mixed $message, bool $space = false): self
     {
         $this->generateColors();
 
@@ -85,11 +90,14 @@ trait MessageTrait
     }
 
     /**
+     * Create a info message
+     *
+     * @param mixed $message
      * @param bool $space
      * 
-     * @return self
+     * @return self 
      */
-    public function info(string $message, bool $space = false): self
+    public function info(mixed $message, bool $space = false): self
     {
         $this->generateColors();
 
@@ -105,11 +113,14 @@ trait MessageTrait
     }
 
     /**
+     * Create a warning message
+     *
+     * @param mixed $message
      * @param bool $space
      * 
-     * @return self
+     * @return self 
      */
-    public function warning(string $message, bool $space = false): self
+    public function warning(mixed $message, bool $space = false): self
     {
         $this->generateColors();
 
@@ -125,11 +136,14 @@ trait MessageTrait
     }
 
     /**
+     * Create a error message
+     *
+     * @param mixed $message
      * @param bool $space
      * 
-     * @return self
+     * @return self 
      */
-    public function error(string $message, bool $space = false): self
+    public function error(mixed $message, bool $space = false): self
     {
         $this->generateColors();
 
@@ -145,11 +159,14 @@ trait MessageTrait
     }
 
     /**
+     * Create a normal message
+     *
+     * @param mixed $message
      * @param bool $space
      * 
-     * @return self
+     * @return self 
      */
-    public function line(string $message, bool $space = false): self
+    public function line(mixed $message, bool $space = false): self
     {
         $this->generateColors();
 
@@ -165,6 +182,8 @@ trait MessageTrait
     }
 
     /**
+     * Write message on CLI
+     * 
      * @return self
      */
     public function print(): self
@@ -175,9 +194,13 @@ trait MessageTrait
     }
 
     /**
+     * Break a line
+     * 
+     * @param bool $repeat Break another line
+     * 
      * @return self
      */
-    public function break($repeat = false): self
+    public function break(bool $repeat = false): self
     {
         if ($repeat == true) {
             echo PHP_EOL . PHP_EOL;
@@ -189,6 +212,8 @@ trait MessageTrait
     }
 
     /**
+     * Call `exit()` function
+     * 
      * @return void
      */
     public function exit(): void

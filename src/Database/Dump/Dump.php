@@ -3,7 +3,6 @@
 namespace Solital\Core\Database\Dump;
 
 use Solital\Core\Database\Dump\Exception\DumpException;
-use Symfony\Component\Yaml\Yaml;
 use Solital\Core\Kernel\Application;
 use Spatie\DbDumper\Databases\{MySql, PostgreSql, Sqlite};
 
@@ -24,17 +23,29 @@ class Dump
      */
     public function __construct()
     {
-        $this->yaml_data = Yaml::parseFile(Application::getDirConfigFiles(5) . '/database.yaml');
+        $this->yaml_data = Application::yamlParse('database.yaml');
 
         $this->checkDbConnection();
         $this->getDatabaseDrive();
         $this->getWindowsDumpBinary();
 
-        if (defined('DB_CONFIG')) {
-            $this->dump->setDbName(getenv('DB_NAME'));
-            $this->dump->setUserName(getenv('DB_USER'));
-            $this->dump->setPassword(getenv('DB_PASS'));
+        if (Application::DEBUG == false) {
+            if (defined('DB_CONFIG')) {
+                $db_name = getenv('DB_NAME');
+                $db_user = getenv('DB_USER');
+                $db_pass = getenv('DB_PASS');
+            }
+        } else {
+            if (defined('DB_CONFIG')) {
+                $db_name = DB_CONFIG['DBNAME'];
+                $db_user = DB_CONFIG['USER'];
+                $db_pass = DB_CONFIG['PASS'];
+            }
         }
+
+        $this->dump->setDbName($db_name);
+        $this->dump->setUserName($db_user);
+        $this->dump->setPassword($db_pass);
     }
 
     /**
@@ -57,24 +68,6 @@ class Dump
     private function getDatabaseDrive(): Dump
     {
         if (defined("DB_CONFIG")) {
-            /* switch (DB_CONFIG['DRIVE']) {
-                case 'mysql':
-                    $this->dump = MySql::create();
-                    break;
-
-                case 'pgsql':
-                    $this->dump = PostgreSql::create();
-                    break;
-
-                case 'sqlite':
-                    $this->dump = Sqlite::create();
-                    break;
-
-                default:
-                    throw new DumpException("Database drive not valid");
-                    break;
-            } */
-
             $this->dump = match (DB_CONFIG['DRIVE']) {
                 'mysql' => MySql::create(),
                 'pgsql' => PostgreSql::create(),
@@ -96,14 +89,26 @@ class Dump
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
             switch (DB_CONFIG['DRIVE']) {
                 case 'mysql':
+                    if (!is_dir($this->yaml_data['dump_windows']['mysql'])) {
+                        throw new \InvalidArgumentException('Directory "' . $this->yaml_data['dump_windows']['mysql'] . '" in "database.yaml" on variable "dump_windows" not found');
+                    }
+
                     $this->dump->setDumpBinaryPath($this->yaml_data['dump_windows']['mysql']);
                     break;
 
                 case 'pgsql':
+                    if (!is_dir($this->yaml_data['dump_windows']['pgsql'])) {
+                        throw new \InvalidArgumentException('Directory "' . $this->yaml_data['dump_windows']['pgsql'] . '" in "database.yaml" on variable "dump_windows" not found');
+                    }
+
                     $this->dump->setDumpBinaryPath($this->yaml_data['dump_windows']['pgsql']);
                     break;
 
                 case 'sqlite':
+                    if (!is_dir($this->yaml_data['dump_windows']['sqlite'])) {
+                        throw new \InvalidArgumentException('Directory "' . $this->yaml_data['dump_windows']['sqlite'] . '" in "database.yaml" on variable "dump_windows" not found');
+                    }
+
                     $this->dump->setDumpBinaryPath($this->yaml_data['dump_windows']['sqlite']);
                     break;
             }

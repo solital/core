@@ -271,10 +271,10 @@ class Container implements ContainerInterface
 	 * @param string $id       Service entry identifier.
 	 * @param mixed  $callback Invokable.
 	 * 
-	 * @return void
+	 * @return mixed
 	 */
 	#[\Override]
-	public function extend(string $id, mixed $callback = null)
+	public function extend(string $id, mixed $callback = null): mixed
 	{
 		if ($callback === null) {
 			$callback = $id;
@@ -349,9 +349,9 @@ class Container implements ContainerInterface
 	 * which simply exposes a register method that we use to pass
 	 * an instance of the container so that entries may be added.
 	 * 
-	 * @param  ServiceProvider $provider Service provider class.
+	 * @param  ServiceProviderInterface $provider Service provider class.
 	 * 
-	 * @return ContainerInterface        The container instance.        
+	 * @return Container        The container instance.        
 	 */
 	#[\Override]
 	public function register(ServiceProviderInterface $provider): self

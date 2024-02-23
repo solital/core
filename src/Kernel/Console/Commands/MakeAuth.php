@@ -26,6 +26,11 @@ class MakeAuth extends Command implements CommandInterface
     protected string $description = "Create 'Login' and 'Forgot Password' structures";
 
     /**
+     * @var array
+     */
+    protected array $options = ["--login", "--forgot", "--remove"];
+
+    /**
      * @var string
      */
     private string $controller_dir = '';
@@ -56,13 +61,13 @@ class MakeAuth extends Command implements CommandInterface
      * 
      * @return mixed
      */
+    #[\Override]
     public function handle(object $arguments, object $options): mixed
     {
         Application::connectionDatabase();
         $this->getAuthFolders();
 
         $handle_files = Application::provider('handler-file');
-
         $this->createUserAuth();
 
         $root_dir = Application::getRootCore('/Kernel/Console/Templates/');
@@ -83,7 +88,6 @@ class MakeAuth extends Command implements CommandInterface
             }
 
             $this->createLoginSkeleton($login_components);
-
             return true;
         }
 
@@ -102,13 +106,11 @@ class MakeAuth extends Command implements CommandInterface
             }
 
             $this->createForgotSkeleton($forgot_components);
-
             return true;
         }
 
-        $this->error('You must inform options: --login/--forgot/--remove')->print();
-
-        return true;
+        //$this->error('You must inform options: --login/--forgot/--remove')->print();
+        //return true;
     }
 
     /**
@@ -193,7 +195,6 @@ class MakeAuth extends Command implements CommandInterface
         }
 
         $this->createHeader();
-
         return $this;
     }
 

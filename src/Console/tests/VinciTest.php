@@ -11,7 +11,7 @@ class VinciTest extends TestCase
         OtherExtendComandTest::class
     ];
 
-    public function testReadWithoutOption()
+    public function testReadWithoutArgument()
     {
         $res = (new Command($this->class_commands))->read('user:test');
         $this->assertEquals("user:test - Command OK", $res);
@@ -25,16 +25,13 @@ class VinciTest extends TestCase
 
     public function testReadWithOptionValue()
     {
-        $res = (new Command($this->class_commands))->read('create:test', ['--option=accept']);
+        $res = (new Command($this->class_commands))->read('create:test', ['--witharg=accept']);
         $this->assertEquals("accept", $res);
     }
 
     public function testReadArgument()
     {
-        $res = (new Command($this->class_commands))->read('create:testesecond', [
-            2 => 'Vinci' // All arguments must start at index `2`
-        ]);
-
+        $res = (new Command($this->class_commands))->read('create:testsecond', ['Vinci']);
         $this->assertEquals("Vinci", $res);
     }
 }

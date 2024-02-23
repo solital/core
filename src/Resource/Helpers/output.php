@@ -2,8 +2,7 @@
 
 use Solital\Core\Resource\JSON;
 use Solital\Core\Resource\Message;
-use Symfony\Component\VarExporter\VarExporter;
-use Symfony\Component\VarDumper\{Cloner\VarCloner, Dumper\CliDumper, Dumper\AbstractDumper};
+use Symfony\Component\VarDumper\{Cloner\VarCloner};
 
 /**
  * Show result pre-formatted
@@ -31,45 +30,6 @@ function cloner($var)
     $cloner = new VarCloner();
     $data = $cloner->cloneVar($var);
     dump($data);
-}
-
-/**
- * @deprecated Use `new VarCloner()` and `new CliDumper()`
- * @param mixed $var
- * @param bool $length
- * 
- * @return mixed
- */
-function dumper($var, bool $length = false)
-{
-    if ($length == true) {
-        $varCloner = new VarCloner();
-        $dumper = new CliDumper(null, null, AbstractDumper::DUMP_STRING_LENGTH | AbstractDumper::DUMP_STRING_LENGTH);
-        $output = $dumper->dump($varCloner->cloneVar($var), true);
-        dump($output);
-
-        return;
-    }
-
-    $cloner = new VarCloner();
-    $dumper = new CliDumper();
-    $output = fopen('php://memory', 'r+b');
-
-    $dumper->dump($cloner->cloneVar($var), $output);
-    $output = stream_get_contents($output, -1, 0);
-    dump($output);
-}
-
-/**
- * @deprecated Use VarExporter::export()
- * @param mixed $value
- * 
- * @return void
- */
-function export($value): void
-{
-    $res = VarExporter::export($value);
-    echo $res;
 }
 
 /**

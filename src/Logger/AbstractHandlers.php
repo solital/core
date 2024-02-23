@@ -22,7 +22,7 @@ abstract class AbstractHandlers
      */
     protected static function getLogConfig(): void
     {
-        self::$log_config = Application::getYamlVariables(5, 'logger.yaml');
+        self::$log_config = Application::yamlParse('logger.yaml');
     }
 
     /**
@@ -34,20 +34,6 @@ abstract class AbstractHandlers
     protected static function setHandler(string $handler_name, mixed $level, string $log_path): mixed
     {
         $path = Application::getRootApp("Storage/", Application::DEBUG);
-
-        /* switch ($handler_name) {
-            case 'stream':
-                $handle = new StreamHandler($path . $log_path, $level);
-                break;
-
-            case 'syslog':
-                $handle = new SyslogHandler($handler_name, level: $level);
-                break;
-
-            case 'mail':
-                $handle = self::mailerHandler();
-                break;
-        } */
 
         $handle = match ($handler_name) {
             'stream' => new StreamHandler($path . $log_path, $level),

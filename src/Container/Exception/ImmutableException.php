@@ -19,7 +19,7 @@ class ImmutableException extends \Exception implements ContainerExceptionInterfa
 	 * @param string $id      Entry identifier.
 	 * @param string $message Optional custom message.
 	 */
-	public function __construct($id, $message = null)
+	public function __construct(?string $id, ?string $message = null)
 	{
 		if ($message) {
 			parent::__construct($message);

@@ -1,5 +1,7 @@
 <?php
 
+require_once dirname(__DIR__) . '/bootstrap.php';
+
 use PHPUnit\Framework\TestCase;
 use Solital\Core\Cache\Psr6\CachePool;
 use Solital\Core\Cache\SimpleCache;
@@ -8,13 +10,12 @@ class SimpleCacheTest extends TestCase
 {
     public function create()
     {
-        $pool = new CachePool();
-        return new SimpleCache($pool);
+        return new SimpleCache();
     }
 
     public function testSimpleCache()
     {
-        $cache = $this->create();
+        $cache = cache();
 
         $cache->delete('simple');
 

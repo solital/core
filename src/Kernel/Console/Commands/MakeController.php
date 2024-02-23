@@ -34,6 +34,7 @@ class MakeController extends Command implements CommandInterface
      * 
      * @return mixed
      */
+    #[\Override]
     public function handle(object $arguments, object $options): mixed
     {
         $controller_dir = Application::getRootApp('Components/Controller/', Application::DEBUG);

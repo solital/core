@@ -26,9 +26,9 @@ trait HelpersTrait
 
             file_put_contents($config['directory'] . $config['component_name'] . '.php', "<?php \n\n" . $data);
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**

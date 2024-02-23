@@ -5,9 +5,7 @@ namespace Solital\Core\Security;
 use Katrina\Katrina;
 use Solital\Core\Mail\Mailer;
 use Solital\Core\Auth\Password;
-use Solital\Core\Course\Course;
 use Respect\Validation\Validator;
-use Solital\Core\Resource\Session;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Exceptions\InvalidArgumentException;
 use Solital\Core\Kernel\Dotenv;
@@ -93,8 +91,6 @@ class Guardian
     /**
      * Verify if Solital project is at another domain
      * 
-     * @param string $domain
-     * 
      * @return void
      * @throws InvalidArgumentException
      */
@@ -106,7 +102,7 @@ class Guardian
             self::checkEnvMail();
             self::$mailer = new Mailer();
 
-            if (Application::DEBUG == false &&  Dotenv::isset('APP_DOMAIN') == false) {
+            if (Application::DEBUG == false && Dotenv::isset('APP_DOMAIN') == false) {
                 Dotenv::add('APP_DOMAIN', self::getUrl(), 'APP DOMAIN');
             }
 

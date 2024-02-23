@@ -7,6 +7,8 @@ use Solital\Core\Kernel\Application;
 use Solital\Core\Resource\Session;
 
 /**
+ * Handles the `URI` class
+ * 
  * @param string|null $name
  * @param string|array|null $parameters
  * @param array|null $getParams
@@ -21,6 +23,8 @@ function url(?string $name = null, $parameters = null, ?array $getParams = null)
 }
 
 /**
+ * Handles the `Response` class
+ * 
  * @return Response
  */
 function response(): Response
@@ -29,6 +33,8 @@ function response(): Response
 }
 
 /**
+ * Handles the `Request` class
+ * 
  * @return Request
  */
 function request(): Request
@@ -53,6 +59,8 @@ function input(string $index = null, string $defaultValue = null, ...$methods)
 }
 
 /**
+ * Redirect to another route
+ * 
  * @param string $url
  * @param int|null $code
  * 
@@ -69,6 +77,8 @@ function to_route(string $url, ?int $code = null): void
 }
 
 /**
+ * Defines a limit on requests that can be made at a certain time
+ * 
  * @param string $key
  * @param int $limit = 5
  * @param int $seconds = 60
@@ -97,7 +107,7 @@ function request_limit(string $key, int $limit = 5, int $seconds = 60)
 }
 
 /**
- * request_repeat
+ * Checks if a value was previously sent in the requisition
  *
  * @param string $key
  * @param string $value
@@ -119,7 +129,7 @@ function request_repeat(string $key, string $value)
  */
 function middleware(string $value): string
 {
-    $config = Application::getYamlVariables(5, 'middleware.yaml');
+    $config = Application::yamlParse('middleware.yaml');
 
     if (array_key_exists($value, $config['middleware']) == true) {
         return $config['middleware'][$value];

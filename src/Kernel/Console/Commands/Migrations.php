@@ -33,6 +33,7 @@ class Migrations extends Command implements CommandInterface
      * 
      * @return mixed
      */
+    #[\Override]
     public function handle(object $arguments, object $options): mixed
     {
         Application::connectionDatabase();

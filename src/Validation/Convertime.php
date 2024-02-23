@@ -5,7 +5,7 @@ namespace Solital\Core\Validation;
 class Convertime
 {
     /**
-     * @var DateTime
+     * @var \DateTime
      */
     private readonly \DateTime $datetime;
 
@@ -19,6 +19,8 @@ class Convertime
     }
 
     /**
+     * To format a date
+     * 
      * @param string $date
      * @param string $format
      * 
@@ -34,6 +36,8 @@ class Convertime
     }
 
     /**
+     * Add days to a date
+     * 
      * @param string $date
      * @param string $format
      * @param int $add_days
@@ -51,6 +55,8 @@ class Convertime
     }
 
     /**
+     * Add months to a date
+     * 
      * @param string $date
      * @param string $format
      * @param int $add_months
@@ -69,7 +75,7 @@ class Convertime
         $month = $date[1];
         $year = $date[0];
 
-        $this->datetime->setDate($year, $month, $day);
+        $this->datetime->setDate((int)$year, (int)$month, (int)$day);
 
         $future = clone $this->datetime;
         $modifier = "{$add_months} months";
@@ -87,6 +93,8 @@ class Convertime
     }
 
     /**
+     * Add time to another time
+     * 
      * @param string $first_hour
      * @param string $second_hour
      * 
@@ -106,6 +114,8 @@ class Convertime
     }
 
     /**
+     * Check if the date is weekend
+     * 
      * @param string $date
      * 
      * @return bool

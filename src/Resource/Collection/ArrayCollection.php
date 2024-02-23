@@ -183,7 +183,7 @@ final class ArrayCollection implements
     public function mode($key = null)
     {
         if ($this->count() === 0) {
-            return;
+            return null;
         }
 
         $collection = isset($key) ? $this->pluck($key) : $this;
@@ -745,7 +745,7 @@ final class ArrayCollection implements
     /**
      * Get a flattened array of the items in the collection.
      *
-     * @param  int  $depth
+     * @param  mixed  $depth
      * @return static
      */
     public function flatten($depth = INF)
@@ -831,7 +831,7 @@ final class ArrayCollection implements
             }
         }
 
-        $result = new static($results);
+        $result = new $this($results);
 
         if (!empty($nextGroups)) {
             return $result->map->groupBy($nextGroups, $preserveKeys);

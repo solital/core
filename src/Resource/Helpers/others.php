@@ -1,10 +1,11 @@
 <?php
 
-use Respect\Validation\Validator;
+use Solital\Core\Cache\SimpleCache;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Security\Guardian;
 use Solital\Core\Validation\Convertime;
 use Solital\Core\Resource\{Session, Str\Str, Collection\ArrayCollection};
+use Solital\Core\Resource\Memorize\{Memorizator, Storage, Utils};
 
 /**
  * Remove all get param
@@ -13,7 +14,7 @@ use Solital\Core\Resource\{Session, Str\Str, Collection\ArrayCollection};
  */
 function remove_param(): void
 {
-    $config = Application::getYamlVariables(5, 'exceptions.yaml');
+    $config = Application::yamlParse('exceptions.yaml');
     $http = 'http://';
 
     if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
@@ -40,22 +41,6 @@ function remove_param(): void
 }
 
 /**
- * @param mixed $json
- * 
- * @return bool
- */
-function is_json($json): bool
-{
-    $res = Validator::json()->validate($json);
-
-    if ($res == true) {
-        return true;
-    }
-
-    return false;
-}
-
-/**
  * Get atual url
  * 
  * @param string $uri
@@ -68,10 +53,13 @@ function get_url(string $uri = null): string
 }
 
 /**
- * @param string $index
+ * Create or return a session value
+ * 
+ * @param string $key
  * @param mixed $value
  * @param mixed $key
  * @param bool $delete
+ * @param bool $take
  * 
  * @return mixed
  */
@@ -113,11 +101,13 @@ function multi_array_value(string $name, array $array): mixed
 }
 
 /**
+ * Returns trailing name component of path and get rid of trailing slashes/backslashes
+ * 
  * @param string $path
  * 
- * @return string|null
+ * @return string
  */
-function mb_basename(string $path): ?string
+function mb_basename(string $path): string
 {
     if (preg_match('@^.*[\\\\/]([^\\\\/]+)$@s', $path, $matches)) {
         return $matches[1];
@@ -129,6 +119,8 @@ function mb_basename(string $path): ?string
 }
 
 /**
+ * Implode an array as key-value pairs. The third parameter is the symbol to be used between key and value
+ * 
  * @param string $glue
  * @param array $array
  * @param string $symbol
@@ -150,6 +142,8 @@ function mapped_implode(string $glue, array $array, string $symbol = '='): strin
 }
 
 /**
+ * Manipulate the `ArrayCollection` class without having to instantiate it.
+ * 
  * @param mixed $value
  * 
  * @return ArrayCollection
@@ -160,6 +154,8 @@ function collection(mixed $value = null): ArrayCollection
 }
 
 /**
+ * Manipulate the `Str` class without having to instantiate it
+ * 
  * @param string $string
  * 
  * @return Str
@@ -170,6 +166,8 @@ function str(string $string): Str
 }
 
 /**
+ * Return a `Convertime` instance
+ * 
  * @param string|null $timezone
  * 
  * @return Convertime
@@ -177,4 +175,75 @@ function str(string $string): Str
 function convertime(?string $timezone = null): Convertime
 {
     return new Convertime($timezone);
+}
+
+/**
+ * Generate a uniquid ID
+ * 
+ * @param int|float $lenght
+ * 
+ * @return string
+ */
+function uniqid_real(int|float $lenght = 13): string
+{
+    // uniqid gives 13 chars, but you could adjust it to your needs.
+    if (function_exists("random_bytes")) {
+        $bytes = random_bytes(ceil($lenght / 2));
+    } elseif (function_exists("openssl_random_pseudo_bytes")) {
+        $bytes = openssl_random_pseudo_bytes(ceil($lenght / 2));
+    } else {
+        throw new \Exception("no cryptographically secure random function available");
+    }
+
+    return substr(bin2hex($bytes), 0, $lenght);
+}
+
+/**
+ * Return a `SimpleCache` instance
+ *
+ * @param string|null $drive
+ * 
+ * @return SimpleCache
+ */
+function cache(?string $drive = null): SimpleCache
+{
+    return new SimpleCache($drive);
+}
+
+/**
+ * Memorize provides simple in-var cache for closures.
+ * At the first call result will be calculated and stored in cache.
+ * If the closure with the same arguments was run before memorize will return result from cache without the closure call.
+ *
+ * @param Closure $lambda
+ * @param null|string $paramsHash if pass null paramsHash will be calculated automatically
+ * @return mixed
+ */
+function memorize(Closure $lambda, $paramsHash = null)
+{
+    $getStorage = function (Closure $lambda) {
+        $reflection = new ReflectionFunction($lambda);
+        $that = $reflection->getClosureThis();
+
+        if ($that) {
+            if (!isset($that->_memorizeStorage)) {
+                $that->_memorizeStorage = new Storage();
+            }
+            return $that->_memorizeStorage;
+        } else {
+            global $_globalMemorizeStorage;
+            if (is_null($_globalMemorizeStorage)) {
+                $_globalMemorizeStorage = new Storage();
+            }
+            return $_globalMemorizeStorage;
+        }
+    };
+
+    if (is_null($paramsHash)) {
+        $reflection = new ReflectionFunction($lambda);
+        $paramsHash = Utils::hash($reflection->getStaticVariables());
+    }
+
+    $contextName = Utils::stringify($lambda);
+    return Memorizator::memorize($contextName, $lambda, $paramsHash, $getStorage($lambda));
 }

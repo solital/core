@@ -2,9 +2,9 @@
 
 namespace Solital\Core\Course;
 
+use Solital\Core\Console\Table;
 use Solital\Core\Course\Course;
 use Solital\Core\Kernel\Application;
-use Solital\Core\Console\TableBuilder;
 
 class CourseList extends Course
 {
@@ -46,11 +46,14 @@ class CourseList extends Course
     /**
      * @return void
      */
-    public function getRoutes(): void
+    public function getRoutes(): never
     {
         $headers = ["url", "name", "method", "controller"];
 
-        (new TableBuilder())->getTableRows(self::$routes, $headers);
+        $table = new Table();
+        $table->setHeaderStyle(Table::COLOR_LIGHT_GREEN);
+        $table->dynamicRows($headers, self::$routes);
+        echo $table;
 
         exit;
     }

@@ -17,7 +17,7 @@ class Server extends Command implements CommandInterface
 	/**
 	 * @var array
 	 */
-	protected array $arguments = ["host"];
+	protected array $arguments = [];
 
 	/**
 	 * @var string
@@ -34,6 +34,7 @@ class Server extends Command implements CommandInterface
 	 * @param object $options
 	 * @return mixed
 	 */
+	#[\Override]
 	public function handle(object $arguments, object $options): mixed
 	{
 		if (Application::DEBUG == true) {
@@ -41,8 +42,8 @@ class Server extends Command implements CommandInterface
 			return false;
         }
 
-		if (isset($arguments->host)) {
-			$this->host = $arguments->host;
+		if (isset($options->host)) {
+			$this->host = $options->host;
 		}
 
 		$this->success("Server started at " . date("H:i:s"))->print()->break();

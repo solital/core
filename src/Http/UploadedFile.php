@@ -142,7 +142,8 @@ class UploadedFile implements UploadedFileInterface
      * @throws \RuntimeException on any error during the move operation, or on the second or subsequent call to the
      *                           method.
      */
-    public function moveTo($targetPath)
+    #[\Override]
+    public function moveTo($targetPath): void
     {
         if (empty($targetPath) || !is_string($targetPath)) {
             throw new InvalidArgumentException("The target path must be a non-empty string", 400);
@@ -180,7 +181,8 @@ class UploadedFile implements UploadedFileInterface
     /**
      * @return int|null The file size in bytes or null if unknown.
      */
-    public function getSize()
+    #[\Override]
+    public function getSize(): ?int
     {
         return $this->size;
     }
@@ -196,7 +198,8 @@ class UploadedFile implements UploadedFileInterface
     /**
      * @return string|null The filename sent by the client or null if none was provided.
      */
-    public function getClientFilename()
+    #[\Override]
+    public function getClientFilename(): ?string
     {
         return $this->clientFilename;
     }
@@ -204,7 +207,8 @@ class UploadedFile implements UploadedFileInterface
     /**
      * @return string|null The media type sent by the client or null if none was provided.
      */
-    public function getClientMediaType()
+    #[\Override]
+    public function getClientMediaType(): ?string
     {
         return $this->clientMediaType;
     }

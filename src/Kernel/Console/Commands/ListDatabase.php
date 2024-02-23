@@ -4,8 +4,8 @@ namespace Solital\Core\Kernel\Console\Commands;
 
 use Katrina\Sql\KatrinaStatement;
 use Solital\Core\Console\Command;
-use Solital\Core\Console\TableBuilder;
 use Solital\Core\Console\Interface\CommandInterface;
+use Solital\Core\Console\Table;
 use Solital\Core\Kernel\Application;
 
 class ListDatabase extends Command implements CommandInterface
@@ -64,7 +64,11 @@ class ListDatabase extends Command implements CommandInterface
             array_push($all_values, $values);
         }
 
-        (new TableBuilder())->getTableRows($all_values, $keys);
+        $table = new Table();
+        $table->setHeaderStyle(Table::COLOR_LIGHT_GREEN);
+        $table->dynamicRows($keys, $all_values);
+
+        echo $table;
 
         return $this;
     }

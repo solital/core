@@ -45,7 +45,6 @@ class Migration
     public function __construct()
     {
         $this->migrations_directory = Application::getRootApp('Database/migrations/', Application::DEBUG);
-        //$this->handle = new HandleFiles();
         $this->handle = Application::provider('handler-file');
         $this->provider = new MigratorVersionProviderDB();
         $this->provider->initDB();
@@ -67,8 +66,6 @@ class Migration
         $migrationsDir = $this->getMigrationsDirectory();
 
         if (!file_exists($migrationsDir)) {
-            //$handle = new HandleFiles();
-            //$handle->create($migrationsDir);
             $this->handle->create($migrationsDir);
         }
     }

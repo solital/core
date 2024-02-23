@@ -4,6 +4,7 @@ namespace Solital\Core\Cache\Adapter;
 
 use Solital\Core\Cache\Adapter\CacheAdapterInterface;
 use Solital\Core\Cache\Exception\CacheAdapterException;
+use Solital\Core\Kernel\Application;
 
 class MemcacheAdapter implements CacheAdapterInterface
 {
@@ -13,17 +14,25 @@ class MemcacheAdapter implements CacheAdapterInterface
     private \Memcache $memcache;
 
     /**
+     * @var int
+     */
+    private int $ttl = 600;
+
+    /**
      * @param string $host
      * @param string $port
      */
-    public function __construct(string $host, string $port)
+    public function __construct(string $host, int $port)
     {
         if (!class_exists('memcache')) {
             throw new CacheAdapterException("'Memcache' driver not found");
         }
 
         $this->memcache = new \Memcache;
-        $this->memcache->connect($host, $port);
+        $this->memcache->connect($host, (int)$port);
+
+        $yaml_file = Application::yamlParse('cache.yaml');
+        $this->ttl = $yaml_file['cache_ttl'];
     }
 
     /**
@@ -31,6 +40,7 @@ class MemcacheAdapter implements CacheAdapterInterface
      * 
      * @return mixed
      */
+    #[\Override]
     public function get(string $key): mixed
     {
         return $this->memcache->get($key);
@@ -41,6 +51,7 @@ class MemcacheAdapter implements CacheAdapterInterface
      * 
      * @return bool
      */
+    #[\Override]
     public function has(string $key): bool
     {
         $value = $this->memcache->get($key);
@@ -57,6 +68,7 @@ class MemcacheAdapter implements CacheAdapterInterface
      * 
      * @return mixed
      */
+    #[\Override]
     public function delete(string $key): mixed
     {
         $value = $this->memcache->get($key);
@@ -71,12 +83,12 @@ class MemcacheAdapter implements CacheAdapterInterface
     /**
      * @param string $key
      * @param mixed $data
-     * @param int $time
      * 
      * @return mixed
      */
-    public function save(string $key, mixed $data, int $time): mixed
+    #[\Override]
+    public function save(string $key, mixed $data): mixed
     {
-        return $this->memcache->set($key, $data, null, $time);
+        return $this->memcache->set($key, $data, null, $this->ttl);
     }
 }

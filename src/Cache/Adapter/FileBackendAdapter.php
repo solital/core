@@ -1,17 +1,18 @@
 <?php
 
-namespace Solital\Core\Cache\Psr6;
+namespace Solital\Core\Cache\Adapter;
 
 use Solital\Core\Cache\Adapter\CacheAdapterInterface;
 use Solital\Core\Kernel\Application;
 
-class FileBackend implements CacheAdapterInterface
+class FileBackendAdapter implements CacheAdapterInterface
 {
     /**
      * @param string $directory
      */
     public function __construct(
-        private string $directory
+        private string $directory,
+        private int $ttl = 600
     ) {
         $this->directory = Application::getRootApp("Storage/cache/");
     }
@@ -31,6 +32,7 @@ class FileBackend implements CacheAdapterInterface
      * 
      * @return bool
      */
+    #[\Override]
     public function has(string $key): bool
     {
         clearstatcache();
@@ -53,6 +55,7 @@ class FileBackend implements CacheAdapterInterface
      * 
      * @return mixed
      */
+    #[\Override]
     public function get(string $key): mixed
     {
         if ($this->has($key) === false) {
@@ -83,6 +86,7 @@ class FileBackend implements CacheAdapterInterface
      * 
      * @return mixed
      */
+    #[\Override]
     public function delete(string $key): mixed
     {
         clearstatcache();
@@ -98,15 +102,15 @@ class FileBackend implements CacheAdapterInterface
     /**
      * @param string $key
      * @param mixed $data
-     * @param int $time
      * 
      * @return mixed
      */
-    public function save(string $key, mixed $data, int $time): mixed
+    #[\Override]
+    public function save(string $key, mixed $data): mixed
     {
         $path = $this->path($key);
         $data = serialize($data);
 
-        return file_put_contents($path, $data) && touch($path, $time);
+        return file_put_contents($path, $data) && touch($path, $this->ttl);
     }
 }

@@ -34,6 +34,7 @@ class MakeModel extends Command implements CommandInterface
      * 
      * @return mixed
      */
+    #[\Override]
     public function handle(object $arguments, object $options): mixed
     {
         $model_dir = Application::getRootApp('Components/Model/', Application::DEBUG);

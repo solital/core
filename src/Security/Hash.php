@@ -61,15 +61,11 @@ final class Hash
      * 
      * @param string $key
      * 
-     * @return new static
+     * @return static
      */
-    public static function decrypt(string $key): ?static
+    public static function decrypt(string $key): static
     {
         self::checkSecrets();
-
-        if ($key == null || !isset($key)) {
-            return null;
-        }
 
         $key = str_replace("EQUALS", "==", $key);
         $decode = base64_decode($key);
@@ -100,9 +96,9 @@ final class Hash
 
         if ($json['expire_at'] < date("Y-m-d H:i:s")) {
             return false;
-        } else {
-            return true;
         }
+
+        return true;
     }
 
     /**
@@ -162,16 +158,14 @@ final class Hash
      */
     public static function checkSodium(): bool
     {
-        $sodium_constants = [
-            SODIUM_LIBRARY_MAJOR_VERSION,
-            SODIUM_LIBRARY_MINOR_VERSION,
-            SODIUM_LIBRARY_VERSION
-        ];
-
-        if (is_array($sodium_constants)) {
-            return true;
-        } else {
-            throw new \Exception("libsodium not installed", 404);
+        if (
+            !defined('SODIUM_LIBRARY_MAJOR_VERSION') &&
+            !defined('SODIUM_LIBRARY_MINOR_VERSION') &&
+            !defined('SODIUM_LIBRARY_VERSION')
+        ) {
+            throw new NotFoundException("libsodium not installed", 404);
         }
+
+        return true;
     }
 }

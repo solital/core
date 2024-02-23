@@ -33,6 +33,7 @@ class Scanner extends Command implements CommandInterface
      * 
      * @return mixed
      */
+    #[\Override]
     public function handle(object $arguments, object $options): mixed
     {
         $dir = Application::getRoot('', false);

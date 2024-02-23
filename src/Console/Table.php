@@ -110,9 +110,11 @@ class Table
     public function setHeaderStyle(int ...$format): self
     {
         $styles = [];
+
         foreach ($format as $style) {
             $styles[] = $style;
         }
+
         $this->headerStyle = $styles;
         return $this;
     }
@@ -125,9 +127,11 @@ class Table
     public function setCellStyle(int ...$format): self
     {
         $styles = [];
+
         foreach ($format as $style) {
             $styles[] = $style;
         }
+
         $this->cellStyle = $styles;
         return $this;
     }
@@ -140,9 +144,11 @@ class Table
     public function setBorderStyle(int ...$format): self
     {
         $styles = [];
+
         foreach ($format as $style) {
             $styles[] = $style;
         }
+
         $this->borderStyle = $styles;
         return $this;
     }
@@ -156,10 +162,30 @@ class Table
     public function setColumnCellStyle(string $column, int ...$format): self
     {
         $styles = [];
+
         foreach ($format as $style) {
             $styles[] = $style;
         }
+
         $this->columnCellStyle[$column] = $styles;
+        return $this;
+    }
+
+    /**
+     * Generate dynamic rows with header and values
+     *
+     * @param array $header
+     * @param array $rows
+     * 
+     * @return self
+     */
+    public function dynamicRows(array $header, array $rows): self
+    {
+        foreach ($rows as $row) {
+            $full_values = array_combine($header, $row);
+            $this->row($full_values);
+        }
+
         return $this;
     }
 
@@ -171,6 +197,7 @@ class Table
     public function row(array $assoc): self
     {
         $row = [];
+
         foreach ($assoc as $key => $value) {
             if (!\is_string($value)) {
                 if (\is_object($value)) {
@@ -187,9 +214,11 @@ class Table
                     $value = (string)$value;
                 }
             }
+
             $key = \trim((string)$key);
             $row[$key] = \trim($value);
         }
+
         $this->rows[] = $row;
         return $this;
     }
@@ -216,12 +245,15 @@ class Table
         foreach ($this->rows as $row) {
             foreach ($headerData as $column) {
                 $len = \max($columnLengths[$column], $this->strlen($row[$column]));
+
                 if ($len % 2 !== 0) {
                     ++$len;
                 }
+
                 $columnLengths[$column] = $len;
             }
         }
+
         foreach ($columnLengths as &$length) {
             $length += 4;
         }
@@ -229,14 +261,17 @@ class Table
         $res = $this->getTableTopContent($columnLengths)
             . $this->getFormattedRowContent($headerData, $columnLengths, "\e[" . \implode(';', $this->headerStyle) . "m", true)
             . $this->getTableSeparatorContent($columnLengths);
+
         foreach ($this->rows as $row) {
             foreach ($headerData as $column) {
                 if (!isset($row[$column])) {
                     $row[$column] = '[NULL]';
                 }
             }
+
             $res .= $this->getFormattedRowContent($row, $columnLengths, "\e[" . \implode(';', $this->cellStyle) . "m");
         }
+
         return $res . $this->getTableBottomContent($columnLengths);
     }
 
@@ -261,9 +296,11 @@ class Table
             $customFormat = '';
             $value = ' ' . $value;
             $len = $this->strlen($value) - $lengths[$key] + 1;
+
             if ($isHeader === FALSE && isset($this->columnCellStyle[$key]) && !empty($this->columnCellStyle[$key])) {
                 $customFormat = "\e[" . \implode(";", $this->columnCellStyle[$key]) . "m";
             }
+
             $rows[] = ($format !== '' ? $format : '')
                 . ($customFormat !== '' ? $customFormat : '')
                 . $value

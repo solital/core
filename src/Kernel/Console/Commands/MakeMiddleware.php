@@ -34,6 +34,7 @@ class MakeMiddleware extends Command implements CommandInterface
      * 
      * @return mixed
      */
+    #[\Override]
     public function handle(object $arguments, object $options): mixed
     {
         $middleware_dir = Application::getRootApp('Middleware/', Application::DEBUG);

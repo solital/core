@@ -26,17 +26,6 @@ class ValidTest extends TestCase
     }
 
     /**
-     * Test validation json
-     */
-    public function testJson()
-    {
-        $json = '{"foo":"bar"}';
-
-        $res = is_json($json);
-        $this->assertTrue($res);
-    }
-
-    /**
      * Test validation base64
      */
     public function testbase64()

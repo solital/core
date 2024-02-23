@@ -5,7 +5,7 @@ namespace Solital\Core\Resource;
 use Solital\Core\Resource\Str\Str;
 
 /** @phpstan-consistent-constructor */
-class BrowserStorage
+final class BrowserStorage
 {
     /**
      * @var string

@@ -17,7 +17,7 @@ class JSON
     public function __construct(
         private int $constants = JSON_UNESCAPED_UNICODE,
     ) {
-        $this->throws_error = Application::getYamlVariables(5, 'bootstrap.yaml');
+        $this->throws_error = Application::yamlParse('bootstrap.yaml');
         $this->throwsError($constants);
     }
 

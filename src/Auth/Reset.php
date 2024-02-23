@@ -81,7 +81,6 @@ abstract class Reset
     /**
      * @param string $email
      * @param string $uri
-     * @param string $time
      * 
      * @return bool
      */
@@ -111,7 +110,7 @@ abstract class Reset
      * @param string $email
      * @param string $value
      * 
-     * @return bool|null
+     * @return bool
      */
     public function changePass(
         string $table,
@@ -119,7 +118,7 @@ abstract class Reset
         string $column_pass,
         string $email,
         string $value
-    ): ?bool {
+    ): bool {
         $value_hash = (new Password())->create($value);
 
         $sql = "UPDATE $table SET $column_pass = ? WHERE $column_user = '$email'";
@@ -133,8 +132,6 @@ abstract class Reset
         } catch (\PDOException) {
             return false;
         }
-
-        return null;
     }
 
     /**
@@ -145,7 +142,7 @@ abstract class Reset
      */
     private function generateDefaultLink(string $uri, string $email, string $time): ?string
     {
-        if (empty($this->link) || $this->link == "") {
+        if ($this->link == "") {
             $domain = Guardian::getUrl();
             $hash = Hash::encrypt($email, $time);
             $this->link = $domain . $uri . $hash;

@@ -179,10 +179,7 @@ trait PrintTrait
     protected function report(?int $start, string $dir): void
     {
         $end = time();
-
-        /* $this->info('Start time: ')->print();
-        $this->line((string)date('Y-m-d H:m:s', $start))->print()->break(); */
-
+        
         $this->info('End time: ')->print();
         $this->line((string)date('Y-m-d H:i:s', $end))->print()->break(true);
 

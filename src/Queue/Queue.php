@@ -5,7 +5,6 @@ namespace Solital\Core\Queue;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Console\MessageTrait;
 use Solital\Core\Queue\Exception\QueueException;
-use Solital\Core\FileSystem\HandleFiles;
 use Nette\PhpGenerator\{ClassType, Method, PhpNamespace};
 
 class Queue

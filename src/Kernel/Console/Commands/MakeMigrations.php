@@ -28,16 +28,12 @@ class MakeMigrations extends Command implements CommandInterface
     protected string $description = "Create a migration";
 
     /**
-     * @var mixed
-     */
-    private mixed $targetVersion = false;
-
-    /**
      * @param object $arguments
      * @param object $options
      * 
      * @return mixed
      */
+    #[\Override]
     public function handle(object $arguments, object $options): mixed
     {
         Application::connectionDatabase();
@@ -49,11 +45,9 @@ class MakeMigrations extends Command implements CommandInterface
             }
 
             $migrations->createMigration($arguments->migration_name);
-
             return true;
         } catch (\Exception $e) {
             $this->error("Error: " . $e->getMessage())->print()->break();
-
             return false;
         }
 

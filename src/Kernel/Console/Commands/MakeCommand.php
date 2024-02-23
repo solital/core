@@ -7,6 +7,7 @@ use Solital\Core\Console\Command;
 use Solital\Core\Console\Interface\CommandInterface;
 use Solital\Core\Kernel\Console\HelpersTrait;
 use Nette\PhpGenerator\{ClassType, Method, Parameter, PhpNamespace, Property};
+use Override;
 
 class MakeCommand extends Command implements CommandInterface
 {
@@ -33,6 +34,7 @@ class MakeCommand extends Command implements CommandInterface
      * 
      * @return mixed
      */
+    #[\Override]
     public function handle(object $arguments, object $options): mixed
     {
         $command_dir = Application::getRootApp('Console/Command/');
@@ -55,11 +57,9 @@ class MakeCommand extends Command implements CommandInterface
 
         if ($res == true) {
             $this->success("Command successfully created!")->print()->break();
-
             return true;
         } else {
             $this->error("Error: Command already exists!")->print()->break();
-
             return false;
         }
 
@@ -84,6 +84,12 @@ class MakeCommand extends Command implements CommandInterface
             ->setProtected()
             ->addComment("\n@var array\n");
 
+        $options_property = (new Property('options'))
+            ->setType('array')
+            ->setValue([])
+            ->setProtected()
+            ->addComment("\n@var array\n");
+
         $description_property = (new Property('description'))
             ->setType('string')
             ->setValue("")
@@ -92,12 +98,13 @@ class MakeCommand extends Command implements CommandInterface
 
         $handle_method = (new Method('handle'))
             ->setPublic()
-            ->setBody('return $this;')
+            ->setBody('echo \'Hello World\';' . PHP_EOL . 'return $this;')
             ->setReturnType('mixed')
             ->setParameters([
                 (new Parameter('arguments'))->setType('object'),
                 (new Parameter('options'))->setType('object')
             ])
+            ->addAttribute(Override::class)
             ->addComment("@param object " . '$arguments' . "\n@param object " . '$options' . "\n@return mixed");
 
         $class = (new ClassType($controller_name))
@@ -105,6 +112,7 @@ class MakeCommand extends Command implements CommandInterface
             ->addImplement(CommandInterface::class)
             ->addMember($command_property)
             ->addMember($arguments_property)
+            ->addMember($options_property)
             ->addMember($description_property)
             ->addMember($handle_method)
             ->addComment("@generated class generated using Vinci Console");

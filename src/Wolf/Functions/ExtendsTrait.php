@@ -25,7 +25,9 @@ trait ExtendsTrait
         }
 
         ob_start();
-        extract($this->getArgs(), EXTR_SKIP);
+
+        $args = $this->getArgs();
+        extract($args, EXTR_SKIP);
 
         $view_in_temp = $this->generateTempFile($view);
         include_once $view_in_temp;
@@ -48,7 +50,8 @@ trait ExtendsTrait
      */
     public function extend(string $view): void
     {
-        extract(Wolf::getAllArgs(), EXTR_SKIP);
+        $all_args = Wolf::getAllArgs();
+        extract($all_args, EXTR_SKIP);
 
         if (str_ends_with($view, ".php")) {
             $view = str_replace(".php", "", $view);

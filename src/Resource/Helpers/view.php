@@ -3,18 +3,23 @@
 use Solital\Core\Kernel\Application;
 
 /**
+ * Render a view
+ * 
  * @param string $view
  * @param array|null $args
+ * @param bool $escape_special_chars
  */
-function view(string $view, array $args = null)
+function view(string $view, array $args = null, bool $escape_special_chars = true)
 {
     $wolf = Application::provider('solital-wolf');
-    $wolf->setArgs($args);
+    $wolf->setArgs($args, $escape_special_chars);
     $wolf->setView($view);
     echo $wolf->render();
 }
 
 /**
+ * Load a CSS file into the `public/assets/_css/` folder
+ * 
  * @param string $asset
  * 
  * @return string
@@ -25,6 +30,8 @@ function load_css(string $asset): string
 }
 
 /**
+ * Loads the minified CSS file created by the `minify()->style()` method
+ * 
  * @return string
  */
 function load_min_css(): string
@@ -33,6 +40,8 @@ function load_min_css(): string
 }
 
 /**
+ * Load a Javascript file into the `public/assets/_js/` folder
+ * 
  * @param string $asset
  * 
  * @return string
@@ -43,6 +52,8 @@ function load_js(string $asset): string
 }
 
 /**
+ * Loads the minified Javascript file created by the `minify()->script()` method
+ * 
  * @return string
  */
 function load_min_js(): string
@@ -51,6 +62,8 @@ function load_min_js(): string
 }
 
 /**
+ * Load a image file into the `public/assets/_img/` folder
+ * 
  * @param string $asset
  * 
  * @return string
@@ -61,6 +74,8 @@ function load_img(string $asset): string
 }
 
 /**
+ * Load a file into the `public/assets/` folder
+ * 
  * @param string $asset
  * 
  * @return string

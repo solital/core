@@ -28,9 +28,8 @@ interface CacheAdapterInterface
     /**
      * @param string $key
      * @param mixed $data
-     * @param int $time
      * 
      * @return bool
      */
-    public function save(string $key, mixed $data, int $time): mixed;
+    public function save(string $key, mixed $data): mixed;
 }

@@ -22,7 +22,7 @@ class GenerateConfigFiles extends Command implements CommandInterface
     /**
      * @var array
      */
-    protected array $arguments = ["component_name"];
+    protected array $arguments = [];
 
     /**
      * @var string
@@ -35,17 +35,18 @@ class GenerateConfigFiles extends Command implements CommandInterface
      * 
      * @return mixed
      */
+    #[\Override]
     public function handle(object $arguments, object $options): mixed
     {
         $config_app_dir = Application::getRootApp('config/', Application::DEBUG);
         $config_core_dir = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Config';
 
-        if (isset($arguments->component_name) && isset($options->component)) {
+        if (isset($options->component) && isset($options->component)) {
             $arguments_default = (object)[
-                'controller_name' => $arguments->component_name . 'Controller',
-                'model_name' => $arguments->component_name,
-                'migration_name' => 'create_' . strtolower($arguments->component_name),
-                'seeder_name' => $arguments->component_name . 'Seed'
+                'controller_name' => $options->component . 'Controller',
+                'model_name' => $options->component,
+                'migration_name' => 'create_' . strtolower($options->component),
+                'seeder_name' => $options->component . 'Seed'
             ];
 
             $controller = new MakeController();

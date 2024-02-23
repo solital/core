@@ -87,7 +87,6 @@ class Seeder
 
             $this->success("Seeder executed: " . $options->class)->print()->break();
         } else {
-            //$handle = new HandleFiles();
             $handle = Application::provider('handler-files');
             $seeder = $handle->folder($this->seeds_dir)->files();
 

@@ -8,11 +8,12 @@ use Solital\Core\Course\Course;
 use Solital\Core\Resource\Session;
 use Solital\Core\Security\Guardian;
 use Solital\Core\FileSystem\HandleFiles;
-use Solital\Core\Kernel\Exceptions\ApplicationException;
+use Solital\Core\Kernel\Exceptions\{ApplicationException, YamlException};
 
 use Solital\Core\Kernel\Traits\{
     KernelTrait,
-    ClassLoaderTrait
+    ClassLoaderTrait,
+    DatabaseTrait
 };
 
 use Solital\Core\Container\{
@@ -25,6 +26,7 @@ abstract class Application
 {
     use KernelTrait;
     use ClassLoaderTrait;
+    use DatabaseTrait;
 
     /**
      * @var string
@@ -65,27 +67,31 @@ abstract class Application
      * @return mixed
      * @throws ApplicationException
      */
-    public static function yamlParse(string $yaml_file, bool $return_dir_name = false): mixed
+    public static function yamlParse(string $yaml_file, bool $return_dir_name = false, bool $throws = false): mixed
     {
         if (!defined('SITE_ROOT')) {
             throw new ApplicationException("SITE_ROOT constant not defined");
         }
 
         if (self::DEBUG == true) {
-            $yaml_dir_file = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Kernel' . DIRECTORY_SEPARATOR . 'Console' . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR . $yaml_file;
+            $yaml_dir_file = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Kernel' . DIRECTORY_SEPARATOR . 'Console' . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR;
         } else {
             $yaml_dir_file = constant('SITE_ROOT') . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR;
         }
 
         if (!file_exists($yaml_dir_file)) {
-            throw new ApplicationException('YAML file "' . $yaml_file . '" not found');
+            if ($throws == true) {
+                throw new YamlException('YAML file "' . $yaml_file . '" not found');
+            }
+
+            return false;
         }
 
         if ($return_dir_name == true) {
-            return $yaml_dir_file;
+            return $yaml_dir_file  . $yaml_file;
         }
 
-        return Yaml::parseFile($yaml_dir_file);
+        return Yaml::parseFile($yaml_dir_file . $yaml_file);
     }
 
     /**
@@ -128,6 +134,8 @@ abstract class Application
     }
 
     /**
+     * Initiate instance project
+     * 
      * @return void
      */
     public static function getInstance(): void
@@ -145,8 +153,10 @@ abstract class Application
         /* LOAD DEFAULT TIMEZONE */
         date_default_timezone_set(self::$default_timezone);
 
-        if ($bootstrap_config != false && $bootstrap_config['default_timezone'] != "") {
-            date_default_timezone_set($bootstrap_config['default_timezone']);
+        if (is_array($bootstrap_config)) {
+            if (array_key_exists('default_timezone', $bootstrap_config) && $bootstrap_config['default_timezone'] != "") {
+                date_default_timezone_set($bootstrap_config['default_timezone']);
+            }
         }
 
         /* CONFIG MODERN PHP EXCEPTION */
@@ -196,25 +206,46 @@ abstract class Application
     public static function connectionDatabase(): void
     {
         $db_config = self::$db;
-        $database_connection = self::yamlParse('database.yaml');
+        $database_connection = self::yamlParse('database.yaml', throws: true);
+        $db_config = self::setDatabaseConnection($database_connection);
 
-        if ($database_connection != false) {
-            $db_config = self::setDatabaseConnection($database_connection);
-        }
-
+        // Set variables fo main database
         if (!defined('DB_CONFIG')) {
             define('DB_CONFIG', [
-                'DRIVE' => $db_config['drive'],
-                'HOST' => $db_config['host'],
-                'DBNAME' => $db_config['name'],
-                'USER' => $db_config['user'],
-                'PASS' => $db_config['pass'],
+                'DRIVE'      => $db_config['drive'],
+                'HOST'       => $db_config['host'],
+                'DBNAME'     => $db_config['name'],
+                'USER'       => $db_config['user'],
+                'PASS'       => $db_config['pass'],
                 'SQLITE_DIR' => $db_config['sqlite_dir']
             ]);
         }
+
+        // Set variables of secondary database
+        if (
+            getenv('DB_HOST_SECONDARY') != null ||
+            getenv('DB_NAME_SECONDARY') != null ||
+            getenv('DB_USER_SECONDARY') != null ||
+            getenv('DB_PASS_SECONDARY') != null ||
+            getenv('SQLITE_DIR_SECONDARY') != null
+        ) {
+            if (!defined('DB_CONFIG_SECONDARY')) {
+                define('DB_CONFIG_SECONDARY', [
+                    'HOST'       => getenv('DB_HOST_SECONDARY'),
+                    'DBNAME'     => getenv('DB_NAME_SECONDARY'),
+                    'USER'       => getenv('DB_USER_SECONDARY'),
+                    'PASS'       => getenv('DB_PASS_SECONDARY'),
+                    'SQLITE_DIR' => getenv('SQLITE_DIR_SECONDARY')
+                ]);
+            }
+        }
+
+        self::loadDatabaseCache();
     }
 
     /**
+     * Return directory on root folder
+     * 
      * @param string $dir
      * 
      * @return string
@@ -242,6 +273,8 @@ abstract class Application
     }
 
     /**
+     * Return directory in `app/` folder
+     * 
      * @param string $dir
      * @param bool|null $cli_test
      * @param bool|null $create_app_folder
@@ -301,6 +334,8 @@ abstract class Application
     } */
 
     /**
+     * Return folder on Core
+     * 
      * @param string $dir
      * 
      * @return string
@@ -314,6 +349,8 @@ abstract class Application
     }
 
     /**
+     * Start session
+     * 
      * @return void
      */
     public static function sessionInit(): void
@@ -337,7 +374,7 @@ abstract class Application
      */
     public static function loadCsrfVerifier(): void
     {
-        $custom_csrf = self::yamlParse('bootstrap.yaml');
+        $custom_csrf = self::yamlParse('bootstrap.yaml', throws: true);
 
         $class = 'Solital\Core\Http\Middleware\\' . $custom_csrf['custom_csrf'];
 
@@ -370,6 +407,8 @@ abstract class Application
     }
 
     /**
+     * Check app status
+     * 
      * @return mixed
      */
     public static function appStatus(): mixed

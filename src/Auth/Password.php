@@ -89,9 +89,9 @@ class Password
      * @param string $password
      * @param string $hash
      * 
-     * @return mixed
+     * @return bool
      */
-    public function verify(string $password, string $hash): mixed
+    public function verify(string $password, string $hash): bool
     {
         return $this->password->verifyHash($password, $hash, $this->wait_microseconds);
     }
@@ -112,7 +112,7 @@ class Password
      */
     private function setConfig(): Password
     {
-        $config = Application::getYamlVariables(5, 'auth.yaml');
+        $config = Application::yamlParse('auth.yaml');
         $algo = $config['password']['algorithm'];
 
         $this->algo = match ($algo) {

@@ -2,6 +2,9 @@
 
 namespace Solital\Core\FileSystem;
 
+/**
+ * @deprecated
+ */
 class Diff
 {
     const UNMODIFIED = 0;

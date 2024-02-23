@@ -6,6 +6,7 @@ password:
   memory_cost: ''
   time_cost: ''
   threads: ''
+  crypt_type: openssl
 
 # Set authentication route
 auth:

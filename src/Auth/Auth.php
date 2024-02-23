@@ -437,7 +437,7 @@ final class Auth extends Reset
      */
     private static function getEnv(): void
     {
-        $config = Application::getYamlVariables(5, 'auth.yaml');
+        $config = Application::yamlParse('auth.yaml');
         self::$dashboard_url = $config['auth']['auth_dashboard_url'];
         self::$login_url = $config['auth']['auth_login_url'];
     }

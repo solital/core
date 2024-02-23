@@ -1,6 +1,12 @@
+# Enable cache on Katrina ORM
+cache_database: false
+
 # Set cache type
 cache_drive: file
 
-# (If memcache is used) Set host and port
+# (If memcached is used) Set host and port
 cache_host: 127.0.0.1
 cache_port: 11211
+
+# Set ttl
+cache_ttl: 600

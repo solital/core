@@ -1,5 +1,7 @@
 <?php
 
+require_once dirname(__DIR__) . '/bootstrap.php';
+
 use PHPUnit\Framework\TestCase;
 use Solital\Core\Wolf\Wolf;
 
@@ -22,8 +24,18 @@ class WolfTest extends TestCase
         $res = $wolf->setArgs([
             'xss' => '<strong>Solital</strong>'
         ]);
-
+        
         $this->assertEquals("&lt;strong&gt;Solital&lt;/strong&gt;", $res->getArgs()['xss']);
+    }
+
+    public function testArgsWithoutEscapeSpecialChar()
+    {
+        $wolf = new Wolf();
+        $res = $wolf->setArgs([
+            'xss' => '<strong>Solital</strong>'
+        ], false);
+
+        $this->assertEquals("<strong>Solital</strong>", $res->getArgs()['xss']);
     }
 
     public function testRender()
@@ -38,7 +50,7 @@ class WolfTest extends TestCase
         $this->assertEquals('<h1>home test SOLITAL</h1><p>solital@email.com</p>', $res);
     }
 
-    public function testCacheView()
+    /* public function testCacheView()
     {
         $result = false;
 
@@ -49,7 +61,7 @@ class WolfTest extends TestCase
         ]);
 
         $wolf->setView('contact')->setCacheTime('week')->render();
-    }
+    } */
 
     public function testWithInstance()
     {

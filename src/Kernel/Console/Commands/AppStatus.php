@@ -31,6 +31,7 @@ class AppStatus extends Command implements CommandInterface
      * 
      * @return mixed
      */
+    #[\Override]
     public function handle(object $arguments, object $options): mixed
     {
         $res = Application::appStatus();

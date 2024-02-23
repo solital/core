@@ -33,7 +33,7 @@ class AuthDatabase extends Katrina
                         ->int('id')->primary()->increment()
                         ->varchar("username", 50)->notNull()
                         ->varchar("password", 150)->notNull()
-                        ->createdUpdateAt()
+                        ->createdUpdatedAt()
                         ->closeTable();
                 } elseif (DB_CONFIG['DRIVE'] == "pgsql") {
                     $res = self::createTable("auth_users")

@@ -80,10 +80,10 @@ class HandleFiles
     }
 
     /**
-     * @param string $file
+     * @param string $file_exists
      * @param bool   $delete
      * 
-     * @return null|bool
+     * @return bool
      */
     public function fileExists(string $file_exists, bool $delete = false): bool
     {

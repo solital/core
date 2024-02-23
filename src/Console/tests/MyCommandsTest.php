@@ -8,7 +8,7 @@ use Solital\Core\Console\Interface\CommandInterface;
 class MyCommandsTest extends Command implements CommandInterface
 {
     protected string $command = "user:test";
-    protected array $arguments = ["argument_test"];
+    //protected array $arguments = ["argument_test"];
     protected string $description = "Description user command";
 
     #[\Override]

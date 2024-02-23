@@ -13,7 +13,7 @@ class UserCommand extends Command implements CommandInterface
 	/**
 	 * @var string
 	 */
-	protected string $command = 'mycmd';
+	protected string $command = '';
 
 	/**
 	 * @var array
@@ -21,9 +21,14 @@ class UserCommand extends Command implements CommandInterface
 	protected array $arguments = [];
 
 	/**
+	 * @var array
+	 */
+	protected array $options = [];
+
+	/**
 	 * @var string
 	 */
-	protected string $description = 'test';
+	protected string $description = '';
 
 
 	/**
@@ -31,9 +36,10 @@ class UserCommand extends Command implements CommandInterface
 	 * @param object $options
 	 * @return mixed
 	 */
+	#[\Override]
 	public function handle(object $arguments, object $options): mixed
 	{
-		echo 'Hello World!';
+		echo 'Hello World';
 		return $this;
 	}
 }

@@ -32,6 +32,7 @@ class MakeRouter extends Command implements CommandInterface
      * 
      * @return mixed
      */
+    #[\Override]
     public function handle(object $arguments, object $options): mixed
     {
         $router_dir = Application::getRoot('routers/', Application::DEBUG);
@@ -71,7 +72,6 @@ class MakeRouter extends Command implements CommandInterface
         ?array $replace = null
     ): bool {
         $folder = Application::provider('handler-file');
-
         $output_template = file_get_contents($component_template);
 
         if (str_contains($output_template, 'NameDefault')) {

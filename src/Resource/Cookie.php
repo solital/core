@@ -423,7 +423,7 @@ final class Cookie
      *                       only and not through scripting languages
      * @param string|null $sameSiteRestriction indicates that the cookie should not be sent along with 
      *                                         cross-site requests (either `null`, `None`, `Lax` or `Strict`)
-     * @return string the HTTP header
+     * @return null|string the HTTP header
      */
     public static function buildCookieHeader(
         string $name,
@@ -434,7 +434,7 @@ final class Cookie
         bool $secureOnly = false,
         bool $httpOnly = false,
         ?string $sameSiteRestriction = null
-    ) {
+    ): ?string {
         if (self::isNameValid($name)) {
             $name = (string) $name;
         } else {

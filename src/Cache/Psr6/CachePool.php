@@ -2,11 +2,10 @@
 
 namespace Solital\Core\Cache\Psr6;
 
-use Psr\Cache\CacheItemInterface;
-use Psr\Cache\CacheItemPoolInterface;
-use Solital\Core\Cache\Adapter\MemcacheAdapter;
-use Solital\Core\Cache\Exception\InvalidArgumentException;
 use Solital\Core\Kernel\Application;
+use Solital\Core\Cache\Exception\InvalidArgumentException;
+use Psr\Cache\{CacheItemInterface, CacheItemPoolInterface};
+use Solital\Core\Cache\Adapter\{APCuAdapter, FileBackendAdapter, MemcacheAdapter, MemcachedAdapter};
 
 class CachePool implements CacheItemPoolInterface
 {
@@ -21,29 +20,59 @@ class CachePool implements CacheItemPoolInterface
     private array $items = [];
 
     /**
-     * Construct
+     * @var string
      */
-    public function __construct()
-    {
-        $yaml_data = Application::getYamlVariables(5, 'cache.yaml');
+    private string $cache_drive;
 
-        switch ($yaml_data['cache_drive']) {
+    /**
+     * @param string|null $drive
+     */
+    public function __construct(?string $drive = null)
+    {
+        $yaml_data = Application::yamlParse('cache.yaml');
+        $this->switchDriveAtYamlOrParam($drive, $yaml_data);
+    }
+
+    /**
+     * Switch cache drive between param and yaml file
+     *
+     * @param string|null $drive
+     * @param array $yaml_data
+     * 
+     * @return void
+     */
+    private function switchDriveAtYamlOrParam(?string $drive, array $yaml_data): void
+    {
+        if (!is_null($drive)) {
+            $this->cache_drive = $drive;
+        } else {
+            if (!array_key_exists('cache_drive', $yaml_data)) {
+                throw new InvalidArgumentException("Variable 'cache_drive' not found at 'cache.yaml' file");
+            }
+
+            $this->cache_drive = $yaml_data['cache_drive'];
+        }
+
+        switch ($this->cache_drive) {
             case 'file':
                 $directory = Application::getRootApp("Storage/cache/");
-                $this->backend = new FileBackend($directory);
-
+                $this->backend = new FileBackendAdapter($directory, $yaml_data['cache_ttl']);
                 break;
 
             case 'memcache':
-                $this->backend = new MemcacheAdapter(
-                    $yaml_data['cache_host'],
-                    $yaml_data['cache_port']
-                );
-
+                $this->backend = new MemcacheAdapter($yaml_data['cache_host'], $yaml_data['cache_port']);
                 break;
 
-            case '':
-                throw new InvalidArgumentException("Drive not found");
+            case 'memcached':
+                $this->backend = new MemcachedAdapter($yaml_data['cache_host'], $yaml_data['cache_port']);
+                break;
+
+            case 'apcu':
+                $this->backend = new APCuAdapter($yaml_data['cache_ttl']);
+                break;
+
+            default:
+                throw new InvalidArgumentException("Cache drive isn't exist or not supported at 'cache.yaml' file");
                 break;
         }
     }
@@ -79,6 +108,7 @@ class CachePool implements CacheItemPoolInterface
 
         if (isset($this->items[$key]) === false) {
             $data = null;
+
             if ($this->backend->has($key)) {
                 $data = $this->backend->get($key);
             }

@@ -14,6 +14,10 @@ class CustomTest extends Command implements CommandInterface
     #[\Override]
     public function handle(object $arguments, object $options): mixed
     {
+        if (isset($options->nondefinedopt)) {
+            var_dump(true);
+        }
+        
         return $arguments->name;
     }
 }

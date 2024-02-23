@@ -111,7 +111,8 @@ class ServerRequest implements ServerRequestInterface
      *
      * @return static
      */
-    public function withCookieParams(array $cookies)
+    #[\Override]
+    public function withCookieParams(array $cookies): static
     {
         return $this->cloneWithProperty('cookieParams', $cookies);
     }
@@ -128,7 +129,8 @@ class ServerRequest implements ServerRequestInterface
      * @param array $query Array of query string arguments, typically from $_GET.
      * @return static
      */
-    public function withQueryParams(array $query)
+    #[\Override]
+    public function withQueryParams(array $query): static
     {
         return $this->cloneWithProperty('queryParams', $query);
     }
@@ -148,7 +150,8 @@ class ServerRequest implements ServerRequestInterface
      * @return static
      * @throws \InvalidArgumentException if an invalid structure is provided.
      */
-    public function withUploadedFiles(array $uploadedFiles)
+    #[\Override]
+    public function withUploadedFiles(array $uploadedFiles): static
     {
         $this->validateUploadedFiles($uploadedFiles);
 
@@ -192,7 +195,8 @@ class ServerRequest implements ServerRequestInterface
      *
      * @throws \InvalidArgumentException if an unsupported argument type is provided.
      */
-    public function withParsedBody($data)
+    #[\Override]
+    public function withParsedBody($data): static
     {
         if ($data !== null && !is_object($data) && !is_array($data)) {
             throw new InvalidArgumentException("Parsed body value must be an array, object or null", 400);
@@ -234,7 +238,8 @@ class ServerRequest implements ServerRequestInterface
      *
      * @return static
      */
-    public function withAttribute($name, $value)
+    #[\Override]
+    public function withAttribute(string $name, $value): static
     {
         $clone = clone $this;
         $clone->attributes[$name] = $value;
@@ -249,7 +254,8 @@ class ServerRequest implements ServerRequestInterface
      *
      * @return static
      */
-    public function withoutAttribute($name)
+    #[\Override]
+    public function withoutAttribute(string $name): static
     {
         $clone = clone $this;
         unset($clone->attributes[$name]);

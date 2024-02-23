@@ -6,7 +6,7 @@ use Katrina\Katrina;
 use Solital\Core\Kernel\Console\HelpersTrait;
 use Solital\Core\Console\Interface\CommandInterface;
 use Solital\Core\Kernel\Application;
-use Solital\Core\Console\{Command, TableBuilder};
+use Solital\Core\Console\{Command, Table, TableBuilder};
 
 class Version extends Command implements CommandInterface
 {
@@ -33,11 +33,12 @@ class Version extends Command implements CommandInterface
      * 
      * @return mixed
      */
+    #[\Override]
     public function handle(object $arguments, object $options): mixed
     {
         $this->info("Solital framework - Fast, easy and practical")->print()->break(true);
 
-        TableBuilder::formattedArray([
+        Table::formattedRowData([
             'Solital Core' => $this->solitalVersion(),
             'PHP Version' => $this->phpVersion(),
             'Katrina ORM' => $this->katrinaVersion()

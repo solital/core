@@ -13,7 +13,7 @@ class HttpCache extends SimpleCache
     private int $time;
 
     /**
-     * @var DateTime
+     * @var \DateTime
      */
     private \DateTime $date_time;
 
@@ -42,8 +42,6 @@ class HttpCache extends SimpleCache
 
         if ($privacity != "public" && $privacity != "private") {
             throw new InvalidArgumentException("'$privacity' is invalid. Use 'public' or 'private'", 404);
-
-            return $this;
         }
 
         if ($revalidate == true) {
@@ -74,7 +72,7 @@ class HttpCache extends SimpleCache
     {
         $atual_time = $this->date_time->getTimestamp();
 
-        if (strtotime($this->time) < strtotime($atual_time)) {
+        if (strtotime((int)$this->time) < strtotime((int)$atual_time)) {
             $this->code = 200;
         } else {
             $this->code = 304;
@@ -95,7 +93,7 @@ class HttpCache extends SimpleCache
     {
         $atual_time = $this->date_time->getTimestamp();
 
-        if (strtotime($this->time) < strtotime($atual_time)) {
+        if (strtotime((int)$this->time) < strtotime((int)$atual_time)) {
             $this->code = 200;
         } else {
             $this->code = 304;
@@ -115,7 +113,7 @@ class HttpCache extends SimpleCache
     {
         $atual_time = $this->date_time->getTimestamp();
 
-        if (strtotime($this->time) < strtotime($atual_time)) {
+        if (strtotime((int)$this->time) < strtotime((int)$atual_time)) {
             $this->code = 200;
         } else {
             $this->code = 304;

@@ -32,6 +32,7 @@ class MakeQueue extends Command implements CommandInterface
      * 
      * @return mixed
      */
+    #[\Override]
     public function handle(object $arguments, object $options): mixed
     {
         if (!isset($arguments->queue_name)) {

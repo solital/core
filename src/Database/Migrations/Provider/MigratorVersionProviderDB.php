@@ -26,7 +26,7 @@ class MigratorVersionProviderDB extends Katrina
                 $res = self::createTable("migrations")
                     ->int('id')->primary()->increment()
                     ->varchar("name", 100)->notNull()
-                    ->createdUpdateAt()
+                    ->createdUpdatedAt()
                     ->closeTable();
             }
             

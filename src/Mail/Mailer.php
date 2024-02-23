@@ -20,7 +20,7 @@ class Mailer extends QueueMail
         if (Application::MAILER_TEST_UNIT == true) {
             $this->mailerConfig('unit');
         } else {
-            $config = Application::getYamlVariables(5, 'mail.yaml');
+            $config = Application::yamlParse('mail.yaml');
 
             if ($config['mail_test']['mail_test_enable'] == true) {
                 $this->mailerConfig('development');
@@ -166,7 +166,7 @@ class Mailer extends QueueMail
      */
     private function mailerConfig(string $type): array
     {
-        $config = Application::getYamlVariables(5, 'mail.yaml');
+        $config = Application::yamlParse('mail.yaml');
 
         if ($type === 'unit') {
             $this->php_mailer_config['exceptions'] = true;

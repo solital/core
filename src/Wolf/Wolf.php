@@ -3,8 +3,10 @@
 namespace Solital\Core\Wolf;
 
 use Solital\Core\Kernel\Application;
+use Solital\Core\Logger\Logger;
 use Solital\Core\Resource\Collection\ArrayCollection;
 use Solital\Core\Wolf\{WolfCacheTrait, WolfMinifyTrait};
+use Solital\Core\Wolf\Exception\WolfException;
 use Solital\Core\Wolf\Functions\{AssetsTrait, ExtendsTrait};
 
 class Wolf
@@ -38,11 +40,6 @@ class Wolf
      * @var array
      */
     protected static array $allArgs = [];
-
-    /**
-     * @var mixed
-     */
-    private static mixed $original_args;
 
     /**
      * Construct
@@ -81,13 +78,16 @@ class Wolf
      * 
      * @return Wolf
      */
-    public function setArgs(?array $args): Wolf
+    public function setArgs(?array $args, bool $escape_special_chars = true): Wolf
     {
         if (isset($args)) {
             $this->args = $args;
             self::$allArgs = $args;
-            $this->args = $this->htmlspecialcharsRecursive($this->args);
-            $this->args = (new ArrayCollection(self::$allArgs))->merge($this->args)->all();
+
+            if ($escape_special_chars == true) {
+                $this->args = $this->htmlspecialcharsRecursive($this->args);
+                $this->args = (new ArrayCollection(self::$allArgs))->merge($this->args)->all();
+            }
         }
 
         return $this;
@@ -123,7 +123,7 @@ class Wolf
     /**
      * @return string
      */
-    /* public function getTemplate(): ?string
+    public function getTemplate(): ?string
     {
         if (!$this->viewExists($this->view)) {
             Logger::channel('single')->error("Template '" . basename($this->view) . "' not found");
@@ -141,14 +141,14 @@ class Wolf
         }
 
         return $template;
-    } */
+    }
 
     /**
      * @return string
      */
     public function render(): ?string
     {
-        $config = Application::getYamlVariables(5, 'bootstrap.yaml');
+        $config = Application::yamlParse('bootstrap.yaml');
 
         if (is_array($config)) {
             $this->setCacheTime($config);
@@ -182,7 +182,6 @@ class Wolf
         }
 
         if (is_array($args)) {
-            //return array_map(array($this, 'htmlspecialcharsRecursive'), $args);
             return array_map($this->htmlspecialcharsRecursive(...), $args);
         }
 
