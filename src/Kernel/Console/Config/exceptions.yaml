@@ -8,9 +8,12 @@ error_message:
 # Use `false` only if you have no internet connection
 enable_cdn_assets: true
 
-# DATABASE CONFIG
-db_drive: mysql
-db_host: localhost
-db_name: teste
-db_user: root
+# Enable occurrences
+enable_occurrences: false
+
+# Database for Modern PHP Exceptions
+db_drive: 
+db_host: 
+db_name: 
+db_user: 
 db_pass: 

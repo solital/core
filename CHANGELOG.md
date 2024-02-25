@@ -1,5 +1,15 @@
 # Released Notes
 
+## v4.1.1 - (2024-03-25)
+
+### Fixed
+
+- Fixed Modern PHP Exception not started
+- Fixed `file_exists` function, used `fileExistsWithoutCache` method
+- Fixed Occurrences for Modern PHP Exceptions
+
+--------------------------------------------------------------------------
+
 ## v4.1.0 - (2024-02-23)
 
 ### Added

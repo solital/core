@@ -2,7 +2,6 @@
 
 namespace Solital\Core\Kernel;
 
-use ModernPHPException\ModernPHPException;
 use Symfony\Component\Yaml\Yaml;
 use Solital\Core\Course\Course;
 use Solital\Core\Resource\Session;
@@ -44,11 +43,6 @@ abstract class Application
     private static string $default_timezone = "America/Fortaleza";
 
     /**
-     * @var ModernPHPException
-     */
-    private static ModernPHPException $exception;
-
-    /**
      * @var HandleFiles
      */
     private static HandleFiles $handle;
@@ -79,7 +73,7 @@ abstract class Application
             $yaml_dir_file = constant('SITE_ROOT') . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR;
         }
 
-        if (!file_exists($yaml_dir_file)) {
+        if (!self::fileExistsWithoutCache($yaml_dir_file)) {
             if ($throws == true) {
                 throw new YamlException('YAML file "' . $yaml_file . '" not found');
             }
@@ -140,7 +134,8 @@ abstract class Application
      */
     public static function getInstance(): void
     {
-        $modern_php_exception_config = '';
+        /* START MODERN PHP EXCEPTION WITHOUT CONFIG FILE*/
+        $exception_instance = self::startModernPHPException();
 
         /* LOAD YAML CONFIG */
         $exception_config = self::yamlParse('exceptions.yaml', true);
@@ -159,13 +154,11 @@ abstract class Application
             }
         }
 
-        /* CONFIG MODERN PHP EXCEPTION */
-        if (file_exists($exception_config)) {
-            $modern_php_exception_config = $exception_config;
+        /* IF CONFIG FILE EXISTS, UNSET OLD INSTANCE AND CREATE NEW MODERN PHP EXCEPTION INSTANCE */
+        if (self::fileExistsWithoutCache($exception_config)) {
+            unset($exception_instance);
+            self::startModernPHPException($exception_config);
         }
-
-        self::$exception = new ModernPHPException($modern_php_exception_config);
-        self::$exception->start();
 
         /* LOAD PROVIDER HANDLE FILES */
         self::$handle = self::provider('handler-file');

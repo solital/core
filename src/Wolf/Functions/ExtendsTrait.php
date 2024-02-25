@@ -2,6 +2,7 @@
 
 namespace Solital\Core\Wolf\Functions;
 
+use Solital\Core\Kernel\Application;
 use Solital\Core\Logger\Logger;
 use Solital\Core\Security\Hash;
 use Solital\Core\Wolf\Exception\WolfException;
@@ -19,7 +20,7 @@ trait ExtendsTrait
      */
     protected function generateTemplate(string $view): mixed
     {
-        if (!$this->viewExists($view)) {
+        if (!Application::fileExistsWithoutCache($view)) {
             Logger::channel('single')->error("Template '" . basename($view) . "' not found");
             throw new WolfException("Template " . basename($view) . " not found");
         }
@@ -39,7 +40,6 @@ trait ExtendsTrait
         }
 
         clearstatcache(true, $view);
-
         return ob_get_clean();
     }
 
@@ -61,7 +61,6 @@ trait ExtendsTrait
         $view = $this->dir_view . $view . ".php";
 
         $view_in_temp = $this->generateTempFile($view);
-
         include_once $view_in_temp;
     }
 
@@ -103,7 +102,6 @@ trait ExtendsTrait
     {
         $hash = Hash::encrypt($email, $time);
         $link = $uri . $hash;
-
         return $link;
     }
 
@@ -118,7 +116,6 @@ trait ExtendsTrait
         $render = $this->checkInternalFunctions($render);
         $render = str_replace(["{{", "}}"], ["<?=", "?>"], (string) $render);
         $render = str_replace(["{%", "%}"], ["<?php", "?>"], $render);
-
         return $render;
     }
 
@@ -133,44 +130,11 @@ trait ExtendsTrait
         $basename_view = basename($view, ".php");
         $view_in_temp = sys_get_temp_dir() . DIRECTORY_SEPARATOR .  $basename_view . ".temp.php";
 
-        if ($this->viewExists($view_in_temp)) {
+        if (Application::fileExistsWithoutCache($view_in_temp)) {
             unlink($view_in_temp);
         }
 
         file_put_contents($view_in_temp, $render);
-        clearstatcache(true, $view);
-
         return $view_in_temp;
-    }
-
-    private function viewExists(string $file_path): bool
-    {
-        $file_exists = false;
-
-        //clear cached results
-        clearstatcache(true, $file_path);
-
-        //trim path
-        $file_dir = trim(dirname($file_path));
-
-        //normalize path separator
-        $file_dir = str_replace('/', DIRECTORY_SEPARATOR, $file_dir) . DIRECTORY_SEPARATOR;
-
-        //trim file name
-        $file_name = trim(basename($file_path));
-
-        //rebuild path
-        $file_path = $file_dir . "{$file_name}";
-
-        //If you simply want to check that some file (not directory) exists, 
-        //and concerned about performance, try is_file() instead.
-        //It seems like is_file() is almost 2x faster when a file exists 
-        //and about the same when it doesn't.
-
-        $file_exists = is_file($file_path);
-
-        //$file_exists=file_exists($file_path);
-
-        return $file_exists;
     }
 }
