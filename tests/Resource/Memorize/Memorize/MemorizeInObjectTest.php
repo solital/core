@@ -3,8 +3,9 @@
 namespace Solital\Test\Resource\Memorize\Memorize;
 
 use PHPUnit\Framework\TestCase;
-use Solodkiy\Memorize\Support\FactorialCalculator;
+use Solital\Test\Resource\Memorize\Support\FactorialCalculator;
 
+#[\AllowDynamicProperties]
 class MemorizeInObjectTest extends TestCase
 {
     public function testMemorize()
@@ -62,6 +63,7 @@ class MemorizeInObjectTest extends TestCase
      */
     public function testIncorrectMemorizeObjects()
     {
+        $this->expectException('RuntimeException');
         $day = new \DateTime('2015-01-01');
         $this->assertEquals(3, $this->incorrectAddDaysToTime($day, 2));
     }

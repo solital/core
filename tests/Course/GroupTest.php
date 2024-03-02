@@ -12,7 +12,6 @@ class GroupTest extends TestCase
     {
         $_SERVER["REQUEST_METHOD"] = 'get';
         $_SERVER["REQUEST_URI"] = '/';
-
         $result = false;
 
         TestRouter::group(['prefix' => '/group'], function () use(&$result) {
@@ -24,58 +23,50 @@ class GroupTest extends TestCase
         } catch(\Exception $e) {
 
         }
+
         $this->assertTrue($result);
     }
 
     public function testNestedGroup()
     {
-
         TestRouter::group(['prefix' => '/api'], function () {
-
             TestRouter::group(['prefix' => '/v1'], function () {
-                TestRouter::get('/test', 'DummyController@method1');
+                TestRouter::get('/test', 'DummyController@method2');
             });
-
         });
 
         TestRouter::debug('/api/v1/test', 'get');
-
         $this->assertTrue(true);
     }
 
     public function testMultipleRoutes()
     {
-
         TestRouter::group(['prefix' => '/api'], function () {
-
             TestRouter::group(['prefix' => '/v2'], function () {
-                TestRouter::get('/test', 'DummyController@method1');
+                TestRouter::get('/test', 'DummyController@method2');
             });
-
         });
 
-        TestRouter::get('/my/match', 'DummyController@method1');
-
+        TestRouter::get('/my/match', 'DummyController@method2');
         TestRouter::group(['prefix' => '/service'], function () {
 
             TestRouter::group(['prefix' => '/v2'], function () {
-                TestRouter::get('/no-match', 'DummyController@method1');
+                TestRouter::get('/no-match', 'DummyController@method2');
             });
 
         });
 
         TestRouter::debug('/my/match', 'get');
-
         $this->assertTrue(true);
     }
 
     public function testUrls()
     {
         // Test array name
-        TestRouter::get('/my/fancy/url/1', 'DummyController@method1', ['as' => 'fancy1']);
+        TestRouter::get('/my/fancy/url/1', 'DummyController@method2', ['as' => 'fancy1']);
 
         // Test method name
-        TestRouter::get('/my/fancy/url/2', 'DummyController@method1')->setName('fancy2');
+        TestRouter::get('/my/fancy/url/2', 'DummyController@method2')->setName('fancy2');
 
         TestRouter::debugNoReset('/my/fancy/url/1');
 
@@ -83,7 +74,6 @@ class GroupTest extends TestCase
         $this->assertEquals('/my/fancy/url/2/', TestRouter::getUri('fancy2')->getPath());
 
         TestRouter::router()->reset();
-
     }
 
 }

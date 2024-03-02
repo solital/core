@@ -87,9 +87,9 @@ class CacheItem implements CacheItemInterface
     /**
      * @param mixed $value
      * 
-     * @return CacheItem
+     * @return static
      */
-    public function set(mixed $value): CacheItem
+    public function set(mixed $value): static
     {
         $this->value = $value;
         $this->expiration = $this->getDefaultExpiration();
@@ -99,9 +99,9 @@ class CacheItem implements CacheItemInterface
 
     /**
      * @param \DateTimeInterface|null $expiration
-     * @return CacheItem
+     * @return static
      */
-    public function expiresAt(?\DateTimeInterface $expiration): CacheItem
+    public function expiresAt(?\DateTimeInterface $expiration): static
     {
         if ($expiration === null) {
             $this->expiration = $this->getDefaultExpiration();
@@ -114,9 +114,9 @@ class CacheItem implements CacheItemInterface
 
     /**
      * @param \DateInterval|int|null $time
-     * @return CacheItem
+     * @return static
      */
-    public function expiresAfter(int|\DateInterval|null $time): CacheItem
+    public function expiresAfter(int|\DateInterval|null $time): static
     {
         if ($time === null) {
             $this->expiration = $this->getDefaultExpiration();

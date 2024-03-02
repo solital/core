@@ -63,13 +63,13 @@ abstract class Application
      */
     public static function yamlParse(string $yaml_file, bool $return_dir_name = false, bool $throws = false): mixed
     {
-        if (!defined('SITE_ROOT')) {
-            throw new ApplicationException("SITE_ROOT constant not defined");
-        }
-
         if (self::DEBUG == true) {
             $yaml_dir_file = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Kernel' . DIRECTORY_SEPARATOR . 'Console' . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR;
         } else {
+            if (!defined('SITE_ROOT')) {
+                throw new ApplicationException("SITE_ROOT constant not defined");
+            }
+
             $yaml_dir_file = constant('SITE_ROOT') . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR;
         }
 

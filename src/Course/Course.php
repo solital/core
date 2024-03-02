@@ -415,12 +415,12 @@ class Course
             try {
                 return new Uri('/');
             } catch (\Exception $e) {
-                #echo $e->getMessage();
+                echo $e->getMessage();
             }
         }
 
         // This will never happen...
-        return null;
+        //return null;
     }
 
     /**

@@ -4,7 +4,11 @@
         colors="true"
         stopOnFailure="false"
         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.4/phpunit.xsd"
-        cacheDirectory=".phpunit.cache">
+        cacheDirectory=".phpunit.cache"
+        displayDetailsOnTestsThatTriggerDeprecations="true"
+        displayDetailsOnTestsThatTriggerErrors="true"
+        displayDetailsOnTestsThatTriggerNotices="true"
+        displayDetailsOnTestsThatTriggerWarnings="true">
   <testsuites>
     <testsuite name="Solital Core Tests">
       <directory>tests</directory>

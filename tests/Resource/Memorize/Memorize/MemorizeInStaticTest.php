@@ -3,9 +3,10 @@
 namespace Solital\Test\Resource\Memorize\Memorize;
 
 use PHPUnit\Framework\TestCase;
-use Solodkiy\Memorize\Support\Singleton;
-use Solodkiy\Memorize\Support\StaticFactorialCalculator;
+use Solital\Test\Resource\Memorize\Support\Singleton;
+use Solital\Test\Resource\Memorize\Support\StaticFactorialCalculator;
 
+#[\AllowDynamicProperties]
 class MemorizeInStaticTest extends TestCase
 {
     public function testMemorize()
@@ -38,8 +39,6 @@ class MemorizeInStaticTest extends TestCase
         $first = Singleton::getInstance();
         $second = Singleton::getInstance();
         $this->assertSame($first, $second);
-        $this->assertInstanceOf('Solodkiy\Memorize\Support\Singleton', $first);
+        $this->assertInstanceOf(Singleton::class, $first);
     }
-
-
 }

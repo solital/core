@@ -265,7 +265,6 @@ abstract class LoadableRoute extends Route implements LoadableRouteInterface
     public function setSettings(array $values, bool $merge = false): RouteInterface
     {
         if (isset($values['as']) === true) {
-
             $name = $values['as'];
 
             if ($this->name !== null && $merge !== false) {

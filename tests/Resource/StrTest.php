@@ -12,13 +12,13 @@ class StrTest extends TestCase
      */
     public function testCallThrowsStrException()
     {
-        $this->expectException('\BadMethodCallException');
+        $this->expectException('BadMethodCallException');
 
         $str = new Str('foo');
         $str->method_that_will_never_exists();
     }
 
-    public function providerRenderValue()
+    public static function providerRenderValue()
     {
         return array(
             array('foo'),
@@ -57,7 +57,7 @@ class StrTest extends TestCase
         ));
     }
 
-    public function providerAddCslashes()
+    public static function providerAddCslashes()
     {
         return array(
             array('foo=bar', 'A..z', '\f\o\o=\b\a\r'),
@@ -81,7 +81,7 @@ class StrTest extends TestCase
         $this->assertEquals($expected, $slashed);
     }
 
-    public function providerAddSlashes()
+    public static function providerAddSlashes()
     {
         return array(
             array("aa'bb", "aa\'bb"),
@@ -105,7 +105,7 @@ class StrTest extends TestCase
         $this->assertEquals($expected, $slashed);
     }
 
-    public function providerChunkSplit()
+    public static function providerChunkSplit()
     {
         return array(
             array('foobar', 2, ':', 'fo:ob:ar:'),
@@ -132,7 +132,7 @@ class StrTest extends TestCase
         $this->assertEquals($expected, $split);
     }
 
-    public function providerCompare()
+    public static function providerCompare()
     {
         return array(
             array('foobar', new Str('fooba'), 1),
@@ -154,7 +154,7 @@ class StrTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function providerCompareInsensitive()
+    public static function providerCompareInsensitive()
     {
         return array(
             array('hello wOrLd', 'HELLO world', 0),
@@ -176,7 +176,7 @@ class StrTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function providerConcat()
+    public static function providerConcat()
     {
         return array(
             array('foo', 'bar', 'foobar'),
@@ -201,7 +201,7 @@ class StrTest extends TestCase
         $this->assertSame($expected, $str->value());
     }
 
-    public function providerContains()
+    public static function providerContains()
     {
         return array(
             array('containing string', 'ning', TRUE),
@@ -224,7 +224,7 @@ class StrTest extends TestCase
         $this->assertSame($result, $expected);
     }
 
-    public function providerCountChars()
+    public static function providerCountChars()
     {
         return array(
             array('abababcabc', TRUE, array(ord('a') => 4, ord('b') => 4, ord('c') => 2)),
@@ -247,7 +247,7 @@ class StrTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function providerExplode()
+    public static function providerExplode()
     {
         return array(
             array('foo is bar sometimes', ' ', array('foo', 'is', 'bar', 'sometimes')),
@@ -270,7 +270,7 @@ class StrTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function providerImplode()
+    public static function providerImplode()
     {
         return array(
             array(' ', array('foo'), 'foo'),
@@ -295,7 +295,7 @@ class StrTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function providerIreplace()
+    public static function providerIreplace()
     {
         return array(
             array('foo=bar', array('FOO' => 'bar'), 'bar=bar'),
@@ -319,7 +319,7 @@ class StrTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function providerLtrim()
+    public static function providerLtrim()
     {
         return array(
             array(" \n\r foo", NULL, 'foo'),
@@ -345,7 +345,7 @@ class StrTest extends TestCase
         $this->assertEquals($expected, $trimmed);
     }
 
-    public function providerNl2Br()
+    public static function providerNl2Br()
     {
         return array(
             array("foo\nbar" . PHP_EOL, "foo<br />\nbar<br />" . PHP_EOL),
@@ -369,7 +369,7 @@ class StrTest extends TestCase
         $this->assertEquals($expected, $str->value());
     }
 
-    public function providerPad()
+    public static function providerPad()
     {
         return array(
             array('foo',    16, '-.-;', STR_PAD_RIGHT, 'foo-.-;-.-;-.-;-'),
@@ -398,7 +398,7 @@ class StrTest extends TestCase
         $this->assertEquals($expected, $str->value());
     }
 
-    public function providerPosition()
+    public static function providerPosition()
     {
         return array(
             array('foo is bar sometimes', ' is ', 0, 3),
@@ -421,7 +421,7 @@ class StrTest extends TestCase
         $this->assertEquals($expected, $str->position($substring, $offset));
     }
 
-    public function providerRepeat()
+    public static function providerRepeat()
     {
         return array(
             array('foo', 5, 'foofoofoofoofoo'),
@@ -441,7 +441,7 @@ class StrTest extends TestCase
         $this->assertEquals($expected, $str->repeat($multiplier));
     }
 
-    public function providerReplace()
+    public static function providerReplace()
     {
         return array(
             array(
@@ -466,7 +466,7 @@ class StrTest extends TestCase
         $this->assertEquals($expected, $str->replace($replacements, $count));
     }
 
-    public function providerReverse()
+    public static function providerReverse()
     {
         return array(
             array('knitS raW pupilS regaL', 'Lager Slipup War Stink'),
@@ -488,7 +488,7 @@ class StrTest extends TestCase
         $this->assertEquals($expected, $str->reverse());
     }
 
-    public function providerRot13()
+    public static function providerRot13()
     {
         return array(
             array('999', '999'),
@@ -512,7 +512,7 @@ class StrTest extends TestCase
         $this->assertEquals($expected, $str->rot13());
     }
 
-    public function providerRTrim()
+    public static function providerRTrim()
     {
         return array(
             array(' foo      ', NULL, ' foo'),
@@ -555,7 +555,7 @@ class StrTest extends TestCase
         $this->assertNotEquals($str->value(), $original);
     }
 
-    public function providerSpecialChars()
+    public static function providerSpecialChars()
     {
         return array(
             array('<p>This should <br>not be wrapped</p>', '&lt;p&gt;This should &lt;br&gt;not be wrapped&lt;/p&gt;', '<p>This should <br>not be wrapped</p>')
@@ -583,7 +583,7 @@ class StrTest extends TestCase
         $this->assertEquals($expected2, $chars_back);
     }
 
-    public function providerStripTags()
+    public static function providerStripTags()
     {
         return array(
             array('<p>This should <br>not be wrapped</p>', NULL, 'This should not be wrapped'),
@@ -608,7 +608,7 @@ class StrTest extends TestCase
         $this->assertEquals($expected, $str->stripTags($allowed_tags));
     }
 
-    public function providerTranslate()
+    public static function providerTranslate()
     {
         return array(
             array(':foo :bar', array(':foo' => ':bar', ':bar' => ':newbar'), ':bar :newbar'),
@@ -632,7 +632,7 @@ class StrTest extends TestCase
         $this->assertEquals($expected, $str->translate($translations));
     }
 
-    public function providerTrim()
+    public static function providerTrim()
     {
         return array(
             array(" \n foo      ", NULL, 'foo'),
@@ -659,7 +659,7 @@ class StrTest extends TestCase
         $this->assertEquals($expected, $str->trim($mask));
     }
 
-    public function providerUndo()
+    public static function providerUndo()
     {
         return array(
             array(' foo is bar ', 1, 'foo is bar'),
@@ -697,7 +697,7 @@ class StrTest extends TestCase
         $str->undo('string');
     }
 
-    public function providerUniqueChars()
+    public static function providerUniqueChars()
     {
         return array(
             array('abcabdabcd', 'abcd'),
@@ -721,7 +721,7 @@ class StrTest extends TestCase
         $this->assertEquals($expected, $unique);
     }
 
-    public function providerWordCount()
+    public static function providerWordCount()
     {
         return array(
             array('foo is here 3 times foo foo', NULL, 6),
@@ -743,7 +743,7 @@ class StrTest extends TestCase
         $this->assertEquals($expected, $str->wordCount($charlist));
     }
 
-    public function providerWords()
+    public static function providerWords()
     {
         return array(
             array('foo foo bar foo', NULL, array(0 => 'foo', 4 => 'foo', 8 => 'bar', 12 => 'foo')),

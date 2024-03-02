@@ -2,6 +2,7 @@ composer.lock
 vendor/
 tests/files_test/Components/*
 tests/files_test/Database/*
+tests/files_test/Storage/*
 /nbproject/
 .phpunit.result.cache
 .phpunit.cache

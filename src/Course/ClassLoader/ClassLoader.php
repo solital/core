@@ -7,21 +7,6 @@ use Solital\Core\Exceptions\RuntimeException;
 class ClassLoader implements ClassLoaderInterface
 {
     /**
-     * @var Container|null
-     */
-    protected $container;
-
-    /**
-     * @var array
-     */
-    private array $closure_params = [];
-
-    /**
-     * @var array
-     */
-    private array $router_params = [];
-
-    /**
      * Load class
      *
      * @param string $class
@@ -29,7 +14,7 @@ class ClassLoader implements ClassLoaderInterface
      * @return mixed
      * @throws RuntimeException
      */
-    public function loadClass(string $class)
+    public function loadClass(string $class): mixed
     {
         if (class_exists($class) === false) {
             throw new RuntimeException("Class '$class' does not exist", 404);
@@ -44,42 +29,16 @@ class ClassLoader implements ClassLoaderInterface
      * @param mixed $closure
      * @param array $parameters
      * 
-     * @return void
+     * @return mixed
      */
-    public function loadClosure(mixed $closure, array $parameters)
-    {
-        $this->closureHasParam($closure, $parameters);
-    }
-
-    /**
-     * @param \Closure $closure
-     * @param array $parameters
-     * 
-     * @return mixed|null
-     * @throws RuntimeException
-     */
-    public function closureHasParam(\Closure $closure, array $parameters)
+    public function loadClosure(mixed $closure, array $parameters): mixed
     {
         $reflect = new \ReflectionFunction($closure);
 
-        foreach ($reflect->getParameters() as $closure_params) {
-            $closure_params = (array)$closure_params;
-            array_push($this->closure_params, $closure_params['name']);
+        if (!empty($reflect->getParameters())) {
+            return call_user_func_array($closure, $parameters);
         }
 
-        foreach ($parameters as $key => $params) {
-            array_push($this->router_params, $key);
-        }
-
-        $diff1 = array_diff($this->router_params, $this->closure_params);
-        $diff2 = array_diff_assoc($this->closure_params, $this->router_params);
-
-        if (empty($diff1) && empty($diff2)) {
-            return \call_user_func_array($closure, $parameters);
-        } else {
-            throw new RuntimeException("Parameter not defined in the URL or function", 404);
-        }
-
-        return null;
+        return call_user_func($closure, $parameters);
     }
 }

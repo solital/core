@@ -312,7 +312,6 @@ class Uri implements \JsonSerializable, UriInterface
     public function setPath(string $path): self
     {
         $this->path = rtrim($path, '/') . '/';
-
         return $this;
     }
 
@@ -346,7 +345,6 @@ class Uri implements \JsonSerializable, UriInterface
     public function setParams(array $params): self
     {
         $this->params = $params;
-
         return $this;
     }
 
@@ -393,7 +391,6 @@ class Uri implements \JsonSerializable, UriInterface
     public function setFragment(string $fragment): self
     {
         $this->fragment = $fragment;
-
         return $this;
     }
 
@@ -412,7 +409,6 @@ class Uri implements \JsonSerializable, UriInterface
     public function indexOf(string $value): int
     {
         $index = stripos($this->getOriginalUrl(), $value);
-
         return ($index === false) ? -1 : $index;
     }
 
@@ -422,7 +418,7 @@ class Uri implements \JsonSerializable, UriInterface
      */
     public function contains(string $value): bool
     {
-        return (stripos($this->getOriginalUrl(), $value) !== false);
+        return (str_contains($this->getOriginalUrl(), $value));
     }
 
     /**
@@ -559,7 +555,6 @@ class Uri implements \JsonSerializable, UriInterface
     public function withScheme($scheme): Uri
     {
         $scheme = $this->sanitizeScheme($scheme);
-
         return $this->cloneWithProperty('scheme', $scheme);
     }
 
@@ -634,7 +629,6 @@ class Uri implements \JsonSerializable, UriInterface
         }
 
         $port = $this->sanitizePort($port);
-
         return $this->cloneWithProperty('port', $port);
     }
 
@@ -686,7 +680,6 @@ class Uri implements \JsonSerializable, UriInterface
     public function withPath($path): Uri
     {
         $path = $this->sanitizePath($path);
-
         return $this->cloneWithProperty('path', $path);
     }
 
@@ -734,7 +727,6 @@ class Uri implements \JsonSerializable, UriInterface
     public function withQuery($query): Uri
     {
         $query = $this->sanitizeQuery($query);
-
         return $this->cloneWithProperty('query', $query);
     }
 
@@ -784,7 +776,6 @@ class Uri implements \JsonSerializable, UriInterface
     public function withFragment($fragment): UriInterface
     {
         $fragment = $this->sanitizeFragment($fragment);
-
         return $this->cloneWithProperty('fragment', $fragment);
     }
 

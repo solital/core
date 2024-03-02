@@ -2,8 +2,11 @@
 
 namespace Solital\Test\Resource\Memorize\Memorize;
 
+require_once dirname(__DIR__) . '/Support/functions.php';
+
 use PHPUnit\Framework\TestCase;
 
+#[\AllowDynamicProperties]
 class MemorizeInFunctionTest extends TestCase
 {
     public function testMemorize()

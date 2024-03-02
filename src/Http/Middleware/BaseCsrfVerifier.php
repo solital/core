@@ -16,9 +16,9 @@ class BaseCsrfVerifier
     protected array $except = [];
 
     /**
-     * @var SessionTokenProvider
+     * @var mixed
      */
-    protected SessionTokenProvider $tokenProvider;
+    protected mixed $tokenProvider;
 
     /**
      * BaseCsrfVerifier constructor.

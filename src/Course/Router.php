@@ -20,7 +20,6 @@ use Solital\Core\Course\Route\{
     ControllerRouteInterface,
     PartialGroupRouteInterface
 };
-use Solital\Core\Security\Guardian;
 
 class Router
 {
@@ -105,11 +104,6 @@ class Router
     protected ClassLoader $classLoader;
 
     /**
-     * @var array
-     */
-    private array $url;
-
-    /**
      * @var bool
      */
     private bool $send_console;
@@ -145,14 +139,14 @@ class Router
             throw new InvalidArgumentException("Invalid request-uri url: " . $e->getMessage());
         }
 
-        /* $this->routes = [];
+        $this->routes = [];
         $this->bootManagers = [];
         $this->routeStack = [];
         $this->processedRoutes = [];
         $this->exceptionHandlers = [];
         $this->loadedExceptionHandlers = [];
-        $this->eventHandlers = []; */
-        //$this->csrfVerifier = null;
+        $this->eventHandlers = [];
+        $this->csrfVerifier = null;
         $this->classLoader = new ClassLoader();
     }
 
@@ -214,6 +208,8 @@ class Router
      */
     protected function processRoutes(array $routes, ?GroupRouteInterface $group = null): void
     {
+        $check_duplicate_routers = [];
+
         // Loop through each route-request
         $exceptionHandlers = [];
 
@@ -269,9 +265,6 @@ class Router
                 $this->processedRoutes[] = $route;
             }
 
-            $this->url[] = $route->url;
-            $routeDuplicate = array_unique(array_diff_assoc($this->url, array_unique($this->url)));
-
             if ($this->send_console == true) {
                 $values[] = [
                     'url' => ($route->url ?? ''),
@@ -280,19 +273,54 @@ class Router
                     'controller' => $route->getControllerName()
                 ];
             }
+
+            $check_duplicate_routers[] = [
+                'url' => ($route->url ?? ''),
+                'method' => strtoupper(implode("|", $route->getRequestMethods()))
+            ];
         }
 
         if ($this->send_console == true) {
             $this->sendToConsole($values);
         }
 
-        if (isset($routeDuplicate)) {
-            foreach ($routeDuplicate as $duplicate) {
-                throw new RuntimeException("Duplicate '$duplicate' route", 404);
+        $this->VerifyDuplicateRoutes($check_duplicate_routers);
+        $this->exceptionHandlers = array_merge($exceptionHandlers, $this->exceptionHandlers);
+    }
+
+    /**
+     * Verify if exists duplicate routes
+     *
+     * @param array $check_duplicate_routers
+     * @param string $key
+     * 
+     * @return void
+     * @throws RuntimeException
+     */
+    private function VerifyDuplicateRoutes(array $check_duplicate_routers, string $key = 'url'): void
+    {
+        $uniq_array = [];
+        $dup_array = [];
+        $key_array = [];
+
+        foreach ($check_duplicate_routers as $val) {
+            if (!in_array($val[$key], $key_array)) {
+                $key_array[] = $val[$key];
+                $uniq_array[] = $val;
+            } else {
+                $dup_array[] = $val;
             }
         }
 
-        $this->exceptionHandlers = array_merge($exceptionHandlers, $this->exceptionHandlers);
+        list($unique_addresses, $duplicates) = [$uniq_array, $dup_array];
+
+        if (!empty($duplicates)) {
+            foreach ($duplicates as $duplicate) {
+                if ($duplicate['url'] != '' || !empty($duplicate['url'])) {
+                    throw new RuntimeException("Duplicate '" . $duplicate['url'] . "' route", 404);
+                }
+            }
+        }
     }
 
     /**
@@ -426,7 +454,6 @@ class Router
         }
 
         if (\count($this->request->getLoadedRoutes()) === 0) {
-
             $rewriteUrl = $this->request->getRewriteUrl();
 
             if ($rewriteUrl !== null) {
@@ -588,17 +615,19 @@ class Router
             }
 
             /* Using @ is most definitely a controller@method or alias@method */
-            if (\is_string($name) === true && strpos($name, '@') !== false) {
-                [$controller, $method] = array_map('strtolower', explode('@', $name));
+            if (!is_null($route->getClass()) && !is_null($route->getMethod())) {
+                if (\is_string($name) === true && str_contains($name, '@')) {
+                    [$controller, $method] = array_map('strtolower', explode('@', $name));
 
-                if ($controller === strtolower($route->getClass()) && $method === strtolower($route->getMethod())) {
-                    return $route;
+                    if ($controller === strtolower($route->getClass()) && $method === strtolower($route->getMethod())) {
+                        return $route;
+                    }
                 }
             }
 
             /* Check if callback matches (if it's not a function) */
             $callback = $route->getCallback();
-            if (\is_string($name) === true && \is_string($callback) === true && strpos($name, '@') !== false && strpos($callback, '@') !== false && \is_callable($callback) === false) {
+            if (\is_string($name) === true && \is_string($callback) === true && str_contains($name, '@') && strpos($callback, '@') !== false && \is_callable($callback) === false) {
 
                 /* Check if the entire callback is matching */
                 if (strpos($callback, $name) === 0 || strtolower($callback) === strtolower($name)) {
@@ -632,21 +661,18 @@ class Router
      * @param array|null $getParams
      * @return Uri
      * @throws InvalidArgumentException
-     * @throws \Solital\Http\Exceptions\MalformedUrlException
      */
     public function getUri(?string $name = null, $parameters = null, ?array $getParams = null): Uri
     {
-        $domain = Guardian::getUrl();
-        
         $this->fireEvents(EventHandler::EVENT_GET_URL, [
             'name'       => $name,
             'parameters' => $parameters,
             'getParams'  => $getParams,
         ]);
 
-        if ($getParams !== null && \is_array($getParams) === false) {
+        /* if ($getParams !== null && \is_array($getParams) === false) {
             throw new InvalidArgumentException('Invalid type for getParams. Must be array or null');
-        }
+        } */
 
         if ($name === '' && $parameters === '') {
             return new Uri('/');
@@ -686,7 +712,7 @@ class Router
         }
 
         /* Using @ is most definitely a controller@method or alias@method */
-        if (\is_string($name) === true && strpos($name, '@') !== false) {
+        if (is_string($name) && str_contains($name, '@')) {
             [$controller, $method] = explode('@', $name);
 
             /* Loop through all the routes to see if we can find a match */
@@ -703,16 +729,16 @@ class Router
                 }
 
                 /* Check if the route controller is equal to the name */
-                /* if ($processedRoute instanceof ControllerRouteInterface && strtolower($processedRoute->getController()) === strtolower($controller)) {
+                if ($processedRoute instanceof ControllerRouteInterface && strtolower($processedRoute->getController()) === strtolower($controller)) {
                     return $this->request
                         ->getUrlCopy()
                         ->setPath($processedRoute->findUrl($method, $parameters, $name))
                         ->setParams($getParams);
-                } */
+                }
             }
         }
 
-        /* No result so we assume that someone is using a hardcoded url and join everything together. */
+        /* No result so we assume that someone is using a hardcoded url and join everything together */
         $url = trim(implode('/', array_merge((array)$name, (array)$parameters)), '/');
         $url = (($url === '') ? '/' : '/' . $url . '/');
 
@@ -725,7 +751,6 @@ class Router
     public function addExceptionHandler(ExceptionHandlerInterface $handler): self
     {
         $this->exceptionHandlers[] = $handler;
-
         return $this;
     }
 
@@ -747,7 +772,6 @@ class Router
     public function setBootManagers(array $bootManagers): self
     {
         $this->bootManagers = $bootManagers;
-
         return $this;
     }
 
@@ -760,7 +784,6 @@ class Router
     public function addBootManager(RouterBootManagerInterface $bootManager): self
     {
         $this->bootManagers[] = $bootManager;
-
         return $this;
     }
 
@@ -791,7 +814,6 @@ class Router
     public function setRoutes(array $routes): self
     {
         $this->routes = $routes;
-
         return $this;
     }
 

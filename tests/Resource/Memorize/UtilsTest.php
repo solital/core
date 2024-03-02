@@ -21,7 +21,7 @@ class UtilsTest extends TestCase
      */
     public function testStringifyResource()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(RuntimeException::class);
         Utils::stringify(fopen('php://temp', 'r'));
     }
 
@@ -39,11 +39,11 @@ class UtilsTest extends TestCase
      */
     public function testStringifyCustomObject()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(RuntimeException::class);
         Utils::stringify(new \DateTime('now'));
     }
 
-    public function hashProvider()
+    public static function hashProvider()
     {
         return [
             'int'           => ['i:15;', 15],

@@ -90,6 +90,7 @@ class RouteResource extends LoadableRoute implements ControllerRouteInterface
     public function findUrl(?string $method = null, $parameters = null, ?string $name = null): string
     {
         $url = array_search($name, $this->names, false);
+
         if ($url !== false) {
             return rtrim($this->url . $this->urls[$url], '/') . '/';
         }
@@ -105,7 +106,6 @@ class RouteResource extends LoadableRoute implements ControllerRouteInterface
     protected function call(?string $method): bool
     {
         $this->setCallback($this->controller . '@' . $method);
-
         return true;
     }
 
@@ -130,6 +130,15 @@ class RouteResource extends LoadableRoute implements ControllerRouteInterface
 
         $route = rtrim($this->url, '/') . '/{id?}/{action?}';
 
+        $url = explode("/", $url);
+        $filter_url = array_filter($url, [$this, 'isStringOrNumeric']);
+
+        if (!empty($filter_url)) {
+            unset($url[1]);
+        }
+
+        $url = implode("/", $url);
+
         /* Parse parameters from current route */
         $this->parameters = $this->parseParameters($route, $url);
 
@@ -138,7 +147,12 @@ class RouteResource extends LoadableRoute implements ControllerRouteInterface
             return false;
         }
 
-        $action = strtolower(trim($this->parameters['action']));
+        if (!is_null($this->parameters['action'])) {
+            $action = strtolower(trim($this->parameters['action']));
+        } else {
+            $action = 'index';
+        }
+
         $id = $this->parameters['id'];
 
         // Remove action parameter
@@ -162,7 +176,7 @@ class RouteResource extends LoadableRoute implements ControllerRouteInterface
         }
 
         // Create
-        if ($method === static::REQUEST_TYPE_GET && $id === 'create') {
+        if ($method === static::REQUEST_TYPE_GET && $action === 'create') {
             return $this->call($this->methodNames['create']);
         }
 
@@ -172,7 +186,7 @@ class RouteResource extends LoadableRoute implements ControllerRouteInterface
         }
 
         // Show
-        if ($method === static::REQUEST_TYPE_GET && $id !== null) {
+        if ($method === static::REQUEST_TYPE_GET && is_numeric($id)) {
             return $this->call($this->methodNames['show']);
         }
 
@@ -195,7 +209,6 @@ class RouteResource extends LoadableRoute implements ControllerRouteInterface
     public function setController(string $controller): ControllerRouteInterface
     {
         $this->controller = $controller;
-
         return $this;
     }
 
@@ -207,7 +220,6 @@ class RouteResource extends LoadableRoute implements ControllerRouteInterface
     public function setName(string $name): LoadableRouteInterface
     {
         $this->name = $name;
-
         $this->names = [
             'index'   => $this->name . '.index',
             'create'  => $this->name . '.create',
@@ -230,7 +242,6 @@ class RouteResource extends LoadableRoute implements ControllerRouteInterface
     public function setMethodNames(array $names)
     {
         $this->methodNames = $names;
-
         return $this;
     }
 
@@ -262,5 +273,17 @@ class RouteResource extends LoadableRoute implements ControllerRouteInterface
         }
 
         return parent::setSettings($values, $merge);
+    }
+
+    /**
+     * Return true if $in is either a numeric
+     *
+     * @param mixed $in
+     * 
+     * @return bool
+     */
+    private function isStringOrNumeric(mixed $in): bool
+    {
+        return is_numeric($in);
     }
 }

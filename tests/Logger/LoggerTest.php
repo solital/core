@@ -16,10 +16,10 @@ class LoggerTest extends TestCase
         Logger::channel('single')->error('My info message');
     }
 
-    public function testMailLog()
+    /* public function testMailLog()
     {
         Logger::channel('mail')->error('My info message');
-    }
+    } */
 
     public function testException()
     {

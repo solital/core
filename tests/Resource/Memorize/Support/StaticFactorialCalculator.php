@@ -2,6 +2,7 @@
 
 namespace Solital\Test\Resource\Memorize\Support;
 
+#[\AllowDynamicProperties]
 class StaticFactorialCalculator
 {
     private static $workLog = [];

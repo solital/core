@@ -18,24 +18,21 @@ class MiddlewareTest extends TestCase
         $this->expectException(MiddlewareLoadedException::class);
 
         TestRouter::group(['exceptionHandler' => 'ExceptionHandler'], function () {
-            TestRouter::get('/my/test/url1', 'DummyController@method1', ['middleware' => 'DummyMiddleware']);
+            TestRouter::get('/my/test/url1', 'DummyController@method2', ['middleware' => 'DummyMiddleware']);
         });
 
         TestRouter::debug('/my/test/url1', 'get');
-
     }
 
     public function testNestedMiddlewareDontLoad()
     {
 
         TestRouter::group(['exceptionHandler' => 'ExceptionHandler', 'middleware' => 'DummyMiddleware'], function () {
-            TestRouter::get('/middleware', 'DummyController@method1');
+            TestRouter::get('/middleware', 'DummyController@method2');
         });
 
-        TestRouter::get('/my/test/url2', 'DummyController@method1');
-
+        TestRouter::get('/my/test/url2', 'DummyController@method2');
         TestRouter::debug('/my/test/url2', 'get');
-
         $this->assertTrue(true);
     }
 

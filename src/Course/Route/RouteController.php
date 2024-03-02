@@ -101,6 +101,10 @@ class RouteController extends LoadableRoute implements ControllerRouteInterface
             $url .= '//' . $group->getDomains()[0];
         }
 
+        if (is_null($method)) {
+            $method = '';
+        }
+
         $url .= '/' . trim($this->getUri(), '/') . '/' . strtolower($method) . implode('/', $parameters);
 
         return '/' . trim($url, '/') . '/';

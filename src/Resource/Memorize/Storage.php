@@ -4,7 +4,7 @@ namespace Solital\Core\Resource\Memorize;
 
 class Storage
 {
-    private $data = [];
+    private array $data = [];
 
     public function set($name, $paramsHash, $value)
     {

@@ -7,19 +7,16 @@ require_once dirname(__DIR__) . '/TestRouter.php';
 
 use PHPUnit\Framework\TestCase;
 
-/**
- * CORRIGIR
- */
 class RouterUrlTest extends TestCase
 {
-    /* public function testUnicodeCharacters() EEEEEEERRRRRRR
+    public function testUnicodeCharacters()
     {
         $_SERVER["REQUEST_METHOD"] = 'get';
         $_SERVER["REQUEST_URI"] = '/';
 
         // Test spanish characters
-        TestRouter::get('/cursos/listado/{listado?}/{category?}', 'DummyController@unicode', ['defaultParameterRegex' => '[\w\p{L}\s-]+']);
-        TestRouter::get('/test/{param}', 'DummyController@param', ['defaultParameterRegex' => '[\w\p{L}\s-\í]+']);
+        TestRouter::get('/cursos/listado/{listado?}/{category?}', 'DummyController@unicode', ['defaultParameterRegex' => '[\w\p{L}\s\-]+']);
+        TestRouter::get('/test/{param}', 'DummyController@param', ['defaultParameterRegex' => '[\w\p{L}\s\-\í]+']);
         TestRouter::debugNoReset('/cursos/listado/especialidad/cirugíalocal', 'get');
 
         $this->assertEquals('/cursos/listado/{listado?}/{category?}/', TestRouter::router()->getRequest()->getLoadedRoute()->getUri());
@@ -36,9 +33,9 @@ class RouterUrlTest extends TestCase
         $this->assertEquals('/kategori/økse/', TestRouter::router()->getRequest()->getLoadedRoute()->getUri());
 
         TestRouter::router()->reset();
-    } */
+    }
 
-    /* public function testOptionalParameters() EEEERRRRR
+    public function testOptionalParameters()
     {
         $_SERVER["REQUEST_METHOD"] = 'get';
         $_SERVER["REQUEST_URI"] = '/';
@@ -64,9 +61,9 @@ class RouterUrlTest extends TestCase
         $this->assertEquals('/{param?}/', TestRouter::router()->getRequest()->getLoadedRoute()->getUri());
 
         TestRouter::router()->reset();
-    } */
+    }
 
-    /* public function testSimilarUrls() EEERRR
+    public function testSimilarUrls()
     {
         $_SERVER["REQUEST_METHOD"] = 'get';
         $_SERVER["REQUEST_URI"] = '/';
@@ -80,11 +77,12 @@ class RouterUrlTest extends TestCase
         $this->assertEquals(TestRouter::getUri('match'), TestRouter::getUri());
 
         TestRouter::router()->reset();
-    } */
+    }
 
     public function testUrls()
     {
-        #$_SERVER["REQUEST_METHOD"] = 'get';
+        $_SERVER["REQUEST_METHOD"] = 'get';
+        $_SERVER["REQUEST_URI"] = '/';
 
         // Match normal route on alias
         TestRouter::get('/', 'DummyController@method2', ['as' => 'home']);

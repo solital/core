@@ -16,24 +16,12 @@ class JSONTest extends TestCase
 
     public function testJsonEncodeError()
     {
-        //$this->expectException('JsonException');
-
         $json_encode = "\xB1\x31";
 
         $json = new JSON();
         $res = $json->encode($json_encode, true);
-
-        $this->assertStringContainsString('json_error', $res);
-    }
-
-    public function testJsonEncodeException()
-    {
-        //$this->expectException('JsonException');
-
-        $json_encode = "\xB1\x31";
-
-        $json = new JSON();
-        $json->encode($json_encode, true);
+        $value = $json->decode($res, true);
+        $this->assertArrayHasKey('json_error', $value);
     }
 
     public function testJsonDecode()

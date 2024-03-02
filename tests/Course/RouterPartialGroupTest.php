@@ -7,12 +7,9 @@ require_once dirname(__DIR__) . '/TestRouter.php';
 
 use PHPUnit\Framework\TestCase;
 
-/**
- * CORRIGIR
- */
 class RouterPartialGroupTest extends TestCase
 {
-    /* public function testParameters()
+    public function testParameters()
     {
         $_SERVER["REQUEST_METHOD"] = 'get';
         $_SERVER["REQUEST_URI"] = '/';
@@ -24,13 +21,12 @@ class RouterPartialGroupTest extends TestCase
             $result1 = $param1;
             $result2 = $param2;
 
-            TestRouter::get('/', 'DummyController@method1');
+            TestRouter::get('/', 'DummyController@method3');
         });
 
         TestRouter::debug('/param1/param2', 'get');
 
         $this->assertEquals('param1', $result1);
         $this->assertEquals('param2', $result2);
-    } */
-
+    }
 }

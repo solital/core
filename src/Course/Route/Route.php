@@ -111,7 +111,15 @@ abstract class Route implements RouteInterface
             throw new RuntimeException("Method '$method' doesn't exist in namespace '$className'", 404);
         }
 
-        return \call_user_func_array([$class, $method], $parameters);
+        try {
+            return \call_user_func_array([$class, $method], $parameters);
+        } catch (\Error) {
+            try {
+                return \call_user_func([$class, $method], $parameters);
+            } catch (\Error $e) {
+                throw new \Exception($e->getMessage());
+            }
+        }
     }
 
     /**
@@ -190,7 +198,7 @@ abstract class Route implements RouteInterface
      */
     public function getIdentifier(): string
     {
-        if (\is_string($this->callback) === true && strpos($this->callback, '@') !== false) {
+        if (\is_string($this->callback) === true && str_contains($this->callback, '@')) {
             return $this->callback;
         }
 
@@ -274,7 +282,6 @@ abstract class Route implements RouteInterface
     public function setCallback($callback): RouteInterface
     {
         $this->callback = $callback;
-
         return $this;
     }
 
@@ -291,7 +298,7 @@ abstract class Route implements RouteInterface
      */
     public function getMethod(): ?string
     {
-        if (\is_string($this->callback) === true && strpos($this->callback, '@') !== false) {
+        if (\is_string($this->callback) === true && str_contains($this->callback, '@')) {
             $tmp = explode('@', $this->callback);
 
             return $tmp[1];
@@ -305,7 +312,7 @@ abstract class Route implements RouteInterface
      */
     public function getClass(): ?string
     {
-        if (\is_string($this->callback) === true && strpos($this->callback, '@') !== false) {
+        if (\is_string($this->callback) === true && str_contains($this->callback, '@')) {
             $tmp = explode('@', $this->callback);
 
             return $tmp[0];
@@ -322,7 +329,6 @@ abstract class Route implements RouteInterface
     public function setMethod(string $method): RouteInterface
     {
         $this->callback = sprintf('%s@%s', $this->getClass(), $method);
-
         return $this;
     }
 
@@ -334,7 +340,6 @@ abstract class Route implements RouteInterface
     public function setClass(string $class): RouteInterface
     {
         $this->callback = sprintf('%s@%s', $class, $this->getMethod());
-
         return $this;
     }
 
@@ -345,7 +350,6 @@ abstract class Route implements RouteInterface
     public function setNamespace(string $namespace): RouteInterface
     {
         $this->namespace = $namespace;
-
         return $this;
     }
 
@@ -356,7 +360,6 @@ abstract class Route implements RouteInterface
     public function setDefaultNamespace($namespace): RouteInterface
     {
         $this->defaultNamespace = $namespace;
-
         return $this;
     }
 

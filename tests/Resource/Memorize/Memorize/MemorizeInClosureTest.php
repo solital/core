@@ -2,8 +2,11 @@
 
 namespace Solital\Test\Resource\Memorize\Memorize;
 
+require_once dirname(__DIR__, 3) . '/bootstrap.php';
+
 use PHPUnit\Framework\TestCase;
 
+#[\AllowDynamicProperties]
 class MemorizeInClosureTest extends TestCase
 {
     private $workLog = [];

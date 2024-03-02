@@ -23,7 +23,7 @@ class SessionTest extends TestCase
     public function testDeleteSession()
     {
         $res = Session::delete('name');
-        $this->assertEmpty($res);
+        $this->assertTrue($res);
     }
 
     public function testTakeSession()

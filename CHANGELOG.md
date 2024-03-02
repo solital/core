@@ -1,6 +1,22 @@
 # Released Notes
 
-## v4.1.1 - (2024-03-25)
+## v4.1.2 - (2024-03-02)
+
+### Fixed
+
+- Fixed `SITE_ROOT` constant checking on `yamlParse` method
+- Fixed Closure parameters on `ClassLoader` and `Route` class
+- Fixed `RouteResource` class
+- Fixed url clone and `getUrlCopy` method at `Request` class
+- Fixed methods without `str_contains` function
+- Fixed duplicate route checking
+- Fixed CSRF verifier
+- Fixed `CacheItem` interface
+- Fixed dynamic properties on `memorize` helper
+
+--------------------------------------------------------------------------
+
+## v4.1.1 - (2024-02-25)
 
 ### Fixed
 

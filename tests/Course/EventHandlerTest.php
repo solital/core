@@ -32,7 +32,7 @@ class EventHandlerTest extends TestCase
         });
 
         TestRouter::addEventHandler($eventHandler);
-        TestRouter::get('/', 'DummyController@method1')->name('home');
+        TestRouter::get('/', 'DummyController@method2')->name('home');
 
         // Trigger findRoute
         TestRouter::router()->findRoute('home');
@@ -46,9 +46,7 @@ class EventHandlerTest extends TestCase
         TestRouter::csrfVerifier($csrfVerifier);
 
         // Add boot-manager
-        TestRouter::addBootManager(new TestBootManager([
-            '/test',
-        ], '/'));
+        TestRouter::addBootManager(new TestBootManager(['/test',], '/'));
 
         // Start router
         TestRouter::debug('/');
@@ -66,7 +64,7 @@ class EventHandlerTest extends TestCase
         });
 
         TestRouter::addEventHandler($eventHandler);
-        TestRouter::get('/2', 'DummyController@method1');
+        TestRouter::get('/2', 'DummyController@method2');
         TestRouter::debug('/2');
 
         // All event should fire for each other event
@@ -91,7 +89,6 @@ class EventHandlerTest extends TestCase
         });
 
         TestRouter::addEventHandler($eventHandler);
-
         $this->assertTrue($status);
     }
 }

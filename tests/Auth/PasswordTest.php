@@ -4,6 +4,7 @@ require_once dirname(__DIR__, 2) . '/src/Resource/Helpers/security.php';
 
 use PHPUnit\Framework\TestCase;
 use Solital\Core\Auth\Password;
+use Solital\Core\Kernel\Application;
 
 class PasswordTest extends TestCase
 {
@@ -38,6 +39,8 @@ class PasswordTest extends TestCase
 
     public function testHelpers()
     {
+        Application::getInstance();
+        
         $hash = pass_hash('solital');
         $res = pass_verify('solital', $hash);
         $this->assertTrue($res);

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Solital\Core\Http;
 
 use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\UriInterface;
 use Solital\Core\Resource\Session;
 use Solital\Core\Http\{Uri, Input\InputHandler, Traits\RequestTrait};
 use Solital\Core\Course\{Course, Route\RouteUrl, Route\LoadableRouteInterface};
@@ -41,6 +40,13 @@ class Request implements RequestInterface
      * @var Uri
      */
     protected ?Uri $uri = null;
+
+    /**
+     * Current request url
+     * 
+     * @var Uri
+     */
+    protected ?Uri $uri_clone = null;
 
     /**
      * Current request url
@@ -94,8 +100,13 @@ class Request implements RequestInterface
 
     /**
      * Request constructor.
+     * 
+     * @param string $method
+     * @param mixed $uri
+     * @param mixed $body
+     * @param array $headers
      */
-    public function __construct(string $method, $uri, $body = 'php://memory', array $headers = [])
+    public function __construct(string $method, mixed $uri, mixed $body = 'php://memory', array $headers = [])
     {
         $this->headers = $_SERVER;
         $this->initialize($method, $uri, $body, $headers);
@@ -164,6 +175,8 @@ class Request implements RequestInterface
 
             $this->uri->setHost((string)$this->getHost());
         }
+
+        $this->uri_clone = clone $this->uri;
     }
 
     /**
@@ -173,7 +186,11 @@ class Request implements RequestInterface
      */
     public function getUrlCopy(): Uri
     {
-        return clone $this->uri;
+        if (is_null($this->uri_clone)) {
+            $this->getUri();
+        }
+        
+        return $this->uri_clone;
     }
 
     /**

@@ -226,15 +226,28 @@ function memorize(Closure $lambda, $paramsHash = null)
         $that = $reflection->getClosureThis();
 
         if ($that) {
-            if (!isset($that->_memorizeStorage)) {
-                $that->_memorizeStorage = new Storage();
+            if (!isset($that->memorizeStorage)) {
+                $that->memorizeStorage = new Storage();
             }
-            return $that->_memorizeStorage;
+
+            $class = get_class($that);
+            $reflection_class = new \ReflectionClass($class);
+            $attr = $reflection_class->getAttributes();
+
+            $values = array_map(fn($attribute) => $attribute->getName(), $attr);
+
+            if (!in_array("AllowDynamicProperties", $values)) {
+                throw new \Exception("You must add 'AllowDynamicProperties' attribute on ". $class);
+            }
+
+            return $that->memorizeStorage;
         } else {
             global $_globalMemorizeStorage;
+            
             if (is_null($_globalMemorizeStorage)) {
                 $_globalMemorizeStorage = new Storage();
             }
+            
             return $_globalMemorizeStorage;
         }
     };
