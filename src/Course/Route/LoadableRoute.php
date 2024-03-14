@@ -2,8 +2,8 @@
 
 namespace Solital\Core\Course\Route;
 
+use Solital\Core\Http\Exception\NotFoundHttpException;
 use Solital\Core\Http\Request;
-use Solital\Core\Exceptions\NotFoundHttpException;
 use Solital\Core\Course\Router;
 use Solital\Core\Course\Route\{
     Route,

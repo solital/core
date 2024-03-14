@@ -4,7 +4,7 @@ namespace Solital\Core\Course\Route;
 
 use Solital\Core\Course\Router;
 use Solital\Core\Http\{Request, Middleware\MiddlewareInterface};
-use Solital\Core\Exceptions\{NotFoundHttpException, RuntimeException};
+use Solital\Core\Exceptions\RuntimeException;
 
 abstract class Route implements RouteInterface
 {
@@ -69,7 +69,7 @@ abstract class Route implements RouteInterface
      * @param Router $router
      * 
      * @return string|null
-     * @throws NotFoundHttpException
+     * @throws Exception
      */
     public function renderRoute(Request $request, Router $router): ?string
     {

@@ -316,7 +316,7 @@ class InputHandler
     {
         $output = $_GET;
 
-        if ($this->request->getMethod() === 'post') {
+        if ($this->request->getMethod() === 'post' || $this->request->getMethod() === 'put') {
             if (filter_input_array(INPUT_POST) != null) {
                 // Append POST data
                 $output += filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -329,7 +329,7 @@ class InputHandler
                         $output += $post;
                     }
                 }
-            } elseif ($_POST != null) {
+            } elseif ($_POST != null || !empty(file_get_contents('php://input'))) {
                 // Append POST data
                 $output += filter_var_array($_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
                 $contents = file_get_contents('php://input');

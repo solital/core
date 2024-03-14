@@ -3,7 +3,7 @@
 require_once 'Dummy/DummyMiddleware.php';
 require_once 'Dummy/DummyController.php';
 require_once 'Dummy/Handler/ExceptionHandler.php';
-require_once dirname(__DIR__) . '/TestRouter.php';
+require_once dirname(__DIR__) . '/bootstrap.php';
 
 use PHPUnit\Framework\TestCase;
 
@@ -11,9 +11,6 @@ class RouterUrlTest extends TestCase
 {
     public function testUnicodeCharacters()
     {
-        $_SERVER["REQUEST_METHOD"] = 'get';
-        $_SERVER["REQUEST_URI"] = '/';
-
         // Test spanish characters
         TestRouter::get('/cursos/listado/{listado?}/{category?}', 'DummyController@unicode', ['defaultParameterRegex' => '[\w\p{L}\s\-]+']);
         TestRouter::get('/test/{param}', 'DummyController@param', ['defaultParameterRegex' => '[\w\p{L}\s\-\í]+']);
@@ -37,9 +34,6 @@ class RouterUrlTest extends TestCase
 
     public function testOptionalParameters()
     {
-        $_SERVER["REQUEST_METHOD"] = 'get';
-        $_SERVER["REQUEST_URI"] = '/';
-
         TestRouter::get('/aviso/legal', 'DummyController@unicode');
         TestRouter::get('/listado/{category}', 'DummyController@unicode');
         TestRouter::get('/lang/{lang}/{name}', 'DummyController@params');
@@ -65,9 +59,6 @@ class RouterUrlTest extends TestCase
 
     public function testSimilarUrls()
     {
-        $_SERVER["REQUEST_METHOD"] = 'get';
-        $_SERVER["REQUEST_URI"] = '/';
-
         // Match normal route on alias
         TestRouter::resource('/url11', 'DummyController@method2');
         TestRouter::resource('/url1', 'DummyController@method2', ['as' => 'match']);
@@ -81,9 +72,6 @@ class RouterUrlTest extends TestCase
 
     public function testUrls()
     {
-        $_SERVER["REQUEST_METHOD"] = 'get';
-        $_SERVER["REQUEST_URI"] = '/';
-
         // Match normal route on alias
         TestRouter::get('/', 'DummyController@method2', ['as' => 'home']);
 

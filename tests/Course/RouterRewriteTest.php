@@ -6,7 +6,7 @@ require_once 'Dummy/Handler/ExceptionHandlerFirst.php';
 require_once 'Dummy/Handler/ExceptionHandlerSecond.php';
 require_once 'Dummy/Handler/ExceptionHandlerThird.php';
 require_once 'Dummy/Middleware/RewriteMiddleware.php';
-require_once dirname(__DIR__) . '/TestRouter.php';
+require_once dirname(__DIR__) . '/bootstrap.php';
 
 use PHPUnit\Framework\TestCase;
 use Solital\Core\Course\Route\RouteUrl;
@@ -15,9 +15,6 @@ class RouterRewriteTest extends TestCase
 {
     public function testRewriteUrlFromRoute()
     {
-        $_SERVER["REQUEST_METHOD"] = 'get';
-        $_SERVER["REQUEST_URI"] = '/';
-
         TestRouter::get('/old', function () {
             TestRouter::request()->setRewriteUrl('/new0');
         });
@@ -35,13 +32,11 @@ class RouterRewriteTest extends TestCase
         });
 
         $output = TestRouter::debugOutput('/old');
-
         $this->assertEquals('ok', $output);
     }
 
     public function testRewriteCallbackFromRoute()
     {
-
         TestRouter::get('/old2', function () {
             TestRouter::request()->setRewriteUrl('/new3');
         });
@@ -59,15 +54,12 @@ class RouterRewriteTest extends TestCase
         });
 
         $output = TestRouter::debugOutput('/old2');
-
         TestRouter::router()->reset();
-
         $this->assertEquals('ok', $output);
     }
 
     public function testRewriteRouteFromRoute()
     {
-
         TestRouter::get('/match', function () {
             TestRouter::request()->setRewriteRoute(new RouteUrl('/match', function () {
                 echo 'ok';
@@ -87,15 +79,12 @@ class RouterRewriteTest extends TestCase
         });
 
         $output = TestRouter::debugOutput('/match');
-
         TestRouter::router()->reset();
-
         $this->assertEquals('ok', $output);
     }
 
     public function testMiddlewareRewrite()
     {
-
         TestRouter::group(['middleware' => 'RewriteMiddleware'], function () {
             TestRouter::get('/', function () {
                 echo 'ok';
@@ -107,7 +96,6 @@ class RouterRewriteTest extends TestCase
         });
 
         $output = TestRouter::debugOutput('/');
-
         $this->assertEquals('middleware-ok', $output);
     }
 }

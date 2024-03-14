@@ -23,7 +23,6 @@ interface RouteInterface
      *
      * @param Request $request
      * @param Router $router
-     * @throws \Solital\Course\Exceptions\NotFoundHttpException
      * @return string
      */
     public function renderRoute(Request $request, Router $router): ?string;

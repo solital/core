@@ -1,5 +1,15 @@
 # Released Notes
 
+## v4.1.3 - (2024-03-14)
+
+### Fixed
+
+- Fixed POST stream at `InputHandler` class
+- Fixed CSRF exception
+- Fixed IP restrict exception
+
+--------------------------------------------------------------------------
+
 ## v4.1.2 - (2024-03-02)
 
 ### Fixed

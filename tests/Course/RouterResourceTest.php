@@ -1,7 +1,7 @@
 <?php
 
 require_once 'Dummy/ResourceController.php';
-require_once dirname(__DIR__) . '/TestRouter.php';
+require_once dirname(__DIR__) . '/bootstrap.php';
 
 use PHPUnit\Framework\TestCase;
 
@@ -9,9 +9,6 @@ class RouterResourceTest extends TestCase
 {
     public function testResourceIndex()
     {
-        $_SERVER["REQUEST_METHOD"] = 'get';
-        $_SERVER["REQUEST_URI"] = '/';
-
         TestRouter::resource('/resource', 'ResourceController');
         $response = TestRouter::debugOutput('/resource', 'get');
 
@@ -20,9 +17,6 @@ class RouterResourceTest extends TestCase
 
     public function testResourceGet()
     {
-        $_SERVER["REQUEST_METHOD"] = 'get';
-        $_SERVER["REQUEST_URI"] = '/';
-
         TestRouter::resource('/resource', 'ResourceController');
         $response = TestRouter::debugOutput('/resource/38', 'get');
 
@@ -31,9 +25,6 @@ class RouterResourceTest extends TestCase
     
     public function testResourceStore()
     {
-        $_SERVER["REQUEST_METHOD"] = 'get';
-        $_SERVER["REQUEST_URI"] = '/';
-
         TestRouter::resource('/resource', ResourceController::class);
         $response = TestRouter::debugOutput('/resource', 'post');
 
@@ -42,9 +33,6 @@ class RouterResourceTest extends TestCase
 
     public function testResourceCreate()
     {
-        $_SERVER["REQUEST_METHOD"] = 'get';
-        $_SERVER["REQUEST_URI"] = '/';
-
         TestRouter::resource('/resource', 'ResourceController');
         $response = TestRouter::debugOutput('/resource/create', 'get');
 
@@ -53,9 +41,6 @@ class RouterResourceTest extends TestCase
 
     public function testResourceDestroy()
     {
-        $_SERVER["REQUEST_METHOD"] = 'get';
-        $_SERVER["REQUEST_URI"] = '/';
-
         TestRouter::resource('/resource', 'ResourceController');
         $response = TestRouter::debugOutput('/resource/38', 'delete');
 
@@ -64,9 +49,6 @@ class RouterResourceTest extends TestCase
 
     public function testResourceEdit()
     {
-        $_SERVER["REQUEST_METHOD"] = 'get';
-        $_SERVER["REQUEST_URI"] = '/';
-
         TestRouter::resource('/resource', 'ResourceController');
         $response = TestRouter::debugOutput('/resource/38/edit', 'get');
 
@@ -75,9 +57,6 @@ class RouterResourceTest extends TestCase
 
     public function testResourceUpdate()
     {
-        $_SERVER["REQUEST_METHOD"] = 'get';
-        $_SERVER["REQUEST_URI"] = '/';
-
         TestRouter::resource('/resource', 'ResourceController');
         $response = TestRouter::debugOutput('/resource/38', 'put');
 

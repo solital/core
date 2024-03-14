@@ -6,14 +6,11 @@ use Solital\Core\Course\RouterBootManagerInterface;
 
 class TestBootManager implements RouterBootManagerInterface
 {
+    protected $rewrite;
 
-    protected $routes;
-    protected $aliasUrl;
-
-    public function __construct(array $routes, string $aliasUrl)
+    public function __construct(array $rewrite)
     {
-        $this->routes = $routes;
-        $this->aliasUrl = $aliasUrl;
+        $this->rewrite = $rewrite;
     }
 
     /**
@@ -24,11 +21,11 @@ class TestBootManager implements RouterBootManagerInterface
      */
     public function boot(Router $router, Request $request): void
     {
-        foreach ($this->routes as $url) {
+        foreach ($this->rewrite as $url => $rewrite) {
             // If the current url matches the rewrite url, we use our custom route
 
             if ($request->getUri()->contains($url) === true) {
-                $request->setRewriteUrl($this->aliasUrl);
+                $request->setRewriteUrl($rewrite);
             }
 
         }

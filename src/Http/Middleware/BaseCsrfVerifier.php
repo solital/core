@@ -2,8 +2,8 @@
 
 namespace Solital\Core\Http\Middleware;
 
-use Solital\Core\Exceptions\InvalidArgumentException;
 use Solital\Core\Http\{Request, Security\SessionTokenProvider, Security\TokenProviderInterface};
+use Solital\Core\Http\Exception\TokenMismatchException;
 
 class BaseCsrfVerifier
 {
@@ -70,14 +70,14 @@ class BaseCsrfVerifier
      * @param Request $request
      * 
      * @return void
-     * @throws InvalidArgumentException
+     * @throws TokenMismatchException
      */
     public function validateToken(Request $request): void
     {
         if ($this->skip($request) === false && \in_array($request->getMethod(), ['post', 'put', 'delete'], true) === true) {
 
             if ($this->tokenProvider->validate() === false) {
-                throw new InvalidArgumentException("Invalid CSRF-token");
+                throw new TokenMismatchException("Invalid CSRF-token");
             }
         }
     }

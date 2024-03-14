@@ -49,4 +49,9 @@ class DummyController
     {
         # code...
     }
+
+    public function contact()
+    {
+        # code...
+    }
 }

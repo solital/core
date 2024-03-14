@@ -3,17 +3,14 @@
 require_once 'Dummy/DummyMiddleware.php';
 require_once 'Dummy/DummyController.php';
 require_once 'Dummy/Handler/ExceptionHandler.php';
-require_once dirname(__DIR__) . '/TestRouter.php';
+require_once dirname(__DIR__) . '/bootstrap.php';
 
 use PHPUnit\Framework\TestCase;
 
 class RouterPartialGroupTest extends TestCase
 {
     public function testParameters()
-    {
-        $_SERVER["REQUEST_METHOD"] = 'get';
-        $_SERVER["REQUEST_URI"] = '/';
-        
+    {   
         $result1 = null;
         $result2 = null;
 

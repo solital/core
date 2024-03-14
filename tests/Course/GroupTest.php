@@ -4,14 +4,12 @@ use PHPUnit\Framework\TestCase;
 
 require_once 'Dummy/DummyMiddleware.php';
 require_once 'Dummy/DummyController.php';
-require_once dirname(__DIR__) . '/TestRouter.php';
+require_once dirname(__DIR__) . '/bootstrap.php';
 
 class GroupTest extends TestCase
 {
     public function testGroupLoad()
     {
-        $_SERVER["REQUEST_METHOD"] = 'get';
-        $_SERVER["REQUEST_URI"] = '/';
         $result = false;
 
         TestRouter::group(['prefix' => '/group'], function () use(&$result) {
@@ -75,5 +73,4 @@ class GroupTest extends TestCase
 
         TestRouter::router()->reset();
     }
-
 }

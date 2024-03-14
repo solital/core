@@ -5,7 +5,7 @@ require_once 'Dummy/DummyController.php';
 require_once 'Dummy/Handler/ExceptionHandler.php';
 require_once 'Dummy/Security/SilentTokenProvider.php';
 require_once 'Dummy/Managers/TestBootManager.php';
-require_once dirname(__DIR__) . '/TestRouter.php';
+require_once dirname(__DIR__) . '/bootstrap.php';
 
 use PHPUnit\Framework\TestCase;
 use Solital\Core\Course\Event\EventArgument;
@@ -17,9 +17,6 @@ class EventHandlerTest extends TestCase
 {
     public function testAllEventTriggered()
     {
-        $_SERVER["REQUEST_METHOD"] = 'get';
-        $_SERVER["REQUEST_URI"] = '/';
-
         $events = EventHandler::$events;
 
         // Remove the all event

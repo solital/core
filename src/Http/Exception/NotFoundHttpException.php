@@ -1,6 +1,6 @@
 <?php
 
-namespace Solital\Core\Exceptions;
+namespace Solital\Core\Http\Exception;
 
 class NotFoundHttpException extends \Exception
 {

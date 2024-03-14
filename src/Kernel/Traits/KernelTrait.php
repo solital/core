@@ -10,7 +10,7 @@ trait KernelTrait
     /**
      * That variables must be changed manually
      */
-    const SOLITAL_VERSION   = "4.1.2";
+    const SOLITAL_VERSION   = "4.1.3";
     const SITE_DOC_DOMAIN   = "https://solital.github.io/site/";
     const DEBUG             = false;
     const DEBUG_DATABASE    = false;
