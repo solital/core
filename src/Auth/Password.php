@@ -5,6 +5,8 @@ namespace Solital\Core\Auth;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Exceptions\NotFoundException;
 use SecurePassword\{SecurePassword, HashAlgorithm};
+use Solital\Core\Kernel\Dotenv;
+use Solital\Core\Kernel\Exceptions\DotenvException;
 
 class Password
 {
@@ -21,7 +23,7 @@ class Password
     /**
      * @var string
      */
-    private string $pepper;
+    private string $pepper = '';
 
     /**
      * @var string
@@ -59,7 +61,6 @@ class Password
     public function __construct()
     {
         $this->setConfig();
-
         $this->password = new SecurePassword([
             'algo' => $this->algo,
             'cost' => (int)$this->cost,
@@ -76,7 +77,7 @@ class Password
      * 
      * @return mixed
      */
-    public function create(string $password, bool $info = false): mixed
+    public function create(#[\SensitiveParameter] string $password, bool $info = false): mixed
     {
         if ($info == true) {
             return $this->password->createHash($password)->getHashInfo();
@@ -91,7 +92,7 @@ class Password
      * 
      * @return bool
      */
-    public function verify(string $password, string $hash): bool
+    public function verify(#[\SensitiveParameter] string $password, string $hash): bool
     {
         return $this->password->verifyHash($password, $hash, $this->wait_microseconds);
     }
@@ -102,7 +103,7 @@ class Password
      * 
      * @return mixed
      */
-    public function needsRehash(string $password, string $hash): mixed
+    public function needsRehash(#[\SensitiveParameter] string $password, string $hash): mixed
     {
         return $this->password->needsRehash($password, $hash);
     }
@@ -122,11 +123,15 @@ class Password
             default => throw new NotFoundException('Password: hash algorithm not found')
         };
 
-        $this->pepper = $config['password']['pepper'];
-        $this->cost = $config['password']['cost'];
-        $this->memory_cost = $config['password']['memory_cost'];
-        $this->time_cost = $config['password']['time_cost'];
-        $this->threads = $config['password']['threads'];
+        if (isset($config['password']['pepper'])) {
+            $this->pepper = $config['password']['pepper'];
+        } elseif (Dotenv::isset('APP_HASH') == true && getenv('APP_HASH') != false) {
+            $this->pepper = getenv('APP_HASH');
+        } else {
+            if (getenv('APP_HASH') == '' || !Dotenv::isset('APP_HASH')) {
+                throw new DotenvException("APP_HASH not found. Execute 'php vinci generate:hash' command");
+            }
+        }
 
         if (isset($config['password']['wait_microseconds'])) {
             $this->wait_microseconds = $config['password']['wait_microseconds'];
@@ -135,6 +140,11 @@ class Password
         if (isset($config['password']['crypt_type'])) {
             $this->crypt_type = $config['password']['crypt_type'];
         }
+
+        $this->cost = $config['password']['cost'];
+        $this->memory_cost = $config['password']['memory_cost'];
+        $this->time_cost = $config['password']['time_cost'];
+        $this->threads = $config['password']['threads'];
 
         return $this;
     }

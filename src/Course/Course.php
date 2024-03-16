@@ -2,9 +2,8 @@
 
 namespace Solital\Core\Course;
 
-use Solital\Core\Exceptions\InvalidArgumentException;
+use Solital\Core\Exceptions\{InvalidArgumentException, CallbackExceptionHandler};
 use Solital\Core\Http\{Uri, Request, Response, Middleware\BaseCsrfVerifier};
-
 use Solital\Core\Course\{
     Router,
     RouterBootManagerInterface,
@@ -16,7 +15,8 @@ use Solital\Core\Course\{
     Route\RoutePartialGroup,
     Route\GroupRouteInterface,
     Route\PartialGroupRouteInterface,
-    Handlers\EventHandlerInterface
+    Handlers\EventHandlerInterface,
+    ClassLoader\ClassLoaderInterface
 };
 
 class Course
@@ -26,7 +26,7 @@ class Course
      * 
      * @var string|null
      */
-    protected static $defaultNamespace;
+    protected static ?string $defaultNamespace = null;
 
     /**
      * The response object
@@ -47,7 +47,7 @@ class Course
      * 
      * @var string|null
      */
-    protected static $basePath;
+    protected static ?string $basePath = null;
 
     /**
      * Start routing
@@ -80,6 +80,16 @@ class Course
     public static function setDefaultBasepath(string $basePath): void
     {
         static::$basePath = $basePath;
+    }
+
+    /**
+     * Set custom class-loader class used
+     * 
+     * @param ClassLoaderInterface $classLoader
+     */
+    public static function setCustomClassLoader(ClassLoaderInterface $classLoader): void
+    {
+        static::router()->setClassLoader($classLoader);
     }
 
     /**
@@ -380,14 +390,18 @@ class Course
     }
 
     /**
-     * @param bool $redirect
-     * @param string $url
+     * Add exception callback handler.
+     *
+     * @param \Closure $callback
+     * @return CallbackExceptionHandler $callbackHandler
      */
-    public static function error(bool $redirect, string $url)
+    public static function error(\Closure $callback): CallbackExceptionHandler
     {
-        if ($redirect == true) {
-            Router::setUrlRedirect($url, $redirect);
-        }
+        $callbackHandler = new CallbackExceptionHandler($callback);
+
+        static::router()->addExceptionHandler($callbackHandler);
+
+        return $callbackHandler;
     }
 
     /**

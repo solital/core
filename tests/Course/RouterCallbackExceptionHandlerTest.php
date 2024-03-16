@@ -1,27 +1,26 @@
 <?php
 
-use Solital\Core\Exceptions\NotFoundHttpException;
+use Solital\Core\Exceptions\RuntimeException;
+use Solital\Core\Http\Exception\NotFoundHttpException;
 use Solital\Core\Http\Request;
 
 require_once 'Dummy/DummyMiddleware.php';
 require_once 'Dummy/DummyController.php';
 require_once 'Dummy/Exception/ExceptionHandlerException.php';
+require_once dirname(__DIR__) . '/bootstrap.php';
 
-/**
- * PARA IMPLEMENTAR
- */
 class RouterCallbackExceptionHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /* public function testCallbackExceptionHandler()
+    public function testCallbackExceptionHandler()
     {
-        $this->expectException(ExceptionHandlerException::class);
+        $this->expectException(RuntimeException::class);
 
         // Match normal route on alias
         TestRouter::get('/my-new-url', 'DummyController@method2');
-        TestRouter::get('/my-url', 'DummyController@method1');
+        TestRouter::get('/my-url', 'DummyController@about');
 
-        TestRouter::error(function (Request $request, \Exception $exception) {
-            throw new ExceptionHandlerException();
+        TestRouter::customErrorHandler(function (Request $request, \Exception $exception) {
+            throw new RuntimeException();
         });
 
         TestRouter::debug('/404-url');
@@ -35,8 +34,7 @@ class RouterCallbackExceptionHandlerTest extends \PHPUnit\Framework\TestCase
             });
 
             TestRouter::get('/not-found', 'DummyController@method1');
-            TestRouter::error(function(Request $request, \Exception $exception) {
-
+            TestRouter::customErrorHandler(function(Request $request, \Exception $exception) {
                 if($exception instanceof NotFoundHttpException && $exception->getCode() === 404) {
                     return $request->setRewriteCallback(static function() {
                         return 'success';
@@ -47,5 +45,5 @@ class RouterCallbackExceptionHandlerTest extends \PHPUnit\Framework\TestCase
 
         $result = TestRouter::debugOutput('/thisdoes-not/existssss', 'get');
         $this->assertEquals('success', $result);
-    } */
+    }
 }

@@ -1,12 +1,12 @@
 # Set configurations in PHP Security Password component
 password:
   algorithm: default # default - argon2 - argon2d
-  pepper: b3f952d5d9adea6f63bee9d4c6fceeaa
   cost: 10
   memory_cost: ''
   time_cost: ''
   threads: ''
   crypt_type: openssl
+  wait_microseconds: 25000
 
 # Set authentication route
 auth:

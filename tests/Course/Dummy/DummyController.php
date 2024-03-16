@@ -54,4 +54,9 @@ class DummyController
     {
         # code...
     }
+
+    public function classLoader()
+    {
+        echo 'Loader';
+    }
 }

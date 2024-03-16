@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__DIR__, 2) . '/src/Resource/Helpers/security.php';
+require_once dirname(__DIR__) . '/bootstrap.php';
 
 use PHPUnit\Framework\TestCase;
 use Solital\Core\Auth\Password;

@@ -3,6 +3,7 @@
     "description": "Official core of Solital framework",
     "license": "MIT",
     "homepage": "https://solital.github.io/site/docs/",
+    "version": "4.2.0",
     "require": {
         "php": "^8.3",
         "ext-json": "*",
@@ -37,8 +38,7 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^10",
-        "phpstan/phpstan": "^1.9",
-        "symfony/var-dumper": "7.*"
+        "phpstan/phpstan": "^1.9"
     },
     "autoload": {
         "psr-4": {

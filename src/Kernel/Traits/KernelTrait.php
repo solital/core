@@ -3,14 +3,16 @@
 namespace Solital\Core\Kernel\Traits;
 
 use ModernPHPException\ModernPHPException;
-use Solital\Core\Kernel\Application;
+use Solital\Core\Kernel\{Application, Dotenv};
+use Solital\Core\Kernel\Exceptions\DotenvException;
+use Solital\Core\Security\Hash;
 
 trait KernelTrait
 {
     /**
      * That variables must be changed manually
      */
-    const SOLITAL_VERSION   = "4.1.3";
+    const SOLITAL_VERSION   = "4.2.0";
     const SITE_DOC_DOMAIN   = "https://solital.github.io/site/";
     const DEBUG             = false;
     const DEBUG_DATABASE    = false;
@@ -123,5 +125,31 @@ trait KernelTrait
         }
 
         return $exception->start();
+    }
+
+    /**
+     * Verify for APP_HASH variable
+     *
+     * @return void
+     */
+    public static function verifyAppHash(): void
+    {
+        if (self::DEBUG == false) {
+            if (!Dotenv::isset('APP_HASH')) {
+                try {
+                    Dotenv::add('APP_HASH', Hash::randomString());
+                } catch (DotenvException) {
+                    throw new DotenvException("APP_HASH not found. Execute 'php vinci generate:hash' command");
+                }
+            }
+
+            if (Dotenv::isset('APP_HASH') && empty(getenv('APP_HASH'))) {
+                try {
+                    Dotenv::edit('APP_HASH', Hash::randomString());
+                } catch (DotenvException) {
+                    throw new DotenvException("APP_HASH not found. Execute 'php vinci generate:hash' command");
+                }
+            }
+        }
     }
 }

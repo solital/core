@@ -12,6 +12,8 @@ class EventLoop
     private array $callStrack = [];
 
     /**
+     * Sleep a Fiber in seconds
+     * 
      * @param float $seconds
      * 
      * @return void
@@ -25,6 +27,8 @@ class EventLoop
     }
 
     /**
+     * Suspend a Fiber and next
+     * 
      * @param mixed|null $value
      * 
      * @return Fiber|null
@@ -35,6 +39,8 @@ class EventLoop
     }
 
     /**
+     * Add a callable to a Fiber
+     * 
      * @param callable $callable
      * 
      * @return void
@@ -45,6 +51,24 @@ class EventLoop
     }
 
     /**
+     * Add a callable to a Fiber with time
+     * 
+     * @param  float     $seconds
+     * @param  callable  $callback
+     *
+     * @return void
+     */
+    public function deferWithTimer(float $seconds, callable $callback): void
+    {
+        $this->defer(function () use ($seconds, $callback) {
+            $this->sleep($seconds);
+            call_user_func($callback);
+        });
+    }
+
+    /**
+     * Execute all Fibers
+     * 
      * @return void
      */
     public function run(): void

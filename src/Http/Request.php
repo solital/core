@@ -189,7 +189,7 @@ class Request implements RequestInterface
         if (is_null($this->uri_clone)) {
             $this->getUri();
         }
-        
+
         return $this->uri_clone;
     }
 

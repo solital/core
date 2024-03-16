@@ -5,7 +5,13 @@ namespace Solital\Core\Cache\Psr6;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Cache\Exception\InvalidArgumentException;
 use Psr\Cache\{CacheItemInterface, CacheItemPoolInterface};
-use Solital\Core\Cache\Adapter\{APCuAdapter, FileBackendAdapter, MemcacheAdapter, MemcachedAdapter};
+use Solital\Core\Cache\Adapter\{
+    APCuAdapter,
+    FileBackendAdapter,
+    MemcacheAdapter,
+    MemcachedAdapter,
+    YacAdapter
+};
 
 class CachePool implements CacheItemPoolInterface
 {
@@ -71,8 +77,12 @@ class CachePool implements CacheItemPoolInterface
                 $this->backend = new APCuAdapter($yaml_data['cache_ttl']);
                 break;
 
+            case 'yac':
+                $this->backend = new YacAdapter($yaml_data['cache_ttl']);
+                break;
+
             default:
-                throw new InvalidArgumentException("Cache drive isn't exist or not supported at 'cache.yaml' file");
+                throw new InvalidArgumentException("Cache drive (" . $this->cache_drive . ") isn't exist or not supported at 'cache.yaml' file");
                 break;
         }
     }

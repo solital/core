@@ -37,7 +37,7 @@ function spoofing(string $method): string
  * 
  * @return string
  */
-function pass_hash(string $value, bool $info = false): string
+function pass_hash(#[\SensitiveParameter] string $value, bool $info = false): string
 {
     return Application::provider('solital-password')->create($value, $info);
 }
@@ -50,7 +50,7 @@ function pass_hash(string $value, bool $info = false): string
  * 
  * @return bool
  */
-function pass_verify(string $value, string $hash): bool
+function pass_verify(#[\SensitiveParameter] string $value, string $hash): bool
 {
     return Application::provider('solital-password')->verify($value, $hash);
 }

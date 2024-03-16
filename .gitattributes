@@ -4,4 +4,5 @@ phpunit.xml export-ignore
 README.md export-ignore
 rector.php export-ignore
 vinci.example export-ignore
-debug.md
+debug.md export-ignore
+.env export-ignore

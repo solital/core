@@ -1,5 +1,37 @@
 # Released Notes
 
+## v4.2.0 - (2024-03-16)
+
+### Added
+
+- Added `APP_HASH` environment to `Hash` and `Password` class
+- Added `SensitiveParameter` attribute on `Password` and helpers
+- Added `deferWithTimer` method on `EventLoop` class
+- Added `Mailer`, `Message` and `EventLoop` on Default Container
+- Added `Yac` cache support
+- Added HTTP Client to Core
+- Added helper to container
+- Added support to basic and digest auth
+- Added custom ClassLoader
+- Added create resource command
+- Added custom error handler
+
+### Changed
+
+- Changed key in sodium support on `Hash` class
+- Changed `error` router
+
+### Fixed
+
+- Fixed `ListDatabase` class command
+
+### Removed
+
+- Removed peeper on `auth.yaml`
+- Removed `symfony/var-dumper` component
+
+--------------------------------------------------------------------------
+
 ## v4.1.3 - (2024-03-14)
 
 ### Fixed

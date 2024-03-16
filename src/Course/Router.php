@@ -3,16 +3,10 @@
 namespace Solital\Core\Course;
 
 use Solital\Core\Logger\Logger;
-use Solital\Core\Http\{Uri, Request, Middleware\BaseCsrfVerifier};
+use Solital\Core\Http\{Uri, Request, Middleware\BaseCsrfVerifier, Exception\NotFoundHttpException};
 use Solital\Core\Course\Handlers\{EventHandler, EventHandlerInterface};
 use Solital\Core\Course\ClassLoader\{ClassLoader, ClassLoaderInterface};
-
-use Solital\Core\Exceptions\{
-    InvalidArgumentException,
-    ExceptionHandlerInterface,
-    RuntimeException
-};
-
+use Solital\Core\Exceptions\{InvalidArgumentException, ExceptionHandlerInterface, RuntimeException};
 use Solital\Core\Course\Route\{
     RouteInterface,
     GroupRouteInterface,
@@ -23,7 +17,6 @@ use Solital\Core\Course\Route\{
 
 class Router
 {
-
     /**
      * Current request
      * 
@@ -99,24 +92,14 @@ class Router
     /**
      * Class loader instance
      * 
-     * @var ClassLoader
+     * @var ClassLoaderInterface
      */
-    protected ClassLoader $classLoader;
+    protected ClassLoaderInterface $classLoader;
 
     /**
      * @var bool
      */
     private bool $send_console;
-
-    /**
-     * @var string
-     */
-    private static string $url_redirect;
-
-    /**
-     * @var bool
-     */
-    private static bool $redirect = false;
 
     /**
      * Router constructor.
@@ -128,6 +111,8 @@ class Router
 
     /**
      * Resets the router by reloading request and clearing all routes and data.
+     * 
+     * @return void
      */
     public function reset(): void
     {
@@ -399,6 +384,8 @@ class Router
      */
     public function routeRequest(): ?string
     {
+        $methodNotAllowed = null;
+
         try {
             $url = $this->request->getRewriteUrl() ?? $this->request->getUri()->getPath();
 
@@ -414,7 +401,13 @@ class Router
 
                     /* Check if request method matches */
                     if (\count($route->getRequestMethods()) !== 0 && \in_array($this->request->getMethod(), $route->getRequestMethods(), true) === false) {
-                        throw new \Exception("Route '" . $this->request->getUri()->getPath() . "' or method '" . strtoupper($this->request->getMethod()) . "' not allowed", 403);
+                        //throw new \Exception("Route '" . $this->request->getUri()->getPath() . "' or method '" . strtoupper($this->request->getMethod()) . "' not allowed", 403);
+
+                        // Only set method not allowed is not already set
+                        if ($methodNotAllowed === null) {
+                            $methodNotAllowed = true;
+                        }
+
                         continue;
                     }
 
@@ -429,6 +422,8 @@ class Router
                     if ($output !== null) {
                         return $output;
                     }
+
+                    $methodNotAllowed = false;
 
                     $this->request->addLoadedRoute($route);
 
@@ -453,44 +448,26 @@ class Router
             $this->handleException($e);
         }
 
+        if ($methodNotAllowed === true) {
+            $message = "Route '" . $this->request->getUri()->getPath() . "' or method '" . strtoupper($this->request->getMethod()) . "' not allowed";
+            return $this->handleException(new NotFoundHttpException($message, 403));
+        }
+
         if (\count($this->request->getLoadedRoutes()) === 0) {
             $rewriteUrl = $this->request->getRewriteUrl();
 
             if ($rewriteUrl !== null) {
-                $this->redirectRoute();
-
                 Logger::channel('single')->warning("Route '" . $rewriteUrl . "' not found (rewrite from: '" . $this->request->getUri()->getPath() . "')");
-                throw new RuntimeException("Route '" . $rewriteUrl . "' not found (rewrite from: '" . $this->request->getUri()->getPath() . "')", 404);
+                $message = "Route '" . $rewriteUrl . "' not found (rewrite from: '" . $this->request->getUri()->getPath() . "')";
             } else {
-                $this->redirectRoute();
-
                 Logger::channel('single')->warning("Route '" . $this->request->getUri()->getPath() . "' not found");
-                throw new RuntimeException("Route '" . $this->request->getUri()->getPath() . "' not found", 404);
+                $message = "Route '" . $this->request->getUri()->getPath() . "' not found";
             }
+
+            return $this->handleException(new NotFoundHttpException($message, 404));
         }
 
         return null;
-    }
-
-    /**
-     * @param string $url
-     * @param bool $redirect
-     */
-    public static function setUrlRedirect(string $url, bool $redirect)
-    {
-        self::$url_redirect = $url;
-        self::$redirect = $redirect;
-    }
-
-    /**
-     * @return void
-     */
-    private function redirectRoute(): void
-    {
-        if (self::$redirect == true) {
-            Course::response()->redirect(self::$url_redirect);
-            exit;
-        }
     }
 
     /**
@@ -582,7 +559,7 @@ class Router
                     return $this->routeRequest();
                 }
             } catch (\Exception $e) {
-                echo "<strong>Exceptionnnnnnn</strong>" . $e->getMessage();
+                //echo "<strong>Exceptionnnnnnn</strong>" . $e->getMessage();
             }
         }
 
@@ -849,11 +826,11 @@ class Router
     /**
      * Set class loader
      *
-     * @param ClassLoaderInterface $loader
+     * @param ClassLoaderInterface $classLoader
      */
-    public function setClassLoader(ClassLoaderInterface $loader): void
+    public function setClassLoader(ClassLoaderInterface $classLoader): void
     {
-        $this->classLoader = $loader;
+        $this->classLoader = $classLoader;
     }
 
     /**

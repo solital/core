@@ -15,7 +15,7 @@ use Solital\Core\Exceptions\ExceptionHandlerInterface;
  */
 class CallbackExceptionHandler implements ExceptionHandlerInterface
 {
-    protected $callback;
+    protected \Closure $callback;
 
     /**
      * @param \Closure $callback

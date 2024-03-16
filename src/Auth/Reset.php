@@ -6,9 +6,8 @@ use Katrina\Sql\KatrinaStatement;
 use Katrina\Connection\Connection;
 use Solital\Core\Mail\Mailer;
 use Solital\Core\Auth\Password;
-use Solital\Core\Security\Guardian;
-use Solital\Core\Security\Hash;
 use Solital\Core\Validation\Valid;
+use Solital\Core\Security\{Guardian, Hash};
 
 abstract class Reset
 {

@@ -8,18 +8,8 @@ use Solital\Core\Resource\Session;
 use Solital\Core\Security\Guardian;
 use Solital\Core\FileSystem\HandleFiles;
 use Solital\Core\Kernel\Exceptions\{ApplicationException, YamlException};
-
-use Solital\Core\Kernel\Traits\{
-    KernelTrait,
-    ClassLoaderTrait,
-    DatabaseTrait
-};
-
-use Solital\Core\Container\{
-    Interface\ContainerInterface,
-    Container,
-    DefaultServiceContainer
-};
+use Solital\Core\Kernel\Traits\{KernelTrait, ClassLoaderTrait, DatabaseTrait};
+use Solital\Core\Container\{Interface\ContainerInterface, Container, DefaultServiceContainer};
 
 abstract class Application
 {
@@ -86,45 +76,6 @@ abstract class Application
         }
 
         return Yaml::parseFile($yaml_dir_file . $yaml_file);
-    }
-
-    /**
-     * Get directory of the YAML files
-     * 
-     * @deprecated Use Application::yamlParse()
-     * @param int $dir_number
-     * 
-     * @return string
-     */
-    public static function getDirConfigFiles(int $dir_number): string
-    {
-        if (self::DEBUG == true) {
-            $dir_config_file = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Kernel' . DIRECTORY_SEPARATOR . 'Console' . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR;
-        } else {
-            $dir_config_file = dirname(__DIR__, $dir_number) . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR;
-        }
-
-        return $dir_config_file;
-    }
-
-    /**
-     * Returns variables by YAML file
-     * 
-     * @deprecated Use Application::yamlParse()
-     * @param int $dir_number
-     * @param string $yaml_file
-     * 
-     * @return mixed
-     */
-    public static function getYamlVariables(int $dir_number, string $yaml_file): mixed
-    {
-        $yaml_file = self::getDirConfigFiles($dir_number) . $yaml_file;
-
-        if (file_exists($yaml_file)) {
-            return Yaml::parseFile($yaml_file);
-        }
-
-        return false;
     }
 
     /**

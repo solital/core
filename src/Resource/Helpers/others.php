@@ -234,20 +234,20 @@ function memorize(Closure $lambda, $paramsHash = null)
             $reflection_class = new \ReflectionClass($class);
             $attr = $reflection_class->getAttributes();
 
-            $values = array_map(fn($attribute) => $attribute->getName(), $attr);
+            $values = array_map(fn ($attribute) => $attribute->getName(), $attr);
 
             if (!in_array("AllowDynamicProperties", $values)) {
-                throw new \Exception("You must add 'AllowDynamicProperties' attribute on ". $class);
+                throw new \Exception("You must add 'AllowDynamicProperties' attribute on " . $class);
             }
 
             return $that->memorizeStorage;
         } else {
             global $_globalMemorizeStorage;
-            
+
             if (is_null($_globalMemorizeStorage)) {
                 $_globalMemorizeStorage = new Storage();
             }
-            
+
             return $_globalMemorizeStorage;
         }
     };
@@ -259,4 +259,16 @@ function memorize(Closure $lambda, $paramsHash = null)
 
     $contextName = Utils::stringify($lambda);
     return Memorizator::memorize($contextName, $lambda, $paramsHash, $getStorage($lambda));
+}
+
+/**
+ * Get a PSR-11 container
+ *
+ * @param string $provider
+ * 
+ * @return mixed
+ */
+function container(string $provider): mixed
+{
+    return Application::provider($provider);
 }

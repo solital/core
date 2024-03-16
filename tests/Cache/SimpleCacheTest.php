@@ -15,7 +15,7 @@ class SimpleCacheTest extends TestCase
 
     public function testSimpleCache()
     {
-        $cache = cache();
+        $cache = cache('yac');
 
         $cache->delete('simple');
 

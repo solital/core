@@ -12,7 +12,7 @@ class Command
     use MessageTrait;
 
     public const VERSION = "4.2.0";
-    public const DATE_VERSION = "Mar xx 2024";
+    public const DATE_VERSION = "Mar 15 2024";
     public const SITE_DOC = "https://solital.github.io/site/docs/4.x/vinci-console/";
 
     /**
@@ -142,8 +142,13 @@ class Command
             return $this->instance->handle((object)$this->all_arguments, (object)$this->all_options);
         }
 
-        $this->error("Command '" . $this->command . "' not found")->print()->break()->exit();
-        return $this;
+        $this->error("Command '" . $this->command . "' not found")->print()->break();
+
+        if (!empty($this->verify_commands)) {
+            $this->spellCheckCommand($this->verify_commands, $this->command);
+        }
+        
+        exit;
     }
 
     /**
@@ -395,5 +400,32 @@ class Command
         }
 
         return $this;
+    }
+
+    /**
+     * @param array $text1
+     * @param string $text2
+     * 
+     * @return void
+     */
+    private function spellCheckCommand(array $text1, string $text2): void
+    {
+        $is_similar = true;
+        $input_word = null;
+
+        foreach ($text1 as $word) {
+            if ($text2 != $word) {
+                similar_text(strtolower($word), strtolower($text2), $perc);
+
+                if ($perc >= 80) {
+                    $is_similar = false;
+                    $input_word = $word;
+                }
+            }
+        }
+
+        if ($is_similar == false) {
+            $this->info("\n Didn't you mean: " . $input_word . "?")->print()->break();
+        }
     }
 }

@@ -3,21 +3,19 @@
 require_once 'Dummy/DummyMiddleware.php';
 require_once 'Dummy/DummyController.php';
 require_once 'Dummy/ClassLoader/CustomClassLoader.php';
+require_once dirname(__DIR__) . '/bootstrap.php';
 
 use PHPUnit\Framework\TestCase;
 
-/**
- * PARA IMPLEMENTAR
- */
 class ClassLoaderTest extends TestCase
 {
-    /* public function testCustomClassLoader()
+    public function testCustomClassLoader()
     {
         $result = false;
 
         TestRouter::setCustomClassLoader(new CustomClassLoader());
 
-        TestRouter::get('/', 'NonExistingClass@method3');
+        TestRouter::get('/', 'NonExistingClass@classLoader');
         TestRouter::get('/test-closure', function($status) use(&$result) {
             $result = $status;
         });
@@ -25,9 +23,9 @@ class ClassLoaderTest extends TestCase
         $classLoaderClass = TestRouter::debugOutput('/', 'get', false);
         TestRouter::debugOutput('/test-closure');
 
-        $this->assertEquals('method3', $classLoaderClass);
+        $this->assertEquals('Loader', $classLoaderClass);
         $this->assertTrue($result);
 
         TestRouter::router()->reset();
-    } */
+    }
 }

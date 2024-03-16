@@ -6,6 +6,7 @@ require_once 'Dummy/Handler/ExceptionHandler.php';
 require_once dirname(__DIR__) . '/bootstrap.php';
 
 use PHPUnit\Framework\TestCase;
+use Solital\Core\Http\Input\InputItem;
 
 class InputHandlerTest extends TestCase
 {
@@ -36,11 +37,13 @@ class InputHandlerTest extends TestCase
         $this->assertEquals($names, $handler->value('names'));
         $this->assertEquals($names, $handler->all(['names'])['names']);
         $this->assertEquals($day, $handler->value('day'));
-        $this->assertInstanceOf(\Solital\Core\Http\Input\InputItem::class, $handler->find('day'));
-        $this->assertInstanceOf(\Solital\Core\Http\Input\InputItem::class, $handler->post('day'));
+        $this->assertTrue($handler->exists('day'));
+        $this->assertInstanceOf(InputItem::class, $handler->find('day'));
+        $this->assertInstanceOf(InputItem::class, $handler->post('day'));
 
         // Check non-existing and wrong request-type
         $this->assertEmpty($handler->all(['non-existing']));
+        $this->assertFalse($handler->exists('non-existing'));
         $this->assertNull($handler->value('non-existing'));
         $this->assertNull($handler->find('non-existing'));
         $this->assertNull($handler->value('names', null, 'get'));
@@ -50,9 +53,9 @@ class InputHandlerTest extends TestCase
 
         $this->assertCount(4, $objects);
 
-        /* @var $object \Solital\Core\Http\Input\InputItem */
-        foreach($objects as $i => $object) {
-            $this->assertInstanceOf(\Solital\Core\Http\Input\InputItem::class, $object);
+        /* @var $object InputItem */
+        foreach ($objects as $i => $object) {
+            $this->assertInstanceOf(InputItem::class, $object);
             $this->assertEquals($names[$i], $object->getValue());
         }
 
@@ -86,11 +89,13 @@ class InputHandlerTest extends TestCase
         $this->assertEquals($names, $handler->value('names'));
         $this->assertEquals($names, $handler->all(['names'])['names']);
         $this->assertEquals($day, $handler->value('day'));
-        $this->assertInstanceOf(\Solital\Core\Http\Input\InputItem::class, $handler->find('day'));
-        $this->assertInstanceOf(\Solital\Core\Http\Input\InputItem::class, $handler->get('day'));
+        $this->assertTrue($handler->exists('day'));
+        $this->assertInstanceOf(InputItem::class, $handler->find('day'));
+        $this->assertInstanceOf(InputItem::class, $handler->get('day'));
 
         // Check non-existing and wrong request-type
         $this->assertEmpty($handler->all(['non-existing']));
+        $this->assertFalse($handler->exists('non-existing'));
         $this->assertNull($handler->value('non-existing'));
         $this->assertNull($handler->find('non-existing'));
         $this->assertNull($handler->value('names', null, 'post'));
@@ -100,9 +105,9 @@ class InputHandlerTest extends TestCase
 
         $this->assertCount(4, $objects);
 
-        /* @var $object \Solital\Core\Http\Input\InputItem */
-        foreach($objects as $i => $object) {
-            $this->assertInstanceOf(\Solital\Core\Http\Input\InputItem::class, $object);
+        /* @var $object InputItem */
+        foreach ($objects as $i => $object) {
+            $this->assertInstanceOf(InputItem::class, $object);
             $this->assertEquals($names[$i], $object->getValue());
         }
 
@@ -123,5 +128,4 @@ class InputHandlerTest extends TestCase
     {
         $this->assertEquals(true, true);
     }
-
 }
