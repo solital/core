@@ -13,7 +13,7 @@ class Command
     use MessageTrait;
 
     public const VERSION = "4.3.0";
-    public const DATE_VERSION = "Apr xx 2024";
+    public const DATE_VERSION = "Apr 05 2024";
     public const SITE_DOC = "https://solital.github.io/site/docs/4.x/vinci-console/";
 
     /**
@@ -103,10 +103,10 @@ class Command
      */
     public function __construct(array $class = [])
     {
-        //if (!class_exists(ModernPHPException::class)) {
-        $exc = new ModernPHPException();
-        $exc->start();
-        //}
+        if (!class_exists(ModernPHPException::class, false)) {
+            $exc = new ModernPHPException();
+            $exc->start();
+        }
 
         $this->all_command_class = $class;
         self::$all_command_class_copy = $class;
