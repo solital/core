@@ -3,7 +3,7 @@
     "description": "Official core of Solital framework",
     "license": "MIT",
     "homepage": "https://solital.github.io/site/docs/",
-    "version": "4.2.0",
+    "version": "4.3.0",
     "require": {
         "php": "^8.3",
         "ext-json": "*",
