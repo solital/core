@@ -168,6 +168,7 @@ function str(string $string): Str
 /**
  * Return a `Convertime` instance
  * 
+ * @deprecated Use Temporal class
  * @param string|null $timezone
  * 
  * @return Convertime

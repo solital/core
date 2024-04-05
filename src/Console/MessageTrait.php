@@ -2,8 +2,9 @@
 
 namespace Solital\Core\Console;
 
-use Codedungeon\PHPCliColors\Color;
-
+/**
+ * @deprecated Use Solital\Core\Console\Output\ConsoleOutput class
+ */
 trait MessageTrait
 {
     /**
@@ -54,6 +55,7 @@ trait MessageTrait
     /**
      * Print a single message on CLI
      * 
+     * @deprecated Use Solital\Core\Console\Output\ConsoleOutput class
      * @param string $message
      * 
      * @return self
@@ -68,7 +70,8 @@ trait MessageTrait
 
     /**
      * Create a success message
-     *
+     * 
+     * @deprecated Use Solital\Core\Console\Output\ConsoleOutput::success()
      * @param mixed $message
      * @param bool $space
      * 
@@ -92,6 +95,7 @@ trait MessageTrait
     /**
      * Create a info message
      *
+     * @deprecated Use Solital\Core\Console\Output\ConsoleOutput::info()
      * @param mixed $message
      * @param bool $space
      * 
@@ -115,6 +119,7 @@ trait MessageTrait
     /**
      * Create a warning message
      *
+     * @deprecated Use Solital\Core\Console\Output\ConsoleOutput::warning()
      * @param mixed $message
      * @param bool $space
      * 
@@ -138,6 +143,7 @@ trait MessageTrait
     /**
      * Create a error message
      *
+     * @deprecated Use Solital\Core\Console\Output\ConsoleOutput::error()
      * @param mixed $message
      * @param bool $space
      * 
@@ -161,6 +167,7 @@ trait MessageTrait
     /**
      * Create a normal message
      *
+     * @deprecated Use Solital\Core\Console\Output\ConsoleOutput::line()
      * @param mixed $message
      * @param bool $space
      * 
@@ -227,12 +234,12 @@ trait MessageTrait
     private function generateColors(): self
     {
         if ($this->colorIsSupported() || $this->are256ColorsSupported()) {
-            self::$color_reset = Color::RESET;
-            self::$color_success = Color::light_green();
-            self::$color_info = Color::light_cyan();
-            self::$color_warning = Color::light_yellow();
-            self::$color_error = Color::bg_red();
-            self::$color_line = Color::white();
+            self::$color_reset = "\e[0m";
+            self::$color_success = "\033[92m";
+            self::$color_info = "\033[96m";
+            self::$color_warning = "\033[93m";
+            self::$color_error = "\033[41m";
+            self::$color_line = "\033[97m";
         }
 
         return $this;
@@ -241,7 +248,7 @@ trait MessageTrait
     /**
      * @return bool
      */
-    public function colorIsSupported(): bool
+    private function colorIsSupported(): bool
     {
         if (DIRECTORY_SEPARATOR === '\\') {
             if (function_exists('sapi_windows_vt100_support') && @sapi_windows_vt100_support(STDOUT)) {
@@ -258,7 +265,7 @@ trait MessageTrait
     /**
      * @return bool
      */
-    public function are256ColorsSupported(): bool
+    private function are256ColorsSupported(): bool
     {
         if (DIRECTORY_SEPARATOR === '\\') {
             return function_exists('sapi_windows_vt100_support') && @sapi_windows_vt100_support(STDOUT);

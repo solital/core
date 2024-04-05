@@ -10,9 +10,7 @@
         "ext-pdo": "*",
         "brenno-duarte/modern-php-exception": "3.*",
         "brenno-duarte/php-secure-password": "3.*",
-        "codedungeon/php-cli-colors": "1.*",
         "delight-im/http": "2.*",
-        "egulias/email-validator": "4.*",
         "fig/event-dispatcher-util": "1.*",
         "matthiasmullie/minify": "1.*",
         "monolog/monolog": "^3.5",
@@ -31,7 +29,8 @@
         "spatie/db-dumper": "^3.4",
         "symfony/finder": "^7.0",
         "symfony/filesystem": "^7.0",
-        "symfony/yaml": "7.*"
+        "symfony/yaml": "7.*",
+        "wixel/gump": "^2.0"
     },
     "replace": {
         "solital/vinci-console": "self.version"

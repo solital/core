@@ -2,8 +2,8 @@
 
 namespace Solital\Core\Http\Input;
 
-use Solital\Core\Http\Request;
-use Solital\Core\Resource\JSON;
+use Solital\Core\Http\{Request, RequestValidatorInterface};
+use Solital\Core\Resource\{JSON, Validation};
 
 class InputHandler
 {
@@ -345,6 +345,48 @@ class InputHandler
         }
 
         return (\count($filter) > 0) ? array_intersect_key($output, array_flip($filter)) : $output;
+    }
+
+    /**
+     * Validate input values
+     *
+     * @param array|string $validate
+     * @param array|null $data_filter
+     * 
+     * @return array
+     */
+    public function validate(array|string $validate, ?array $data_filter = null): array
+    {
+        if (is_string($validate)) {
+            if (!class_exists($validate)) {
+                throw new \Exception("Class '" . $validate . "' not exists");
+            }
+
+            $reflection = new \ReflectionClass($validate);
+
+            if (!$reflection->implementsInterface(RequestValidatorInterface::class)) {
+                throw new \Exception($reflection->getName() . " not implements 'RequestValidationInterface' interface");
+            }
+
+            $request_validation = $reflection->newInstanceWithoutConstructor();
+            $validate = $request_validation->rules();
+            $data_messages = $request_validation->messages();
+            $data_filter = $request_validation->filters();
+        }
+
+        $valid = new Validation();
+        $valid->verifyRequestInput($validate);
+
+        if (!empty($data_messages)) {
+            $valid->setFieldsErrorMessages($data_messages);
+        }
+
+        if (!is_null($data_filter)) {
+            $valid->filter($data_filter);
+        }
+
+        $result = $valid->getResult();
+        return $result;
     }
 
     /**

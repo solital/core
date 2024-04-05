@@ -1,6 +1,6 @@
 <?php
 
-namespace Solital\Core\Database\Seeds\Exception;
+namespace Solital\Core\Database\Exceptions;
 
 class SeedsException extends \Exception
 {

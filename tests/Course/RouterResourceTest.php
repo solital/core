@@ -1,6 +1,7 @@
 <?php
 
 require_once 'Dummy/ResourceController.php';
+//require_once dirname(__DIR__) . '/files_test/Components/Controller/ResourceTest.php';
 require_once dirname(__DIR__) . '/bootstrap.php';
 
 use PHPUnit\Framework\TestCase;

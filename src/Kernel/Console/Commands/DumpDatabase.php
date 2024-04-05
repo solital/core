@@ -4,9 +4,10 @@ namespace Solital\Core\Kernel\Console\Commands;
 
 use Solital\Core\Console\Command;
 use Solital\Core\Console\Interface\CommandInterface;
+use Solital\Core\Console\Output\ConsoleOutput;
 use Solital\Core\Database\Dump\Dump;
-use Solital\Core\Database\Dump\Exception\DumpException;
-use Solital\Core\Kernel\Application;
+use Solital\Core\Database\Exceptions\DumpException;
+use Solital\Core\Kernel\{Application, DebugCore};
 
 class DumpDatabase extends Command implements CommandInterface
 {
@@ -36,7 +37,7 @@ class DumpDatabase extends Command implements CommandInterface
     {
         Application::connectionDatabase();
 
-        if (Application::DEBUG == false) {
+        if (DebugCore::isCoreDebugEnabled() == false) {
             if (getenv('DB_NAME') == '' || getenv('DB_USER') == '' || getenv('DB_PASS') == '') {
                 throw new DumpException('Variables DB_NAME, DB_USER and DB_PASS not configured');
             }
@@ -50,7 +51,7 @@ class DumpDatabase extends Command implements CommandInterface
         }
 
         $dump->dumpDatabase($dir_dump);
-        $this->success("Dump Database created successfully!")->print()->break()->exit();
+        ConsoleOutput::success("Dump Database created successfully!")->print()->break()->exit();
 
         return $this;
     }

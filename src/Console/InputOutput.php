@@ -2,12 +2,10 @@
 
 namespace Solital\Core\Console;
 
-use Solital\Core\Console\MessageTrait;
+use Solital\Core\Console\Output\ConsoleOutput;
 
 class InputOutput
 {
-    use MessageTrait;
-
     /**
      * @var string
      */
@@ -61,14 +59,14 @@ class InputOutput
 
         if ($this->color != '') {
             if ($this->color == 'green') {
-                $read_message = $this->success($read_message)->getMessage();
+                $read_message = ConsoleOutput::success($read_message)->getMessage();
             } else if ($this->color == 'yellow') {
-                $read_message = $this->warning($read_message)->getMessage();
+                $read_message = ConsoleOutput::warning($read_message)->getMessage();
             } else if ($this->color == 'blue') {
-                $read_message = $this->info($read_message)->getMessage();
+                $read_message = ConsoleOutput::info($read_message)->getMessage();
             }
         } else {
-            $read_message = $this->line($read_message)->getMessage();
+            $read_message = ConsoleOutput::line($read_message)->getMessage();
         }
 
         $this->message_console = $this->readlineWithUnicodeSupport($read_message);
@@ -88,14 +86,14 @@ class InputOutput
     {
         if ($this->color != '') {
             if ($this->color == 'green') {
-                $message = $this->success($message)->getMessage();
+                $message = ConsoleOutput::success($message)->getMessage();
             } else if ($this->color == 'yellow') {
-                $message = $this->warning($message)->getMessage();
+                $message = ConsoleOutput::warning($message)->getMessage();
             } else if ($this->color == 'blue') {
-                $message = $this->info($message)->getMessage();
+                $message = ConsoleOutput::info($message)->getMessage();
             }
         } else {
-            $message = $this->line($message)->getMessage();
+            $message = ConsoleOutput::line($message)->getMessage();
         }
 
         $this->message_console = $this->readlineWithUnicodeSupport($message);
@@ -153,7 +151,7 @@ class InputOutput
             }
         }
 
-        $this->error("Option not found")->print()->break()->exit();
+        ConsoleOutput::error("Option not found")->print()->break()->exit();
     }
 
     /**

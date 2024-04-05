@@ -4,8 +4,10 @@ namespace Solital\Core\Kernel\Console\Commands;
 
 use Solital\Core\Console\Command;
 use Solital\Core\Console\Interface\CommandInterface;
+use Solital\Core\Console\Output\ConsoleOutput;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Kernel\Console\HelpersTrait;
+use Solital\Core\Kernel\DebugCore;
 
 class MakeRouter extends Command implements CommandInterface
 {
@@ -35,12 +37,12 @@ class MakeRouter extends Command implements CommandInterface
     #[\Override]
     public function handle(object $arguments, object $options): mixed
     {
-        $router_dir = Application::getRoot('routers/', Application::DEBUG);
+        $router_dir = Application::getRoot('routers/', DebugCore::isCoreDebugEnabled());
         $router_template = Application::getConsoleComponent('RouterName.php');
         $comment = "";
 
         if (empty($arguments->router_name)) {
-            $this->error("Error: You need to define a name for your route")->print()->break();
+            ConsoleOutput::error("Error: You need to define a name for your route")->print()->break();
             return false;
         }
 
@@ -94,11 +96,11 @@ class MakeRouter extends Command implements CommandInterface
             }
 
             file_put_contents($component_dir . $argument_name . ".php", $output_template);
-            $this->success("Router successfully created!")->print()->break();
+            ConsoleOutput::success("Router successfully created!")->print()->break();
             return true;
         }
 
-        $this->error("Error: Router already exists!")->print()->break();
+        ConsoleOutput::error("Error: Router already exists!")->print()->break();
         return false;
     }
 }

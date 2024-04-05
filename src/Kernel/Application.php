@@ -53,7 +53,7 @@ abstract class Application
      */
     public static function yamlParse(string $yaml_file, bool $return_dir_name = false, bool $throws = false): mixed
     {
-        if (self::DEBUG == true) {
+        if (DebugCore::isCoreDebugEnabled() == true) {
             $yaml_dir_file = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Kernel' . DIRECTORY_SEPARATOR . 'Console' . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR;
         } else {
             if (!defined('SITE_ROOT')) {
@@ -125,6 +125,7 @@ abstract class Application
     {
         self::getInstance();
         self::connectionDatabase();
+        self::loadBootManager();
         Guardian::validateDomain();
 
         Course::start();
@@ -230,7 +231,7 @@ abstract class Application
     {
         self::getInstance();
 
-        if (self::DEBUG == true) {
+        if (DebugCore::isCoreDebugEnabled() == true) {
             $dir = str_replace('/', DIRECTORY_SEPARATOR, $dir);
             $dir_app = "tests" . DIRECTORY_SEPARATOR . "files_test" . DIRECTORY_SEPARATOR;
         } else {
@@ -319,7 +320,6 @@ abstract class Application
     public static function loadCsrfVerifier(): void
     {
         $custom_csrf = self::yamlParse('bootstrap.yaml', throws: true);
-
         $class = 'Solital\Core\Http\Middleware\\' . $custom_csrf['custom_csrf'];
 
         if (!class_exists($class)) {
@@ -330,6 +330,25 @@ abstract class Application
         $instance = $reflection->newInstance();
 
         Course::csrfVerifier($instance);
+    }
+
+    /**
+     * Load all bottmanagers
+     *
+     * @return void 
+     */
+    public static function loadBootManager(): void
+    {
+        $dir = self::getBootManagers();
+
+        if (!empty($dir)) {
+            foreach ($dir as $boot_manager) {
+                $reflection = new \ReflectionClass($boot_manager);
+                $instance = $reflection->newInstance();
+
+                Course::addBootManager($instance);
+            }
+        }
     }
 
     /**
@@ -383,9 +402,14 @@ abstract class Application
             $message['E-mail not configured'] = "Check e-mail configuration at '.env' file";
         }
 
-        if (empty(getenv('FIRST_SECRET')) || empty(getenv('SECOND_SECRET'))) {
+        if (empty(getenv('APP_HASH'))) {
             $config = false;
-            $message['OpenSSL error'] = "FIRST_SECRET and SECOND_SECRET variables don't have a defined value";
+            $message['APP HASH is empty'] = "APP_HASH variable don't have a defined value";
+        }
+
+        if (!(Dotenv::isset('APP_HASH'))) {
+            $config = false;
+            $message['APP HASH not found'] = "APP_HASH variable not found";
         }
 
         if (date('H') >= 18) {

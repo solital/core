@@ -6,14 +6,10 @@ use Katrina\Katrina;
 use Katrina\Sql\KatrinaStatement;
 use Solital\Core\Kernel\Application;
 use Solital\Core\FileSystem\HandleFiles;
-
-use Solital\Core\Database\Migrations\{
-    HandleMigrationTrait,
-    Provider\MigratorVersionProviderDB,
-    Exception\MigrationException
-};
-
-use Nette\PhpGenerator\{ClassType, Method, Parameter, PhpNamespace, Property};
+use Solital\Core\Console\Output\ConsoleOutput;
+use Solital\Core\Database\{Exceptions\MigrationException, Migrations\HandleMigrationTrait};
+use Solital\Core\Kernel\{DebugCore, Model\MigrationModel};
+use Nette\PhpGenerator\{ClassType, Method, PhpNamespace};
 
 class Migration
 {
@@ -30,9 +26,9 @@ class Migration
     protected array $migration_files = [];
 
     /**
-     * @var MigratorVersionProviderDB
+     * @var MigrationModel
      */
-    protected MigratorVersionProviderDB $provider;
+    protected MigrationModel $provider;
 
     /**
      * @var HandleFiles
@@ -44,9 +40,9 @@ class Migration
      */
     public function __construct()
     {
-        $this->migrations_directory = Application::getRootApp('Database/migrations/', Application::DEBUG);
+        $this->migrations_directory = Application::getRootApp('Database/migrations/', DebugCore::isCoreDebugEnabled());
         $this->handle = Application::provider('handler-file');
-        $this->provider = new MigratorVersionProviderDB();
+        $this->provider = new MigrationModel();
         $this->provider->initDB();
 
         // set up initial data
@@ -98,7 +94,7 @@ class Migration
     public function latestVersion(): ?string
     {
         if (empty($this->migration_files)) {
-            $this->line("No migrations available")->print()->break();
+            ConsoleOutput::line("No migrations available")->print()->break();
             return null;
         }
 
@@ -139,14 +135,12 @@ class Migration
         $file_name = strtolower($file_name);
         $file_path = $this->getMigrationsDirectory() . DIRECTORY_SEPARATOR . $file_name;
 
-        $this->generateMigrationClass($migration_explode, $file_path, $file_name);
+        ConsoleOutput::debugMessage('Create migration ', 'MIGRATION', 49)->print()->break(true);
 
-        $file_name = $this->warning($file_name)->getMessage();
-        $file_path = $this->success($file_path)->getMessage();
-        $msg1 = $this->line('Created migration ')->getMessage();
-        $msg2 = $this->line(' at ')->getMessage();
-
-        echo $msg1 . $file_name . $msg2 . $file_path . PHP_EOL;
+        ConsoleOutput::status($file_name, function () use ($migration_explode, $file_path, $file_name) {
+            $this->generateMigrationClass($migration_explode, $file_path, $file_name);
+            return $this;
+        })->printStatus();
     }
 
     /**
@@ -186,7 +180,7 @@ class Migration
         }
 
         if (file_exists($file_path)) {
-            $this->error("Migration '{$file_name}' already exists. Aborting!")->print()->break()->exit();
+            ConsoleOutput::error("Migration '{$file_name}' already exists. Aborting!")->print()->break()->exit();
         }
 
         $up_method = (new Method('up'))
@@ -235,11 +229,9 @@ class Migration
                 if ($instance != null) {
                     if (isset($options->rollback)) {
                         $this->provider->delete("name", $migrate_name);
-
                         $instance->down();
                     } else {
                         KatrinaStatement::executePrepare("UPDATE migrations SET name = '{$migrates->name}'");
-
                         $instance->up();
                     }
                 }
@@ -262,21 +254,31 @@ class Migration
         }
 
         foreach ($migrations_db as $migrations_db) {
-            $this->warning("Rollback migration: " . $migrations_db->name)->print()->break();
+            ConsoleOutput::warning("Rollback migration: " . $migrations_db->name)->print()->break();
 
-            $instance = $this->instantiateMigration($migrations_db->name);
-            $this->provider->delete("name", $migrations_db->name);
+            ConsoleOutput::status($migrations_db->name, function () use ($migrations_db) {
+                try {
+                    $instance = $this->instantiateMigration($migrations_db->name);
 
-            $instance->down();
+                    if ($instance === null) {
+                        return false;
+                    }
 
-            $this->success("Rollback executed: " . $migrations_db->name)->print()->break();
+                    $this->provider->delete("name", $migrations_db->name);
+                    $instance->down();
+
+                    return true;
+                } catch (MigrationException $e) {
+                    return false;
+                }
+            })->printStatus();
         }
 
         $end_time = microtime(true);
         $execution_time = ($end_time - $start_time);
 
         echo PHP_EOL;
-        $this->success("Migrations performed on: " . $execution_time . " sec")->print()->break()->exit();
+        ConsoleOutput::success("Migrations performed on: " . $execution_time . " sec")->print()->break()->exit();
     }
 
     /**
@@ -298,35 +300,39 @@ class Migration
         }
 
         foreach ($all_files as $migration_file) {
-            $this->warning("Running migration: " . $migration_file)->print()->break();
+            ConsoleOutput::warning("Running migration: " . basename($migration_file))->print()->break();
 
             $migration_file = str_replace(".php", "", $migration_file);
-            $instance = $this->instantiateMigration(basename($migration_file));
 
-            if (isset($options->rollback)) {
-                $this->provider->delete("name", basename($migration_file));
+            ConsoleOutput::status(basename($migration_file), function () use ($migration_file, $options) {
+                $instance = $this->instantiateMigration(basename($migration_file));
 
-                $instance->down();
-            } else {
-                try {
-                    $migrator = new MigratorVersionProviderDB();
-                    $migrator->name = basename($migration_file);
-                    $migrator->save();
-
-                    $instance->up();
-
-                    $this->success("Migration executed: " . $migration_file)->print()->break();
-                } catch (MigrationException $e) {
-                    $this->error($e->getMessage() . ": " . $migration_file)->print()->break();
+                if ($instance === null) {
+                    return false;
                 }
-            }
+
+                if (isset($options->rollback)) {
+                    $this->provider->delete("name", basename($migration_file));
+                    $instance->down();
+                } else {
+                    try {
+                        $migrator = new MigrationModel();
+                        $migrator->name = basename($migration_file);
+                        $migrator->save();
+                        $instance->up();
+                        return true;
+                    } catch (MigrationException $e) {
+                        return false;
+                    }
+                }
+            })->printStatus();
         }
 
         $end_time = microtime(true);
         $execution_time = ($end_time - $start_time);
 
         echo PHP_EOL;
-        $this->success("Migrations performed on: " . $execution_time . " sec")->print()->break()->exit();
+        ConsoleOutput::success("Migrations performed on: " . $execution_time . " sec")->print()->break()->exit();
     }
 
     /**

@@ -2,6 +2,9 @@
 
 namespace Solital\Core\Validation;
 
+/**
+ * @deprecated Use Solital\Core\Resource\Temporal class
+ */
 class Convertime
 {
     /**

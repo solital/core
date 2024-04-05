@@ -3,7 +3,7 @@
 namespace Solital\Core\Mail;
 
 use Katrina\Connection\Connection;
-use Solital\Core\Mail\ConnectDatabase;
+use Solital\Core\Kernel\Model\MailModel;
 
 abstract class QueueMail
 {
@@ -19,7 +19,7 @@ abstract class QueueMail
      */
     public function queue(string $subject, string $body, string $alt_body = null): bool
     {
-        ConnectDatabase::checkTableQueue();
+        MailModel::checkTableQueue();
 
         try {
             $sql = "INSERT INTO mail_queue (subject, body, from_email, from_name, recipient_email, 
@@ -50,10 +50,10 @@ abstract class QueueMail
      */
     public function sendQueue(int $per_second = 5)
     {
-        ConnectDatabase::checkTableQueue();
+        MailModel::checkTableQueue();
 
         $mailer = new Mailer();
-        $res = ConnectDatabase::select()->where("sent_at IS NULL")->get();
+        $res = MailModel::select()->where("sent_at IS NULL")->get();
 
         foreach ($res as $send) {
             $mailer->add(

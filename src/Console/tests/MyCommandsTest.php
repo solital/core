@@ -14,6 +14,8 @@ class MyCommandsTest extends Command implements CommandInterface
     #[\Override]
     public function handle(object $arguments, object $options): mixed
     {
-        return $this->getCommand() . " - Command OK";
+        print_r(Command::call('user:test'));
+
+        return $this->getCommand() . " - Command OK" . PHP_EOL;
     }
 }

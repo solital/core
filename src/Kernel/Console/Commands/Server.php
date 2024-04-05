@@ -4,7 +4,8 @@ namespace Solital\Core\Kernel\Console\Commands;
 
 use Solital\Core\Console\Command;
 use Solital\Core\Console\Interface\CommandInterface;
-use Solital\Core\Kernel\Application;
+use Solital\Core\Console\Output\ConsoleOutput;
+use Solital\Core\Kernel\DebugCore;
 use Solital\Core\Process\{Process, ProcessException};
 
 class Server extends Command implements CommandInterface
@@ -37,8 +38,8 @@ class Server extends Command implements CommandInterface
 	#[\Override]
 	public function handle(object $arguments, object $options): mixed
 	{
-		if (Application::DEBUG == true) {
-            $this->error("Debug mode enabled! Server won't working!")->print()->break();
+		if (DebugCore::isCoreDebugEnabled() == true) {
+            ConsoleOutput::error("Debug mode enabled! Server won't working!")->print()->break();
 			return false;
         }
 
@@ -46,9 +47,9 @@ class Server extends Command implements CommandInterface
 			$this->host = $options->host;
 		}
 
-		$this->success("Server started at " . date("H:i:s"))->print()->break();
-		$this->success("Host: " . $this->host)->print()->break();
-		$this->info("Press Ctrl+C to cancel host")->print()->break();
+		ConsoleOutput::success("Server started at " . date("H:i:s"))->print()->break();
+		ConsoleOutput::success("Host: " . $this->host)->print()->break();
+		ConsoleOutput::info("Press Ctrl+C to cancel host")->print()->break();
 
 		$process = Process::executeCommand("php -S " . $this->host . " -t public/");
 

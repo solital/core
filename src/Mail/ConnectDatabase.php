@@ -4,6 +4,9 @@ namespace Solital\Core\Mail;
 
 use Katrina\Katrina;
 
+/**
+ * @deprecated Use MailModel
+ */
 class ConnectDatabase extends Katrina
 {
     /**

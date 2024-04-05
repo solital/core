@@ -5,10 +5,11 @@ namespace Solital\Core\Kernel\Console\Commands;
 use Solital\Core\Mail\Mailer;
 use Solital\Core\Queue\Queue;
 use Solital\Core\Console\Command;
+use Solital\Core\Console\Output\ConsoleOutput;
 use Solital\Core\Console\Interface\{ExtendCommandsInterface, CommandInterface};
-use Solital\Core\Kernel\{Application, Console\HelpersTrait};
-use Nette\PhpGenerator\{ClassType, Method, PhpNamespace, Property};
+use Solital\Core\Kernel\{Application, Console\HelpersTrait, DebugCore};
 use Solital\Core\Container\Interface\{ContainerInterface, ServiceProviderInterface};
+use Nette\PhpGenerator\{ClassType, Method, PhpNamespace, Property};
 
 class GenerateConfigFiles extends Command implements CommandInterface
 {
@@ -38,7 +39,7 @@ class GenerateConfigFiles extends Command implements CommandInterface
     #[\Override]
     public function handle(object $arguments, object $options): mixed
     {
-        $config_app_dir = Application::getRootApp('config/', Application::DEBUG);
+        $config_app_dir = Application::getRootApp('config/', DebugCore::isCoreDebugEnabled());
         $config_core_dir = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Config';
 
         if (isset($options->component) && isset($options->component)) {
@@ -68,7 +69,7 @@ class GenerateConfigFiles extends Command implements CommandInterface
         $this->queueFiles();
         $this->commandFiles();
         $this->serviceContainerClass();
-        $this->success('Configuration files copied successfully!')->print()->break();
+        ConsoleOutput::success('Configuration files copied successfully!')->print()->break();
 
         return true;
     }
@@ -78,7 +79,7 @@ class GenerateConfigFiles extends Command implements CommandInterface
      */
     private function queueFiles(): GenerateConfigFiles
     {
-        $dir_queue = Application::getRootApp('Queue/', Application::DEBUG);
+        $dir_queue = Application::getRootApp('Queue/', DebugCore::isCoreDebugEnabled());
 
         $dispatch_method = (new Method('dispatch'))
             ->setPublic()
@@ -113,7 +114,7 @@ class GenerateConfigFiles extends Command implements CommandInterface
      */
     private function serviceContainerClass(): GenerateConfigFiles
     {
-        $provider_dir = Application::getRootApp('', Application::DEBUG);
+        $provider_dir = Application::getRootApp('', DebugCore::isCoreDebugEnabled());
 
         $register_method = (new Method('register'))
             ->setPublic()
@@ -145,7 +146,7 @@ class GenerateConfigFiles extends Command implements CommandInterface
      */
     private function commandFiles(): GenerateConfigFiles
     {
-        $dir_cmd = Application::getRootApp('Console/', Application::DEBUG);
+        $dir_cmd = Application::getRootApp('Console/', DebugCore::isCoreDebugEnabled());
 
         $command_class = (new Property('command_class'))
             ->setType('array')

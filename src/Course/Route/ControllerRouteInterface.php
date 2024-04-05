@@ -20,4 +20,16 @@ interface ControllerRouteInterface extends RouteInterface
      * @return static
      */
     public function setController(string $controller): self;
+
+    /**
+     * Find url that matches method, parameters or name.
+     * Used when calling the url() helper.
+     *
+     * @param string|null $method
+     * @param string|array|null $parameters
+     * @param string|null $name
+     * 
+     * @return string
+     */
+    public function findUrl(?string $method = null, $parameters = null, ?string $name = null): string;
 }

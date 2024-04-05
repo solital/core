@@ -1,10 +1,10 @@
 <?php
 
-namespace Solital\Core\Database\Migrations\Provider;
+namespace Solital\Core\Kernel\Model;
 
 use Katrina\Katrina;
 
-class MigratorVersionProviderDB extends Katrina
+class MigrationModel extends Katrina
 {
     /**
      * @var string|null
@@ -22,20 +22,19 @@ class MigratorVersionProviderDB extends Katrina
     public function initDB(): mixed
     {
         if (defined('DB_CONFIG')) {
-            if (DB_CONFIG['DRIVE'] == "mysql") {
-                $res = self::createTable("migrations")
-                    ->int('id')->primary()->increment()
-                    ->varchar("name", 100)->notNull()
-                    ->createdUpdatedAt()
-                    ->closeTable();
-            }
+            $res = self::createTable("migrations");
             
-            if (DB_CONFIG['DRIVE'] == "pgsql") {
-                $res = self::createTable("migrations")
-                    ->serial('id')->primary()
-                    ->varchar("name", 100)->notNull()
-                    ->closeTable();
+            if (DB_CONFIG['DRIVE'] == "mysql") {
+                $res->int('id')->primary()->increment();
             }
+
+            if (DB_CONFIG['DRIVE'] == "pgsql") {
+                $res->serial('id')->primary();
+            }
+
+            $res->varchar("name", 100)->notNull();
+            $res->createdUpdatedAt();
+            $res->closeTable();
 
             if (!isset($res)) {
                 return $this;

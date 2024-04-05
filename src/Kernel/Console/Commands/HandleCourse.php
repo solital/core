@@ -4,8 +4,9 @@ namespace Solital\Core\Kernel\Console\Commands;
 
 use Solital\Core\Console\Command;
 use Solital\Core\Course\CourseList;
-use Solital\Core\Kernel\Application;
 use Solital\Core\Console\Interface\CommandInterface;
+use Solital\Core\Console\Output\ConsoleOutput;
+use Solital\Core\Kernel\DebugCore;
 
 class HandleCourse extends Command implements CommandInterface
 {
@@ -33,8 +34,8 @@ class HandleCourse extends Command implements CommandInterface
     #[\Override]
     public function handle(object $arguments, object $options): mixed
     {
-        if (Application::DEBUG == true) {
-            $this->error("Debug enabled! You cannot run this command.")->print()->break()->print();
+        if (DebugCore::isCoreDebugEnabled() == true) {
+            ConsoleOutput::error("Debug enabled! You cannot run this command.")->print()->break()->print();
             return false;
         }
 

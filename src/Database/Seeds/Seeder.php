@@ -2,16 +2,14 @@
 
 namespace Solital\Core\Database\Seeds;
 
-use Solital\Core\Console\MessageTrait;
-use Solital\Core\Database\Seeds\Exception\SeedsException;
-use Solital\Core\Kernel\Application;
 use Solital\Core\FileSystem\HandleFiles;
+use Solital\Core\Console\Output\ConsoleOutput;
+use Solital\Core\Database\Exceptions\SeedsException;
+use Solital\Core\Kernel\{Application, DebugCore};
 use Nette\PhpGenerator\{ClassType, Method, PhpNamespace};
 
 class Seeder
 {
-    use MessageTrait;
-
     /**
      * @var string
      */
@@ -22,7 +20,7 @@ class Seeder
      */
     public function __construct()
     {
-        $this->seeds_dir = Application::getRootApp('Database/seeds/', Application::DEBUG);
+        $this->seeds_dir = Application::getRootApp('Database/seeds/', DebugCore::isCoreDebugEnabled());
     }
 
     /**
@@ -51,7 +49,7 @@ class Seeder
         $seed_file_name = $this->seeds_dir . $seed_name . ".php";
 
         if (file_exists($seed_file_name)) {
-            $this->error("Seed '{$seed_name}' already exists!")->print()->break();
+            ConsoleOutput::error("Seed '{$seed_name}' already exists!")->print()->break();
             return $this;
         }
 
@@ -62,9 +60,9 @@ class Seeder
 
             file_put_contents($seed_file_name, "<?php\n\n" . $data);
 
-            $this->success("Seeder created successfully!")->print()->break();
+            ConsoleOutput::success("Seeder created successfully!")->print()->break();
         } catch (SeedsException $e) {
-            $this->error("Seeder not created: " . $e->getMessage())->print()->break()->exit();
+            ConsoleOutput::error("Seeder not created: " . $e->getMessage())->print()->break()->exit();
         }
 
         return $this;
@@ -80,26 +78,38 @@ class Seeder
         $start_time = microtime(true);
 
         if (isset($options->class)) {
-            $this->warning("Running seeder: " . $options->class)->print()->break();
+            ConsoleOutput::warning("Running seeder: " . $options->class)->print()->break();
 
-            $instance = $this->initiateSeeder($this->seeds_dir . $options->class . '.php');
-            $instance->run();
+            ConsoleOutput::status($options->class, function () use ($options) {
+                $instance = $this->initiateSeeder($this->seeds_dir . $options->class . '.php');
 
-            $this->success("Seeder executed: " . $options->class)->print()->break();
+                if ($instance === null) {
+                    return false;
+                }
+
+                $instance->run();
+                return true;
+            })->printStatus();
         } else {
-            $handle = Application::provider('handler-files');
+            $handle = Application::provider('handler-file');
             $seeder = $handle->folder($this->seeds_dir)->files();
 
             if (empty($seeder)) {
-                $this->success("No seeds found")->print()->break();
+                ConsoleOutput::success("No seeds found")->print()->break();
             } else {
                 foreach ($seeder as $seeder) {
-                    $this->warning("Running seeder: " . basename((string) $seeder))->print()->break();
+                    ConsoleOutput::warning("Running seeder: " . basename((string) $seeder))->print()->break();
 
-                    $instance = $this->initiateSeeder($seeder);
-                    $instance->run();
+                    ConsoleOutput::status(basename((string) $seeder), function () use ($seeder) {
+                        $instance = $this->initiateSeeder($seeder);
 
-                    $this->success("Seeder executed: " . basename((string) $seeder))->print()->break();
+                        if ($instance === null) {
+                            return false;
+                        }
+
+                        $instance->run();
+                        return true;
+                    })->printStatus();
                 }
             }
         }
@@ -108,7 +118,7 @@ class Seeder
         $execution_time = ($end_time - $start_time);
 
         echo PHP_EOL;
-        $this->success("Seeds performed on: " . $execution_time . " sec")->print()->break();
+        ConsoleOutput::success("Seeds performed on: " . $execution_time . " sec")->print()->break();
 
         return $this;
     }
@@ -124,8 +134,10 @@ class Seeder
             $seeder_replace = str_replace(".php", "", basename($seeder));
             $class = 'Solital\Database\seeds\\' . $seeder_replace;
 
-            $class = new \ReflectionClass($class);
-            return $class->newInstance();
+            if (class_exists($class)) {
+                $reflection = new \ReflectionClass($class);
+                return $reflection->newInstance();
+            }
         }
 
         return null;

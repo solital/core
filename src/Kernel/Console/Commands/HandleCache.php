@@ -3,8 +3,9 @@
 namespace Solital\Core\Kernel\Console\Commands;
 
 use Solital\Core\Console\Command;
-use Solital\Core\Kernel\Application;
 use Solital\Core\Console\Interface\CommandInterface;
+use Solital\Core\Console\Output\ConsoleOutput;
+use Solital\Core\Kernel\{Application, DebugCore};
 
 class HandleCache extends Command implements CommandInterface
 {
@@ -61,14 +62,14 @@ class HandleCache extends Command implements CommandInterface
      */
     public function clearSession(): bool
     {
-        if (Application::DEBUG == true) {
-            $this->error("SESSION: Debug mode enabled! It is not possible to delete the sessions!")->print()->break();
+        if (DebugCore::isCoreDebugEnabled() == true) {
+            ConsoleOutput::error("SESSION: Debug mode enabled! It is not possible to delete the sessions!")->print()->break();
             return false;
         }
 
         $dir = Application::getRootApp('Storage/session/', false);
         $this->eraseFiles($dir);
-        $this->success("Sessions was cleared successfully!")->print()->break();
+        ConsoleOutput::success("Sessions was cleared successfully!")->print()->break();
 
         return true;
     }
@@ -88,7 +89,7 @@ class HandleCache extends Command implements CommandInterface
             $this->eraseFiles($dir);
         }
 
-        $this->success("Cache was cleared successfully!")->print()->break();
+        ConsoleOutput::success("Cache was cleared successfully!")->print()->break();
 
         return true;
     }
@@ -100,7 +101,7 @@ class HandleCache extends Command implements CommandInterface
     {
         $dir = Application::getRootApp('Storage/schedules/', false);
         $this->eraseFiles($dir);
-        $this->success("Log schedules was cleared successfully!")->print()->break();
+        ConsoleOutput::success("Log schedules was cleared successfully!")->print()->break();
 
         return true;
     }
@@ -112,7 +113,7 @@ class HandleCache extends Command implements CommandInterface
     {
         $dir = Application::getRootApp('Storage/log/', false);
         $this->eraseFiles($dir);
-        $this->success("Logs was cleared successfully!")->print()->break();
+        ConsoleOutput::success("Logs was cleared successfully!")->print()->break();
 
         return true;
     }

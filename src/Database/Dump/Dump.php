@@ -2,8 +2,8 @@
 
 namespace Solital\Core\Database\Dump;
 
-use Solital\Core\Database\Dump\Exception\DumpException;
-use Solital\Core\Kernel\Application;
+use Solital\Core\Database\Exceptions\DumpException;
+use Solital\Core\Kernel\{Application, DebugCore};
 use Spatie\DbDumper\Databases\{MySql, PostgreSql, Sqlite};
 
 class Dump
@@ -29,7 +29,7 @@ class Dump
         $this->getDatabaseDrive();
         $this->getWindowsDumpBinary();
 
-        if (Application::DEBUG == false) {
+        if (DebugCore::isCoreDebugEnabled() == false) {
             if (defined('DB_CONFIG')) {
                 $db_name = getenv('DB_NAME');
                 $db_user = getenv('DB_USER');

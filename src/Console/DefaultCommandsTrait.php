@@ -2,12 +2,10 @@
 
 namespace Solital\Core\Console;
 
-use Solital\Core\Console\MessageTrait;
+use Solital\Core\Console\Output\ConsoleOutput;
 
 trait DefaultCommandsTrait
 {
-    use MessageTrait;
-
     /**
      * @var array
      */
@@ -54,19 +52,19 @@ trait DefaultCommandsTrait
                     $cmd = $instance->getCommand();
 
                     if (in_array($cmd, $arguments)) {
-                        $this->warning("Usage:")->print()->break();
-                        $this->line($instance->getCommand(), true)->print()->break(true);
+                        ConsoleOutput::warning("Usage:")->print()->break();
+                        ConsoleOutput::line($instance->getCommand(), true)->print()->break(true);
 
-                        $this->warning("Description:")->print()->break();
-                        $this->line($instance->getDescription(), true)->print()->break();
+                        ConsoleOutput::warning("Description:")->print()->break();
+                        ConsoleOutput::line($instance->getDescription(), true)->print()->break();
 
                         if (!empty($instance->getAllArguments())) {
                             echo PHP_EOL;
-                            $this->warning("Arguments:")->print()->break();
+                            ConsoleOutput::warning("Arguments:")->print()->break();
                         }
 
                         foreach ($instance->getAllArguments() as $args) {
-                            $this->line($args, true)->print()->break();
+                            ConsoleOutput::line($args, true)->print()->break();
                         }
 
                         $exists == true;
@@ -80,10 +78,10 @@ trait DefaultCommandsTrait
         };
 
         if (isset($arguments[2])) {
-            $this->error("Command '" . $arguments[2] . "' not found")->print()->break()->exit();
+            ConsoleOutput::error("Command '" . $arguments[2] . "' not found")->print()->break()->exit();
         }
 
-        $this->error("You must specify the command name after 'help'")->print()->break()->exit();
+        ConsoleOutput::error("You must specify the command name after 'help'")->print()->break()->exit();
     }
 
     /**
@@ -124,16 +122,16 @@ trait DefaultCommandsTrait
             }
         }
 
-        $console = $this->line("Vinci Console ")->getMessage();
-        $version = $this->success($this->getVersion())->getMessage();
+        $console = ConsoleOutput::line("Vinci Console ")->getMessage();
+        $version = ConsoleOutput::success($this->getVersion())->getMessage();
 
         echo $console . $version . PHP_EOL . PHP_EOL;
 
-        $this->warning("Usage:")->print()->break();
-        $this->line("command <argument>", true)->print()->break(true);
+        ConsoleOutput::warning("Usage:")->print()->break();
+        ConsoleOutput::line("command <argument>", true)->print()->break(true);
 
         for ($i = 0; $i < count($all['cmd']); $i++) {
-            $this->warning($all['type'][$i])->print()->break();
+            ConsoleOutput::warning($all['type'][$i])->print()->break();
 
             if (isset($all_commands[$i])) {
                 Table::formattedRowData($all_commands[$i], margin: true);
@@ -146,13 +144,13 @@ trait DefaultCommandsTrait
      */
     private function about(): void
     {
-        $about = $this->info("Vinci Console ")->getMessage();
-        $version = $this->success(self::getVersion())->getMessage();
-        $date = $this->line(" (" . self::getDateVersion() . ")")->getMessage();
-        $about2 = $this->info("PHP Version ")->getMessage();
-        $php_version = $this->success(PHP_VERSION)->getMessage();
-        $about3 = $this->line("By Solital Framework. Access ")->getMessage();
-        $docs = $this->warning(Command::SITE_DOC)->getMessage();
+        $about = ConsoleOutput::info("Vinci Console ")->getMessage();
+        $version = ConsoleOutput::success(self::getVersion())->getMessage();
+        $date = ConsoleOutput::line(" (" . self::getDateVersion() . ")")->getMessage();
+        $about2 = ConsoleOutput::info("PHP Version ")->getMessage();
+        $php_version = ConsoleOutput::success(PHP_VERSION)->getMessage();
+        $about3 = ConsoleOutput::line("By Solital Framework. Access ")->getMessage();
+        $docs = ConsoleOutput::warning(Command::SITE_DOC)->getMessage();
 
         echo $about . $version . $date . PHP_EOL;
         echo $about2 . $php_version . PHP_EOL . PHP_EOL;

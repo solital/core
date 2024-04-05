@@ -1,6 +1,6 @@
 <?php
 
-namespace Solital\Core\Database\Dump\Exception;
+namespace Solital\Core\Database\Exceptions;
 
 use ModernPHPException\Interface\SolutionInterface;
 use ModernPHPException\Solution;

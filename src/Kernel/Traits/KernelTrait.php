@@ -3,19 +3,34 @@
 namespace Solital\Core\Kernel\Traits;
 
 use ModernPHPException\ModernPHPException;
-use Solital\Core\Kernel\{Application, Dotenv};
-use Solital\Core\Kernel\Exceptions\DotenvException;
 use Solital\Core\Security\Hash;
+use Solital\Core\Kernel\Exceptions\DotenvException;
+use Solital\Core\Kernel\{Application, DebugCore, Dotenv};
 
 trait KernelTrait
 {
     /**
      * That variables must be changed manually
      */
-    const SOLITAL_VERSION   = "4.2.0";
+    const SOLITAL_VERSION   = "4.3.0";
     const SITE_DOC_DOMAIN   = "https://solital.github.io/site/";
+    
+    /**
+     * @deprecated Use DebugCore::enableCoreDebug()
+     * @var bool
+     */
     const DEBUG             = false;
+
+    /**
+     * @deprecated Use DebugCore::enableCoreDebug()
+     * @var bool
+     */
     const DEBUG_DATABASE    = false;
+
+    /**
+     * @deprecated Use DebugCore::enableCoreDebug()
+     * @var bool
+     */
     const MAILER_TEST_UNIT  = false;
 
     /**
@@ -134,7 +149,7 @@ trait KernelTrait
      */
     public static function verifyAppHash(): void
     {
-        if (self::DEBUG == false) {
+        if (DebugCore::isCoreDebugEnabled() == false) {
             if (!Dotenv::isset('APP_HASH')) {
                 try {
                     Dotenv::add('APP_HASH', Hash::randomString());

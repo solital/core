@@ -161,4 +161,28 @@ trait ClassLoaderTrait
 
         return $command_class;
     }
+
+    public static function getBootManagers(): array
+    {
+        $boot_manager = [];
+
+        $cmd_dir = Application::getRootApp('BootManager/', false);
+        $handle = Application::provider('handler-file');
+
+        if (is_dir($cmd_dir)) {
+            $files = $handle->folder($cmd_dir)->files();
+
+            if (!is_null($files)) {
+                foreach ($files as $file) {
+                    $class[] = str_replace('.php', '', basename($file));
+                }
+
+                foreach ($class as $class) {
+                    $boot_manager[] = "\Solital\BootManager\\" . $class;
+                }
+            }
+        }
+
+        return $boot_manager;
+    }
 }

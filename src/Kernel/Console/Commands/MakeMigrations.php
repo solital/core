@@ -7,6 +7,7 @@ use Solital\Core\Kernel\Application;
 use Solital\Core\Kernel\Console\HelpersTrait;
 use Solital\Core\Database\Migrations\Migration;
 use Solital\Core\Console\Interface\CommandInterface;
+use Solital\Core\Console\Output\ConsoleOutput;
 
 class MakeMigrations extends Command implements CommandInterface
 {
@@ -47,7 +48,7 @@ class MakeMigrations extends Command implements CommandInterface
             $migrations->createMigration($arguments->migration_name);
             return true;
         } catch (\Exception $e) {
-            $this->error("Error: " . $e->getMessage())->print()->break();
+            ConsoleOutput::error("Error: " . $e->getMessage())->print()->break();
             return false;
         }
 

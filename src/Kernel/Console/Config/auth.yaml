@@ -1,3 +1,5 @@
+# Generated file by Solital Framework
+
 # Set configurations in PHP Security Password component
 password:
   algorithm: default # default - argon2 - argon2d

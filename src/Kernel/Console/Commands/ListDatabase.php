@@ -3,10 +3,10 @@
 namespace Solital\Core\Kernel\Console\Commands;
 
 use Katrina\Sql\KatrinaStatement;
-use Solital\Core\Console\Command;
 use Solital\Core\Console\Interface\CommandInterface;
-use Solital\Core\Console\Table;
 use Solital\Core\Kernel\Application;
+use Solital\Core\Console\{Command, Table};
+use Solital\Core\Console\Output\{ColorsEnum, ConsoleOutput};
 
 class ListDatabase extends Command implements CommandInterface
 {
@@ -56,7 +56,7 @@ class ListDatabase extends Command implements CommandInterface
         }
 
         if (empty($data)) {
-            $this->success('Table "' . $arguments->name_column . '" is empty')->print()->exit();
+            ConsoleOutput::success('Table "' . $arguments->name_column . '" is empty')->print()->exit();
         }
 
         foreach ($data as $data) {
@@ -66,7 +66,7 @@ class ListDatabase extends Command implements CommandInterface
         }
 
         $table = new Table();
-        $table->setHeaderStyle(Table::COLOR_LIGHT_GREEN);
+        $table->setHeaderStyle(ColorsEnum::LIGHT_GREEN);
         $table->dynamicRows($keys, $all_values);
 
         echo $table;

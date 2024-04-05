@@ -19,7 +19,7 @@ class RouterCallbackExceptionHandlerTest extends \PHPUnit\Framework\TestCase
         TestRouter::get('/my-new-url', 'DummyController@method2');
         TestRouter::get('/my-url', 'DummyController@about');
 
-        TestRouter::customErrorHandler(function (Request $request, \Exception $exception) {
+        TestRouter::error(function (Request $request, \Exception $exception) {
             throw new RuntimeException();
         });
 
@@ -34,7 +34,7 @@ class RouterCallbackExceptionHandlerTest extends \PHPUnit\Framework\TestCase
             });
 
             TestRouter::get('/not-found', 'DummyController@method1');
-            TestRouter::customErrorHandler(function(Request $request, \Exception $exception) {
+            TestRouter::error(function(Request $request, \Exception $exception) {
                 if($exception instanceof NotFoundHttpException && $exception->getCode() === 404) {
                     return $request->setRewriteCallback(static function() {
                         return 'success';

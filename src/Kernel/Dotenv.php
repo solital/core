@@ -25,51 +25,55 @@ abstract class Dotenv
      */
     public static function env(string $path_to_env): void
     {
-        self::$env_path = $path_to_env . DIRECTORY_SEPARATOR . ".env";
+        try {
+            self::$env_path = $path_to_env . DIRECTORY_SEPARATOR . ".env";
 
-        if (!Application::fileExistsWithoutCache(self::$env_path)) {
-            throw new DotenvException("'.env' file not found");
-        }
-
-        $file = file_get_contents(self::$env_path);
-        $lines = file(self::$env_path);
-        $env_to_array = [];
-        $array_multi = [];
-
-        foreach ($lines as $line) {
-            if (str_contains($line, "#")) {
-                $line = str_replace($line, '', $line);
+            if (!Application::fileExistsWithoutCache(self::$env_path)) {
+                throw new DotenvException("'.env' file not found");
             }
 
-            if ($line == "") {
-                $line = str_replace($line, '', $line);
+            $file = file_get_contents(self::$env_path);
+            $lines = file(self::$env_path);
+            $env_to_array = [];
+            $array_multi = [];
+
+            foreach ($lines as $line) {
+                if (str_contains($line, "#")) {
+                    $line = str_replace($line, '', $line);
+                }
+
+                if ($line == "") {
+                    $line = str_replace($line, '', $line);
+                }
+
+                $env_to_array[] = explode("=", $line);
             }
 
-            $env_to_array[] = explode("=", $line);
-        }
-
-        foreach ($env_to_array as $file) {
-            if (is_string($file[0])) {
-                if (isset($file[1])) {
-                    $array_multi[] = $file;
+            foreach ($env_to_array as $file) {
+                if (is_string($file[0])) {
+                    if (isset($file[1])) {
+                        $array_multi[] = $file;
+                    }
                 }
             }
-        }
 
-        foreach ($array_multi as $file) {
-            $value = str_replace('"', '', $file[1]);
-            $value = trim($value);
-            self::$env[$file[0]] = $value;
-            $_ENV[$file[0]] = $value;
-            $_SERVER[$file[0]] = $value;
-            putenv($file[0] . "=" . $value);
-        }
+            foreach ($array_multi as $file) {
+                $value = str_replace('"', '', $file[1]);
+                $value = trim($value);
+                self::$env[$file[0]] = $value;
+                $_ENV[$file[0]] = $value;
+                $_SERVER[$file[0]] = $value;
+                putenv($file[0] . "=" . $value);
+            }
 
-        self::required([
-            'ERRORS_DISPLAY',
-            'DB_HOST', 'DB_NAME', 'DB_USER', 'DB_PASS',
-            'MAIL_DEBUG', 'MAIL_HOST', 'MAIL_USER', 'MAIL_PASS', 'MAIL_SECURITY', 'MAIL_PORT'
-        ]);
+            self::required([
+                'ERRORS_DISPLAY',
+                'DB_HOST', 'DB_NAME', 'DB_USER', 'DB_PASS',
+                'MAIL_DEBUG', 'MAIL_HOST', 'MAIL_USER', 'MAIL_PASS', 'MAIL_SECURITY', 'MAIL_PORT'
+            ]);
+        } catch (DotenvException $e) {
+            die($e->getMessageException());
+        }
     }
 
     /**
@@ -102,37 +106,41 @@ abstract class Dotenv
      */
     public static function add(string $key, string $value, string $comment = ''): bool
     {
-        if (self::$env_path == '') {
-            throw new DotenvException("'.env' file not found");
-        }
-
-        $key = strtoupper($key);
-        $file = fopen(self::$env_path, "a+");
-
-        if (!$file) {
-            throw new DotenvException("Failed to open '.env' file");
-        }
-
-        if ($comment != '') {
-            $comment = "\n\n# " . $comment;
-        }
-
-        if (!self::isset($key)) {
-            fwrite($file, $comment . "\n" . $key . '=' . $value);
-
-            while (($line = fgets($file)) !== false) {
-                echo $line;
+        try {
+            if (self::$env_path == '') {
+                throw new DotenvException("'.env' file not found");
             }
 
-            if (!feof($file)) {
-                throw new DotenvException("fgets() unexpected failure");
+            $key = strtoupper($key);
+            $file = fopen(self::$env_path, "a+");
+
+            if (!$file) {
+                throw new DotenvException("Failed to open '.env' file");
             }
 
-            fclose($file);
-            return true;
-        }
+            if ($comment != '') {
+                $comment = "\n\n# " . $comment;
+            }
 
-        return false;
+            if (!self::isset($key)) {
+                fwrite($file, $comment . "\n" . $key . '=' . $value);
+
+                while (($line = fgets($file)) !== false) {
+                    echo $line;
+                }
+
+                if (!feof($file)) {
+                    throw new DotenvException("fgets() unexpected failure");
+                }
+
+                fclose($file);
+                return true;
+            }
+
+            return false;
+        } catch (DotenvException $e) {
+            die($e->getMessageException());
+        }
     }
 
     /**

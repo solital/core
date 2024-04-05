@@ -6,6 +6,7 @@ use Katrina\Sql\KatrinaStatement;
 use Katrina\Connection\Connection;
 use Solital\Core\Mail\Mailer;
 use Solital\Core\Auth\Password;
+use Solital\Core\Kernel\Application;
 use Solital\Core\Validation\Valid;
 use Solital\Core\Security\{Guardian, Hash};
 
@@ -161,7 +162,7 @@ abstract class Reset
      */
     private function sendHash(string $email, string $uri, string $time): bool
     {
-        $valid = Valid::email($email);
+        $valid = filter_var($email, FILTER_VALIDATE_EMAIL);
 
         if ($valid == null) {
             return false;
@@ -170,7 +171,7 @@ abstract class Reset
         $this->generateDefaultLink($uri, $email, $time);
 
         if ($this->message_email == '') {
-            $template =  __DIR__ . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'template-recovery-password.php';
+            $template = Application::getConsoleComponent('core-templates/template-recovery-password.php');
             $template = file_get_contents($template);
             $template = str_replace(['{{ subject }}', '{{ name_recipient }}', '{{ link }}'], [$this->subject, $this->name_recipient, $this->link], $template);
             $this->message_email = $template;

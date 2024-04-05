@@ -5,6 +5,7 @@ namespace Solital\Core\Kernel\Console\Commands;
 use Solital\Core\Console\Command;
 use Solital\Core\Kernel\Console\HelpersTrait;
 use Solital\Core\Console\Interface\CommandInterface;
+use Solital\Core\Console\Output\ConsoleOutput;
 use Solital\Core\Queue\Queue;
 
 class MakeQueue extends Command implements CommandInterface
@@ -36,7 +37,7 @@ class MakeQueue extends Command implements CommandInterface
     public function handle(object $arguments, object $options): mixed
     {
         if (!isset($arguments->queue_name)) {
-            $this->error("Error: Queue name not found")->print()->break();
+            ConsoleOutput::error("Error: Queue name not found")->print()->break();
             return false;
         }
 

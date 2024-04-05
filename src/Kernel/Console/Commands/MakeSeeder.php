@@ -7,6 +7,7 @@ use Solital\Core\Kernel\Application;
 use Solital\Core\Database\Seeds\Seeder;
 use Solital\Core\Kernel\Console\HelpersTrait;
 use Solital\Core\Console\Interface\CommandInterface;
+use Solital\Core\Console\Output\ConsoleOutput;
 
 class MakeSeeder extends Command implements CommandInterface
 {
@@ -37,12 +38,12 @@ class MakeSeeder extends Command implements CommandInterface
     public function handle(object $arguments, object $options): mixed
     {
         if (!isset($arguments->seeder_name)) {
-            $this->error("Error: Seeder name not found")->print()->break();
+            ConsoleOutput::error("Error: Seeder name not found")->print()->break();
             return false;
         }
 
         Application::connectionDatabase();
-        (new Seeder(Application::DEBUG))->create($arguments->seeder_name);
+        (new Seeder())->create($arguments->seeder_name);
 
         return true;
     }

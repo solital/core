@@ -2,12 +2,13 @@
 
 namespace Solital\Core\Kernel\Console\Commands;
 
-use Solital\Core\Kernel\Application;
+use Override;
+use Solital\Core\Console\Output\ConsoleOutput;
 use Solital\Core\Console\Command;
 use Solital\Core\Console\Interface\CommandInterface;
 use Solital\Core\Kernel\Console\HelpersTrait;
+use Solital\Core\Kernel\{Application, DebugCore};
 use Nette\PhpGenerator\{ClassType, Method, Parameter, PhpNamespace, Property};
-use Override;
 
 class MakeCommand extends Command implements CommandInterface
 {
@@ -37,14 +38,14 @@ class MakeCommand extends Command implements CommandInterface
     #[\Override]
     public function handle(object $arguments, object $options): mixed
     {
-        $command_dir = Application::getRootApp('Console/Command/');
+        $command_dir = Application::getRootApp('Console/Command/', DebugCore::isCoreDebugEnabled());
 
         if (isset($options->remove)) {
             $this->removeComponent($command_dir, $arguments->command_name . ".php");
         }
 
         if (!isset($arguments->command_name)) {
-            $this->error("Error: Command name not found")->print()->break();
+            ConsoleOutput::error("Error: Command name not found")->print()->break();
             return false;
         }
 
@@ -56,10 +57,10 @@ class MakeCommand extends Command implements CommandInterface
         ]);
 
         if ($res == true) {
-            $this->success("Command successfully created!")->print()->break();
+            ConsoleOutput::success("Command successfully created!")->print()->break();
             return true;
         } else {
-            $this->error("Error: Command already exists!")->print()->break();
+            ConsoleOutput::error("Error: Command already exists!")->print()->break();
             return false;
         }
 

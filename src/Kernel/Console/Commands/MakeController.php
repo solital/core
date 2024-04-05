@@ -4,9 +4,10 @@ namespace Solital\Core\Kernel\Console\Commands;
 
 use Solital\Core\Console\Command;
 use Solital\Core\Console\Interface\CommandInterface;
-use Solital\Core\Kernel\Application;
+use Solital\Core\Console\Output\ConsoleOutput;
 use Solital\Core\Kernel\Console\HelpersTrait;
-use Solital\Core\Http\Controller\Controller;
+use Solital\Core\Kernel\{Application, DebugCore};
+use Solital\Core\Http\Controller\{Controller, ResourceControllerInterface};
 use Nette\PhpGenerator\{ClassType, Method, PhpNamespace};
 
 class MakeController extends Command implements CommandInterface
@@ -26,7 +27,7 @@ class MakeController extends Command implements CommandInterface
     /**
      * @var string
      */
-    protected string $description = "Create a Controller class inside the 'app/Components/Controller' folder";
+    protected string $description = "Create a Controller class";
 
     /**
      * @param object $arguments
@@ -37,14 +38,14 @@ class MakeController extends Command implements CommandInterface
     #[\Override]
     public function handle(object $arguments, object $options): mixed
     {
-        $controller_dir = Application::getRootApp('Components/Controller/', Application::DEBUG);
+        $controller_dir = Application::getRootApp('Components/Controller/', DebugCore::isCoreDebugEnabled());
 
         if (isset($options->remove)) {
             $this->removeComponent($controller_dir, $arguments->controller_name . ".php");
         }
 
         if (!isset($arguments->controller_name)) {
-            $this->error("Error: Controller name not found")->print()->break();
+            ConsoleOutput::error("Error: Controller name not found")->print()->break();
             return false;
         }
 
@@ -60,11 +61,11 @@ class MakeController extends Command implements CommandInterface
         ]);
 
         if ($res == true) {
-            $this->success("Controller successfully created!")->print()->break();
+            ConsoleOutput::success("Controller successfully created!")->print()->break();
             return true;
         }
 
-        $this->error("Error: Controller already exists!")->print()->break();
+        ConsoleOutput::error("Error: Controller already exists!")->print()->break();
         return false;
     }
 
@@ -107,54 +108,55 @@ class MakeController extends Command implements CommandInterface
         $index_method = (new Method('index'))
             ->setPublic()
             ->setBody("echo 'index';\nreturn null;")
-            ->setReturnType('?string')
-            ->addComment("@return null|string");
+            ->setReturnType('mixed')
+            ->addComment("@return mixed");
 
         $show_method = (new Method('show'))
             ->setPublic()
             ->setBody('echo "show " . $id;' . "\nreturn null;")
-            ->setReturnType('?string')
-            ->addComment("@return null|string");
+            ->setReturnType('mixed')
+            ->addComment('@param mixed $id'."\n@return null|string");
 
         $show_method->addParameter('id');
 
         $store_method = (new Method('store'))
             ->setPublic()
             ->setBody("echo 'store';\nreturn null;")
-            ->setReturnType('?string')
-            ->addComment("@return null|string");
+            ->setReturnType('mixed')
+            ->addComment("@return mixed");
 
         $create_method = (new Method('create'))
             ->setPublic()
             ->setBody("echo 'create';\nreturn null;")
-            ->setReturnType('?string')
-            ->addComment("@return null|string");
+            ->setReturnType('mixed')
+            ->addComment("@return mixed");
 
         $edit_method = (new Method('edit'))
             ->setPublic()
             ->setBody('echo "edit " . $id;' . "\nreturn null;")
-            ->setReturnType('?string')
-            ->addComment("@return null|string");
+            ->setReturnType('mixed')
+            ->addComment('@param mixed $id'."\n@return mixed");
 
         $edit_method->addParameter('id');
 
         $update_method = (new Method('update'))
             ->setPublic()
             ->setBody('echo "update " . $id;' . "\nreturn null;")
-            ->setReturnType('?string')
-            ->addComment("@return null|string");
+            ->setReturnType('mixed')
+            ->addComment('@param mixed $id'."\n@return mixed");
 
         $update_method->addParameter('id');
 
         $destroy_method = (new Method('destroy'))
             ->setPublic()
             ->setBody('echo "destroy " . $id;' . "\nreturn null;")
-            ->setReturnType('?string')
-            ->addComment("@return null|string");
+            ->setReturnType('mixed')
+            ->addComment('@param mixed $id'."\n@return mixed");
 
         $destroy_method->addParameter('id');
 
         $class = (new ClassType($controller_name))
+            ->setImplements([ResourceControllerInterface::class])
             ->setExtends(Controller::class)
             ->addMember($index_method)
             ->addMember($show_method)
@@ -167,6 +169,7 @@ class MakeController extends Command implements CommandInterface
 
         $data = (new PhpNamespace("Solital\Components\Controller"))
             ->add($class)
+            ->addUse(ResourceControllerInterface::class)
             ->addUse(Controller::class);
 
         return $data;

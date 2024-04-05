@@ -63,6 +63,42 @@ class Course
     }
 
     /**
+     * Start the routing an return array with debugging-information
+     *
+     * @return array
+     */
+    public static function startDebug(): array
+    {
+        $routerOutput = null;
+
+        try {
+            ob_start();
+            static::router()->setDebugEnabled(true)->start();
+            $routerOutput = ob_get_clean();
+        } catch (\Exception $e) {
+
+        }
+
+        $request = static::request();
+        $router = static::router();
+
+        return [
+            'url'             => $request->getUri(),
+            'method'          => $request->getMethod(),
+            'host'            => $request->getHost(),
+            'loaded_routes'   => $request->getLoadedRoutes(),
+            'all_routes'      => $router->getRoutes(),
+            'boot_managers'   => $router->getBootManagers(),
+            'csrf_verifier'   => $router->getCsrfVerifier(),
+            'log'             => $router->getDebugLog(),
+            'event_handlers'  => $router->getEventHandlers(),
+            'router_output'   => $routerOutput,
+            'php_version'     => PHP_VERSION,
+            'server_params'   => $request->getHeaders(),
+        ];
+    }
+
+    /**
      * Set default namespace which will be prepended to all routes.
      *
      * @param string $defaultNamespace

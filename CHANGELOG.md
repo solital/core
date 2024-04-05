@@ -1,5 +1,39 @@
 # Released Notes
 
+## v4.3.0 - (2024-04-05)
+
+### Added
+
+- Added new method to debug routers
+- Added new class to debug Core
+- Added new resource: `Number` and `Temporal` components
+- Added validator data on `InputHandler`
+- Added generate boot manager command
+- Added `MakeBoot` and `MakeValidator` command class
+
+### Changed
+
+- Changed database exception
+- Changed `DotenvException` class
+- Deprecated `Valid` and `Convertime` class
+- Deprecated `AuthDatabase` and `ConnectDatabase` class
+- Deprecated constants in `KernelTrait`
+
+### Fixed
+
+- Fixed `ResourceControllerInterface` when make a resource
+- Fixed OpenSSL crypt and decrypt on `Hash` class
+
+### Removed
+
+- Removed `JsonSerializable` class
+- Removed `codedungeon/php-cli-colors` package
+- Removed `Diff` class
+- Removed `cloner` helper
+- Removed provider DB class
+
+--------------------------------------------------------------------------
+
 ## v4.2.0 - (2024-03-16)
 
 ### Added

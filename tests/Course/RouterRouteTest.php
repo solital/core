@@ -7,6 +7,7 @@ require_once dirname(__DIR__) . '/bootstrap.php';
 
 use PHPUnit\Framework\TestCase;
 use Solital\Core\Exceptions\RuntimeException;
+use Solital\Core\Http\Exception\NotFoundHttpException;
 
 class RouterRouteTest extends TestCase
 {
@@ -38,7 +39,7 @@ class RouterRouteTest extends TestCase
 
     public function testNotFound()
     {
-        $this->expectException(RuntimeException::class);
+        $this->expectException(NotFoundHttpException::class);
         TestRouter::get('/non-existing-path', 'DummyController@method2');
         TestRouter::debug('/test2-param1-param2', 'post');
     }

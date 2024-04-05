@@ -1,0 +1,69 @@
+#!/usr/bin/env php
+<?php
+
+require_once 'vendor/autoload.php';
+
+use Solital\Core\Console\Command;
+use Solital\Core\Console\TableBuilder;
+use Solital\Core\Console\ProgressBar\ProgressBar;
+use Solital\Core\Console\ProgressBar\ProgressBarStyle;
+use Solital\Core\Console\InputOutput;
+
+//dd($argv);
+
+$class_commands = [
+    \Solital\Core\Console\tests\ExtendCommands\ExtendedCommandsTest::class,
+    \Solital\Core\Console\tests\ExtendCommands\OtherExtendComandTest::class
+];
+
+$cmd = new Command($class_commands);
+$res = $cmd->read($argv, $argv);
+
+print_r($res);exit;
+
+## INPUT-OUTPUT --------------------------------
+
+/* (new InputOutput('green'))->confirmDialog('What you want?', 'Y', 'N', false)->confirm(function () {
+    echo "aceito" . PHP_EOL;
+})->refuse(function () {
+    echo "recusado" . PHP_EOL;
+}); */
+
+/* (new InputOutput('green'))->dialog('Enter a string: ')->action(function ($message) {
+    echo $message . PHP_EOL;
+}); */
+
+## TABLE --------------------------------
+
+/* $headers = ['name', 'age'];
+$array = [
+    ['brenno', '22 ']
+];
+
+(new TableBuilder())->getTableRows($array, $headers); */
+
+/* $pepole = [
+    'Mirco Dellarovere' => 'Artista',
+    'Nino Pepe' => 'Attore',
+    'Zoe Yan' => 'Futurista',
+    'Mino' => 'Elettricista'
+];
+
+TableBuilder::formattedArray($pepole); */
+
+## NEW PROGRESSBAR --------------------------------
+
+$progressbarstyle = new ProgressBarStyle("Downloading", "green", "Kb", 16);
+$progressbar = new ProgressBar($progressbarstyle, 1000);
+
+//$progressbar->pauseProgressbar();
+
+for ($i = 0; $i < $progressbar->GetInitialMax(); $i++) {
+    $progressbar->step();
+    //$progressbar->stepBy(1);
+    //$progressbar->stepTo(2184);
+
+    usleep(1000);
+}
+
+//$progressbar->resetProgressbar();

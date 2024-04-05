@@ -2,6 +2,8 @@
 
 namespace Solital\Core\Kernel\Traits;
 
+use Solital\Core\Kernel\DebugCore;
+
 trait DatabaseTrait
 {
     use KernelTrait;
@@ -27,14 +29,8 @@ trait DatabaseTrait
      */
     protected static function setDatabaseConnection(array $database_connection): array
     {
-        if (self::DEBUG_DATABASE == true) {
-            self::$db['drive']      = 'mysql';
-            self::$db['host']       = 'localhost';
-            self::$db['name']       = 'test';
-            self::$db['user']       = 'root';
-            self::$db['pass']       = '';
-            self::$db['sqlite_dir'] = '';
-
+        if (DebugCore::isCoreDebugEnabled()) {
+            self::$db = DebugCore::getDatabaseConnection();
             return self::$db;
         }
 

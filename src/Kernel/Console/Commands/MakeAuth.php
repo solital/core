@@ -2,9 +2,10 @@
 
 namespace Solital\Core\Kernel\Console\Commands;
 
-use Solital\Core\Auth\AuthDatabase;
 use Solital\Core\Console\{Command, Interface\CommandInterface};
-use Solital\Core\Kernel\{Application, Console\HelpersTrait};
+use Solital\Core\Console\Output\ConsoleOutput;
+use Solital\Core\Kernel\{Application, Console\HelpersTrait, DebugCore};
+use Solital\Core\Kernel\Model\AuthModel;
 
 class MakeAuth extends Command implements CommandInterface
 {
@@ -131,7 +132,7 @@ class MakeAuth extends Command implements CommandInterface
         ];
 
         $this->generateAuthTemplate($components, $view_dir);
-        $this->success("Login components created successfully!")->print()->break();
+        ConsoleOutput::success("Login components created successfully!")->print()->break();
 
         return $this;
     }
@@ -153,7 +154,7 @@ class MakeAuth extends Command implements CommandInterface
         ];
 
         $this->generateAuthTemplate($components, $view_dir);
-        $this->success("Forgot components created successfully!")->print()->break();
+        ConsoleOutput::success("Forgot components created successfully!")->print()->break();
 
         return $this;
     }
@@ -203,17 +204,17 @@ class MakeAuth extends Command implements CommandInterface
      */
     public function createUserAuth(): MakeAuth
     {
-        $users = (new AuthDatabase())->createUserTable();
+        $users = (new AuthModel())->createUserTable();
 
         if (empty($users)) {
-            $db = new AuthDatabase();
+            $db = new AuthModel();
             $db->username = 'solital@email.com';
             $db->password = '$2y$10$4gjz66edZG.bNYIabcxkgerycCXYazTu8QOWKBhWZKcUr6gikxjYa'; // pass = solital
             $db->save();
 
-            $this->success("User created successfully!")->print()->break();
+            ConsoleOutput::success("User created successfully!")->print()->break();
         } else {
-            $this->success("User already exists!")->print()->break();
+            ConsoleOutput::success("User already exists!")->print()->break();
         }
 
         return $this;
@@ -224,9 +225,9 @@ class MakeAuth extends Command implements CommandInterface
      */
     private function getAuthFolders(): void
     {
-        $this->controller_dir = Application::getRootApp('Components/Controller/Auth/', Application::DEBUG);
-        $this->middleware_dir = Application::getRootApp('Middleware/', Application::DEBUG);
-        $this->route_dir = Application::getRoot('routers/', Application::DEBUG);
-        $this->view_dir = Application::getRoot('resources/view/auth/', Application::DEBUG);
+        $this->controller_dir = Application::getRootApp('Components/Controller/Auth/', DebugCore::isCoreDebugEnabled());
+        $this->middleware_dir = Application::getRootApp('Middleware/', DebugCore::isCoreDebugEnabled());
+        $this->route_dir = Application::getRoot('routers/', DebugCore::isCoreDebugEnabled());
+        $this->view_dir = Application::getRoot('resources/view/auth/', DebugCore::isCoreDebugEnabled());
     }
 }

@@ -4,10 +4,11 @@ namespace Solital\Core\Kernel\Console\Commands;
 
 use Solital\Core\Console\Command;
 use Solital\Core\Console\Interface\CommandInterface;
-use Solital\Core\Kernel\Application;
 use Solital\Core\Kernel\Console\HelpersTrait;
-use Nette\PhpGenerator\{ClassType, Method, PhpNamespace};
+use Solital\Core\Console\Output\ConsoleOutput;
+use Solital\Core\Kernel\{Application, DebugCore};
 use Solital\Core\Schedule\{Schedule, ScheduleInterface};
+use Nette\PhpGenerator\{ClassType, Method, PhpNamespace};
 
 class MakeSchedule extends Command implements CommandInterface
 {
@@ -48,7 +49,7 @@ class MakeSchedule extends Command implements CommandInterface
     public function handle(object $arguments, object $options): mixed
     {
         $this->handle = Application::provider('handler-file');
-        $this->schedule_dir = Application::getRootApp('Schedule/', Application::DEBUG);
+        $this->schedule_dir = Application::getRootApp('Schedule/', DebugCore::isCoreDebugEnabled());
 
         if (isset($options->remove)) {
             $this->removeComponent($this->schedule_dir, $arguments->schedule_name . ".php");
@@ -110,11 +111,11 @@ class MakeSchedule extends Command implements CommandInterface
         ]);
 
         if ($res == true) {
-            $this->success("Schedule successfully created!")->print()->break();
+            ConsoleOutput::success("Schedule successfully created!")->print()->break();
             return true;
         }
 
-        $this->error("Error: Schedule already exists!")->print()->break();
+        ConsoleOutput::error("Error: Schedule already exists!")->print()->break();
         return false;
     }
 }

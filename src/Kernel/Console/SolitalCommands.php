@@ -3,7 +3,8 @@
 namespace Solital\Core\Kernel\Console;
 
 use Solital\Core\Console\Interface\ExtendCommandsInterface;
-use Solital\Core\Kernel\Application;
+use Solital\Core\Console\Output\{ColorsEnum, ConsoleOutput};
+use Solital\Core\Kernel\{Application, DebugCore};
 use Solital\Core\Kernel\Console\Commands\{
     AppStatus,
     DumpDatabase,
@@ -14,6 +15,7 @@ use Solital\Core\Kernel\Console\Commands\{
     ListDatabase,
     MakeController,
     MakeAuth,
+    MakeBoot,
     MakeCommand,
     MakeMiddleware,
     MakeMigrations,
@@ -22,6 +24,7 @@ use Solital\Core\Kernel\Console\Commands\{
     MakeRouter,
     MakeSchedule,
     MakeSeeder,
+    MakeValidator,
     Migrations,
     Queues,
     Scanner,
@@ -40,6 +43,10 @@ class SolitalCommands implements ExtendCommandsInterface
 
     public function __construct()
     {
+        if (DebugCore::isCoreDebugEnabled()) {
+            ConsoleOutput::banner("DEBUG ENABLED", ColorsEnum::BG_YELLOW)->print()->break();
+        }
+
         Application::getInstance();
     }
 
@@ -55,6 +62,7 @@ class SolitalCommands implements ExtendCommandsInterface
         HandleCourse::class,
         ListDatabase::class,
         MakeController::class,
+        MakeBoot::class,
         MakeAuth::class,
         MakeCommand::class,
         MakeMiddleware::class,
@@ -64,6 +72,7 @@ class SolitalCommands implements ExtendCommandsInterface
         MakeRouter::class,
         MakeSchedule::class,
         MakeSeeder::class,
+        MakeValidator::class,
         Migrations::class,
         Queues::class,
         Scanner::class,

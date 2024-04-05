@@ -2,11 +2,11 @@
 
 namespace Solital\Core\Logger;
 
+use Monolog\Level;
 use Monolog\Formatter\HtmlFormatter;
 use Monolog\Handler\{StreamHandler, SyslogHandler};
-use Monolog\Level;
-use Solital\Core\Kernel\Application;
 use Solital\Core\Mail\Mailer;
+use Solital\Core\Kernel\{Application, DebugCore};
 
 abstract class AbstractHandlers
 {
@@ -33,7 +33,7 @@ abstract class AbstractHandlers
      */
     protected static function setHandler(string $handler_name, mixed $level, string $log_path): mixed
     {
-        $path = Application::getRootApp("Storage/", Application::DEBUG);
+        $path = Application::getRootApp("Storage/", DebugCore::isCoreDebugEnabled());
 
         $handle = match ($handler_name) {
             'stream' => new StreamHandler($path . $log_path, $level),
@@ -51,40 +51,6 @@ abstract class AbstractHandlers
      */
     protected static function setLevel(string $level): mixed
     {
-        /* switch ($level) {
-            case 'debug':
-                $level = Level::Debug;
-                break;
-
-            case 'info':
-                $level = Level::Info;
-                break;
-
-            case 'notice':
-                $level = Level::Notice;
-                break;
-
-            case 'warning':
-                $level = Level::Warning;
-                break;
-
-            case 'error':
-                $level = Level::Error;
-                break;
-
-            case 'critical':
-                $level = Level::Critical;
-                break;
-
-            case 'alert':
-                $level = Level::Alert;
-                break;
-
-            case 'emergency':
-                $level = Level::Emergency;
-                break;
-        } */
-
         $level = match ($level) {
             'debug' => Level::Debug,
             'info' => Level::Info,

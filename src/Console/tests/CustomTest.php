@@ -17,6 +17,9 @@ class CustomTest extends Command implements CommandInterface
         if (isset($options->nondefinedopt)) {
             var_dump(true);
         }
+
+        print_r(Command::call('create:test', ['--witharg=accept']));
+        echo PHP_EOL;
         
         return $arguments->name;
     }

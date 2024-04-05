@@ -1,3 +1,5 @@
+# Generated file by Solital Framework
+
 # Enable cache in view
 wolf_cache:
   enabled: false # false, custom

@@ -2,22 +2,17 @@
 
 namespace Solital\Core\Mail;
 
-use Solital\Core\Kernel\Application;
-use Solital\Core\Mail\QueueMail;
 use PHPMailer\PHPMailer\PHPMailer;
+use Solital\Core\Mail\QueueMail;
+use Solital\Core\Kernel\{Application, DebugCore};
 
 class Mailer extends QueueMail
 {
     use PropertyMailTrait;
 
-    /**
-     * __construct
-     * 
-     * @return void
-     */
     public function __construct()
     {
-        if (Application::MAILER_TEST_UNIT == true) {
+        if (DebugCore::isCoreDebugEnabled() == true) {
             $this->mailerConfig('unit');
         } else {
             $config = Application::yamlParse('mail.yaml');
@@ -169,13 +164,15 @@ class Mailer extends QueueMail
         $config = Application::yamlParse('mail.yaml');
 
         if ($type === 'unit') {
+            $mailer_config = DebugCore::getMailConfig();
+
             $this->php_mailer_config['exceptions'] = true;
             $this->php_mailer_config['debug']      = 0;
-            $this->php_mailer_config['host']       = constant('MAIL_HOST');
-            $this->php_mailer_config['user']       = constant('MAIL_USER');
-            $this->php_mailer_config['pass']       = constant('MAIL_PASS');
-            $this->php_mailer_config['security']   = constant('MAIL_SECURE');
-            $this->php_mailer_config['port']       = constant('MAIL_PORT');
+            $this->php_mailer_config['host']       = ($mailer_config['host'] ?? throw new \Exception("Mail 'host' is empty"));
+            $this->php_mailer_config['user']       = ($mailer_config['user'] ?? throw new \Exception("Mail 'user' is empty"));
+            $this->php_mailer_config['pass']       = ($mailer_config['pass'] ?? throw new \Exception("Mail 'pass' is empty"));
+            $this->php_mailer_config['security']   = ($mailer_config['security'] ?? throw new \Exception("Mail 'security' is empty"));
+            $this->php_mailer_config['port']       = ($mailer_config['port'] ?? throw new \Exception("Mail 'port' is empty"));
         }
 
         if ($type === 'development') {

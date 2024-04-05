@@ -4,6 +4,9 @@ namespace Solital\Core\Validation;
 
 use Respect\Validation\Validator;
 
+/**
+ * @deprecated This class will be removed
+ */
 class Valid
 {
     /**

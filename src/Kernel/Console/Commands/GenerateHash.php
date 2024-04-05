@@ -3,7 +3,7 @@
 namespace Solital\Core\Kernel\Console\Commands;
 
 use Solital\Core\Console\{Interface\CommandInterface, Command};
-use Solital\Core\Kernel\Application;
+use Solital\Core\Console\Output\ConsoleOutput;
 use Solital\Core\Kernel\Console\HelpersTrait;
 use Solital\Core\Kernel\Dotenv;
 use Solital\Core\Security\Hash;
@@ -25,7 +25,7 @@ class GenerateHash extends Command implements CommandInterface
     /**
      * @var string
      */
-    protected string $description = "";
+    protected string $description = "Generate a random hash";
 
     /**
      * @param object $arguments
@@ -40,7 +40,7 @@ class GenerateHash extends Command implements CommandInterface
             $hash = Hash::randomString();
             Dotenv::add('APP_HASH', $hash);
 
-            $this->success("APP_HASH successfully generated!")->print();
+            ConsoleOutput::success("APP_HASH successfully generated!")->print();
             return true;
         }
 
@@ -48,11 +48,11 @@ class GenerateHash extends Command implements CommandInterface
             $hash = Hash::randomString();
             Dotenv::edit('APP_HASH', $hash);
 
-            $this->success("APP_HASH successfully generated!")->print();
+            ConsoleOutput::success("APP_HASH successfully generated!")->print();
             return true;
         }
         
-        $this->error("APP_HASH already exists!")->print();
+        ConsoleOutput::error("APP_HASH already exists!")->print();
         return true;
     }
 }

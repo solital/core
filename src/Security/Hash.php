@@ -63,6 +63,7 @@ final class Hash
             $key = self::legacyOpenSSLEncryption('encrypt', $data);
         } else {
             $key =  self::encryption('openssl', getenv('APP_HASH'))->encrypt(json_encode($data));
+            $key = str_replace("==", "EQUALS", $key);
         }
 
         return (string)$key;
@@ -84,6 +85,7 @@ final class Hash
         ) {
             $decode = self::legacyOpenSSLEncryption('decrypt', key: $key);
         } else {
+            $key = str_replace("EQUALS", "==", $key);
             $decode = self::encryption('openssl', getenv('APP_HASH'))->decrypt($key);
         }
 

@@ -1,3 +1,5 @@
+# Generated file by Solital Framework
+
 # Enable cache on Katrina ORM
 cache_database: false
 

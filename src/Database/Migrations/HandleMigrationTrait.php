@@ -2,12 +2,10 @@
 
 namespace Solital\Core\Database\Migrations;
 
-use Solital\Core\Console\MessageTrait;
+use Solital\Core\Console\Output\ConsoleOutput;
 
 trait HandleMigrationTrait
 {
-    use MessageTrait;
-
     /**
      * @param string $migrations_directory
      * 
@@ -51,12 +49,12 @@ trait HandleMigrationTrait
 
         if (isset($options->status)) {
             if (empty($migrations_standby)) {
-                $this->success("All migrations have been executed!")->print()->break();
+                ConsoleOutput::success("All migrations have been executed!")->print()->break();
             } else {
-                $this->line("The migrations below were not executed:")->print()->break(true);
+                ConsoleOutput::line("The migrations below were not executed:")->print()->break(true);
 
                 foreach ($migrations_standby as $migrations) {
-                    $this->warning($migrations)->print()->break();
+                    ConsoleOutput::warning($migrations)->print()->break();
                 }
             }
 
@@ -64,7 +62,7 @@ trait HandleMigrationTrait
         }
 
         if (empty($migrations_standby)) {
-            $this->success("All migrations have been executed!")->print()->break()->exit();
+            ConsoleOutput::success("All migrations have been executed!")->print()->break()->exit();
         }
 
         if (isset($migrations_standby)) {

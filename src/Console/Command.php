@@ -4,15 +4,16 @@ namespace Solital\Core\Console;
 
 use ModernPHPException\ModernPHPException;
 use Solital\Core\Console\CommandException;
-use Solital\Core\Console\{MessageTrait, DefaultCommandsTrait};
+use Solital\Core\Console\DefaultCommandsTrait;
+use Solital\Core\Console\Output\ConsoleOutput;
 
 class Command
 {
     use DefaultCommandsTrait;
     use MessageTrait;
 
-    public const VERSION = "4.2.0";
-    public const DATE_VERSION = "Mar 15 2024";
+    public const VERSION = "4.3.0";
+    public const DATE_VERSION = "Apr xx 2024";
     public const SITE_DOC = "https://solital.github.io/site/docs/4.x/vinci-console/";
 
     /**
@@ -21,9 +22,26 @@ class Command
     protected string $command = "";
 
     /**
+     * @var string
+     */
+    private static string $command_copy = "";
+
+    /**
+     * @var array
+     */
+    private array $all_command_class = [];
+
+    /**
+     * @var array
+     */
+    private static array $all_command_class_copy = [];
+
+    /**
      * @var array
      */
     protected array $arguments = [];
+
+    private static bool $is_call_method = false;
 
     /**
      * @var array
@@ -85,11 +103,16 @@ class Command
      */
     public function __construct(array $class = [])
     {
-        /* $exc = new ModernPHPException();
-        $exc->start(); */
+        //if (!class_exists(ModernPHPException::class)) {
+        $exc = new ModernPHPException();
+        $exc->start();
+        //}
 
-        if ($class) {
-            foreach ($class as $class) {
+        $this->all_command_class = $class;
+        self::$all_command_class_copy = $class;
+
+        if ($this->all_command_class) {
+            foreach ($this->all_command_class as $class) {
                 $instance = new $class();
                 $this->command_class[] = $instance->getCommandClass();
                 $this->type_commands[] = $instance->getTypeCommands();
@@ -107,14 +130,25 @@ class Command
      */
     public function read(string|array $command = "", array $arguments = []): mixed
     {
+        if ($command == "" || !isset($command[1])) {
+            self::call('list');
+        }
+
         if (is_array($command)) {
             $this->command = $command[1];
+            self::$command_copy = $command[1];
             $arguments = array_slice($command, 2);
         }
 
         if (is_string($command)) {
             $this->command = $command;
-            $arguments = array_slice($arguments, 2);
+            self::$command_copy = $command;
+
+            if (self::$is_call_method == true) {
+                $arguments = $arguments;
+            } else {
+                $arguments = array_slice($arguments, 2);
+            }
         }
 
         $this->arguments = $arguments;
@@ -142,13 +176,36 @@ class Command
             return $this->instance->handle((object)$this->all_arguments, (object)$this->all_options);
         }
 
-        $this->error("Command '" . $this->command . "' not found")->print()->break();
+        ConsoleOutput::error("Command '" . $this->command . "' not found")->print()->break();
 
         if (!empty($this->verify_commands)) {
             $this->spellCheckCommand($this->verify_commands, $this->command);
         }
-        
+
         exit;
+    }
+
+    /**
+     * Call another command inside a command class
+     *
+     * @param string $command Command to execute
+     * @param array  $arguments Arguments as an array
+     * 
+     * @return mixed
+     */
+    public static function call(string $command, array $arguments = []): mixed
+    {
+        if (self::$is_call_method == true) {
+            throw new CommandException("'call' method is calling another 'call' method");
+        }
+
+        if (self::$command_copy === $command) {
+            throw new CommandException("You cannot call the same command");
+        }
+
+        self::$is_call_method = true;
+        $cmd = new static(self::$all_command_class_copy);
+        return $cmd->read($command, $arguments);
     }
 
     /**
@@ -298,6 +355,14 @@ class Command
         $reflection = new \ReflectionClass($class);
         $instance = $reflection->newInstanceWithoutConstructor();
 
+        if (
+            !method_exists($instance, 'getAllArguments') ||
+            !method_exists($instance, 'getAllOptions') ||
+            !method_exists($instance, 'getCommand')
+        ) {
+            throw new CommandException(get_class($instance) . " not extends 'Command' class");
+        }
+
         $args = $instance->getAllArguments();
         $options = $instance->getAllOptions();
         $cmd = $instance->getCommand();
@@ -310,7 +375,7 @@ class Command
             }
 
             if (count($this->arguments) > count($args)) {
-                $this->error("This command (" . $this->command . ") only accepts " . count($args) . " argument(s)")->print()->exit();
+                ConsoleOutput::error("This command (" . $this->command . ") only accepts " . count($args) . " argument(s)")->print()->exit();
             }
 
             $this->instance = $instance;
@@ -322,7 +387,7 @@ class Command
             }
 
             if (!empty($args) && empty($this->all_arguments)) {
-                $this->error("Argument required for this command: " . $this->command)->print()->exit();
+                ConsoleOutput::error("Argument required for this command: " . $this->command)->print()->exit();
             }
         }
     }
@@ -336,9 +401,11 @@ class Command
      */
     private function validateOptions(array $options, string $command): void
     {
+        //dump_die($this->all_options);
+
         if (empty($this->all_options)) {
-            $this->error("Error:")->print();
-            $this->line(" This command (" . $command . ") require an option:")->print()->break(true);
+            ConsoleOutput::error("Error:")->print();
+            ConsoleOutput::line(" This command (" . $command . ") require an option:")->print()->break(true);
             Table::formattedRowData(array_fill_keys($options, ''), margin: true);
             exit;
         }
@@ -353,12 +420,14 @@ class Command
         foreach ($this->all_options as $key => $opt) {
             if (in_array($key . '=', $options_without_char)) {
                 if ($opt === true) {
-                    $this->error("Value to option '--" . $key . "' is required")->print()->exit();
+                    ConsoleOutput::error("Value to option '--" . $key . "' is required")->print()->exit();
                 }
+
+                continue;
             }
 
             if (!in_array($key, $options_without_char)) {
-                $this->error("Option '--" . $key . "' is invalid")->print()->exit();
+                ConsoleOutput::error("Option '--" . $key . "' is invalid")->print()->exit();
             }
         }
     }
@@ -383,7 +452,7 @@ class Command
         }
 
         if ($attr_exists == false) {
-            $this->error("'Override' attribute not found in 'handle' method at '" . basename($instance::class) . "' class")->print()->exit();
+            ConsoleOutput::error("'Override' attribute not found in 'handle' method at '" . basename($instance::class) . "' class")->print()->exit();
         }
     }
 
@@ -394,8 +463,8 @@ class Command
     {
         if (!empty($this->not_found_class)) {
             foreach ($this->not_found_class as $not_found_class) {
-                $this->warning("WARNING! Class not found: ")->print();
-                $this->warning($not_found_class)->print()->break();
+                ConsoleOutput::warning("WARNING! Class not found: ")->print();
+                ConsoleOutput::warning($not_found_class)->print()->break(true);
             }
         }
 
@@ -425,7 +494,7 @@ class Command
         }
 
         if ($is_similar == false) {
-            $this->info("\n Didn't you mean: " . $input_word . "?")->print()->break();
+            ConsoleOutput::info("\n Didn't you mean: " . $input_word . "?")->print()->break();
         }
     }
 }

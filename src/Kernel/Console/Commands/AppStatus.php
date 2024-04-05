@@ -3,6 +3,7 @@
 namespace Solital\Core\Kernel\Console\Commands;
 
 use Solital\Core\Console\{Interface\CommandInterface, Command};
+use Solital\Core\Console\Output\ConsoleOutput;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Kernel\Console\HelpersTrait;
 
@@ -37,17 +38,17 @@ class AppStatus extends Command implements CommandInterface
         $res = Application::appStatus();
 
         if (!empty($res['message'])) {
-            $this->warning('There are alerts you need to see')->print()->break(true);
+            ConsoleOutput::warning('There are alerts you need to see')->print()->break(true);
 
             foreach ($res['message'] as $key => $message) {
-                $this->info($key . ': ')->print();
-                $this->line($message)->print()->break();
+                ConsoleOutput::info($key . ': ')->print();
+                ConsoleOutput::line($message)->print()->break();
             }
 
             return true;
         }
 
-        $this->success('All right, you can now start creating your projects!')->print()->break();
+        ConsoleOutput::success('All right, you can now start creating your projects!')->print()->break();
         return true;
     }
 }

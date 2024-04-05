@@ -1,5 +1,27 @@
 # Released Notes
 
+## v4.3.0 - (2024-04-xx)
+
+### Added
+
+- Added new component to output
+- Added `call` method
+
+### Changed
+
+- Changed `MessageTrait` to deprecated
+
+### Fixed
+
+- Fixed option with value
+- Fixed when command class not extends `Command` class
+
+### Removed
+
+- Removed `codedungeon/php-cli-colors` component
+
+----------------------------------------------------------------------
+
 ## v4.2.0 - (2024-03-15)
 
 ### Added

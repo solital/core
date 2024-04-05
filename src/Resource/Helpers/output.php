@@ -2,7 +2,6 @@
 
 use Solital\Core\Resource\JSON;
 use Solital\Core\Resource\Message;
-use Symfony\Component\VarDumper\{Cloner\VarCloner};
 
 /**
  * Show result pre-formatted
@@ -16,20 +15,6 @@ function pre($value): void
     echo '<pre>';
     var_dump($value);
     echo '</pre>';
-}
-
-/**
- * Create an intermediate representation of any PHP variable
- * 
- * @param mixed $var
- * 
- * @return mixed
- */
-function cloner($var)
-{
-    $cloner = new VarCloner();
-    $data = $cloner->cloneVar($var);
-    dump($data);
 }
 
 /**

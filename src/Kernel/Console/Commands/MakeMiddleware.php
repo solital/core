@@ -7,7 +7,9 @@ use Solital\Core\Kernel\Application;
 use Solital\Core\Kernel\Console\HelpersTrait;
 use Solital\Core\Console\Interface\CommandInterface;
 use Nette\PhpGenerator\{ClassType, Method, PhpNamespace};
+use Solital\Core\Console\Output\ConsoleOutput;
 use Solital\Core\Http\Middleware\BaseMiddlewareInterface;
+use Solital\Core\Kernel\DebugCore;
 
 class MakeMiddleware extends Command implements CommandInterface
 {
@@ -37,31 +39,28 @@ class MakeMiddleware extends Command implements CommandInterface
     #[\Override]
     public function handle(object $arguments, object $options): mixed
     {
-        $middleware_dir = Application::getRootApp('Middleware/', Application::DEBUG);
+        $middleware_dir = Application::getRootApp('Middleware/', DebugCore::isCoreDebugEnabled());
 
         if (isset($options->remove)) {
             $this->removeComponent($middleware_dir, $arguments->middleware_name . ".php");
         }
 
         if (!isset($arguments->middleware_name)) {
-            $this->error("Error: Middleware name not found")->print()->break();
+            ConsoleOutput::error("Error: Middleware name not found")->print()->break();
             return false;
         }
 
         $data = $this->codeGenerated($arguments->middleware_name);
-
         $res = $this->createComponent($data, [
             'component_name' => $arguments->middleware_name,
             'directory' => $middleware_dir
         ]);
 
         if ($res == true) {
-            $this->success("Middleware successfully created!")->print()->break();
-
+            ConsoleOutput::success("Middleware successfully created!")->print()->break();
             return true;
         } else {
-            $this->error("Error: Middleware already exists!")->print()->break();
-
+            ConsoleOutput::error("Error: Middleware already exists!")->print()->break();
             return false;
         }
 

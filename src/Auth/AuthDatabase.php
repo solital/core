@@ -3,12 +3,13 @@
 namespace Solital\Core\Auth;
 
 use Katrina\Katrina;
-use Solital\Core\Console\MessageTrait;
+use Solital\Core\Console\Output\ConsoleOutput;
 
+/**
+ * @deprecated Use AuthModel
+ */
 class AuthDatabase extends Katrina
 {
-    use MessageTrait;
-
     /**
      * @var string|null
      */
@@ -44,13 +45,13 @@ class AuthDatabase extends Katrina
                 }
 
                 if ($res == true) {
-                    $this->success("Table created successfully!")->print()->break();
+                    ConsoleOutput::success("Table created successfully!")->print()->break();
 
                     $users = self::customQuery("SELECT * FROM auth_users", true);
                     return $users;
                 }
 
-                $this->error("Error: table not created!")->print()->break();
+                ConsoleOutput::error("Error: table not created!")->print()->break();
                 return false;
             }
         }

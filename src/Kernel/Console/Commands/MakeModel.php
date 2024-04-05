@@ -5,8 +5,9 @@ namespace Solital\Core\Kernel\Console\Commands;
 use Katrina\Katrina;
 use Solital\Core\Console\Command;
 use Solital\Core\Console\Interface\CommandInterface;
-use Solital\Core\Kernel\Application;
 use Solital\Core\Kernel\Console\HelpersTrait;
+use Solital\Core\Console\Output\ConsoleOutput;
+use Solital\Core\Kernel\{Application, DebugCore};
 use Nette\PhpGenerator\{ClassType, PhpNamespace, Property};
 
 class MakeModel extends Command implements CommandInterface
@@ -26,7 +27,7 @@ class MakeModel extends Command implements CommandInterface
     /**
      * @var string
      */
-    protected string $description = "Create a Model class inside the 'app/Components/Model' folder";
+    protected string $description = "Create a Model class";
 
     /**
      * @param object $arguments
@@ -37,14 +38,14 @@ class MakeModel extends Command implements CommandInterface
     #[\Override]
     public function handle(object $arguments, object $options): mixed
     {
-        $model_dir = Application::getRootApp('Components/Model/', Application::DEBUG);
+        $model_dir = Application::getRootApp('Components/Model/', DebugCore::isCoreDebugEnabled());
 
         if (isset($options->remove)) {
             $this->removeComponent($model_dir, $arguments->model_name . ".php");
         }
 
         if (!isset($arguments->model_name)) {
-            $this->error("Error: Model name not found")->print()->break();
+            ConsoleOutput::error("Error: Model name not found")->print()->break();
             return false;
         }
 
@@ -56,11 +57,11 @@ class MakeModel extends Command implements CommandInterface
         ]);
 
         if ($res == true) {
-            $this->success("Model successfully created!")->print()->break();
+            ConsoleOutput::success("Model successfully created!")->print()->break();
             return true;
         }
 
-        $this->error("Error: Model already exists!")->print()->break();
+        ConsoleOutput::error("Error: Model already exists!")->print()->break();
         return false;
     }
 

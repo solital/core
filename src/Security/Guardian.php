@@ -3,12 +3,11 @@
 namespace Solital\Core\Security;
 
 use Katrina\Katrina;
+use Respect\Validation\Validator;
 use Solital\Core\Mail\Mailer;
 use Solital\Core\Auth\Password;
-use Respect\Validation\Validator;
-use Solital\Core\Kernel\Application;
 use Solital\Core\Exceptions\InvalidArgumentException;
-use Solital\Core\Kernel\Dotenv;
+use Solital\Core\Kernel\{Application, DebugCore, Dotenv};
 
 /** @phpstan-consistent-constructor */
 class Guardian
@@ -102,7 +101,7 @@ class Guardian
             self::checkEnvMail();
             self::$mailer = new Mailer();
 
-            if (Application::DEBUG == false && Dotenv::isset('APP_DOMAIN') == false) {
+            if (DebugCore::isCoreDebugEnabled() == false && Dotenv::isset('APP_DOMAIN') == false) {
                 Dotenv::add('APP_DOMAIN', self::getUrl(), 'APP DOMAIN');
             }
 
@@ -133,7 +132,7 @@ class Guardian
             throw new InvalidArgumentException("Recipient e-mail not valid");
         }
 
-        $template = file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'template-verify-domain.php');
+        $template = Application::getConsoleComponent('core-templates/template-verify-domain.php');
         $template = str_replace('{{ link }}', $url, $template);
 
         if ($url != getenv('APP_DOMAIN')) {

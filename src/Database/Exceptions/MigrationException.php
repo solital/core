@@ -1,6 +1,6 @@
 <?php
 
-namespace Solital\Core\Database\Migrations\Exception;
+namespace Solital\Core\Database\Exceptions;
 
 class MigrationException extends \Exception
 {
