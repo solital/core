@@ -52,8 +52,8 @@ class Course
     /**
      * Start routing
      *
-     * @throws \Solital\Course\Exceptions\NotFoundHttpException
-     * @throws \Solital\Http\Exception\TokenMismatchException
+     * @throws NotFoundHttpException
+     * @throws TokenMismatchException
      * @throws HttpException
      * @throws \Exception
      */

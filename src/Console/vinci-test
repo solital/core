@@ -8,30 +8,50 @@ use Solital\Core\Console\TableBuilder;
 use Solital\Core\Console\ProgressBar\ProgressBar;
 use Solital\Core\Console\ProgressBar\ProgressBarStyle;
 use Solital\Core\Console\InputOutput;
+use Solital\Core\Console\Output\ColorsEnum;
+use Solital\Core\Console\tests\ExtendCommands\{ExtendedCommandsTest, OtherExtendComandTest};
 
 //dd($argv);
 
-$class_commands = [
-    \Solital\Core\Console\tests\ExtendCommands\ExtendedCommandsTest::class,
-    \Solital\Core\Console\tests\ExtendCommands\OtherExtendComandTest::class
-];
-
-$cmd = new Command($class_commands);
+$cmd = new Command([ExtendedCommandsTest::class, OtherExtendComandTest::class]);
 $res = $cmd->read($argv, $argv);
 
-print_r($res);exit;
+//print_r($res);
+exit;
 
 ## INPUT-OUTPUT --------------------------------
 
-/* (new InputOutput('green'))->confirmDialog('What you want?', 'Y', 'N', false)->confirm(function () {
+/* $input_output = new InputOutput();
+$input_output->color(ColorsEnum::GREEN);
+$input_output->confirmDialog('What you want?', 'Y', 'N', false);
+$input_output->confirm(function () {
     echo "aceito" . PHP_EOL;
-})->refuse(function () {
+});
+$input_output->refuse(function () {
     echo "recusado" . PHP_EOL;
 }); */
 
-/* (new InputOutput('green'))->dialog('Enter a string: ')->action(function ($message) {
+
+/* function readline_terminal()
+{
+    $pwd = shell_exec('C:\Windows\system32\WindowsPowerShell\v1.0\powershell.exe -Command "$Password=Read-Host -assecurestring \"Please enter your password\" ; $PlainPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Password)) ; echo $PlainPassword;"');
+    $pwd = explode("\n", $pwd);
+    $pwd = $pwd[0];
+    echo "You have entered the following password: $pwd\n";
+}
+$pass = readline_terminal(); */
+
+/* $input_output = new InputOutput();
+$input_output->color(ColorsEnum::GREEN);
+$input_output->dialog('Enter a string: ');
+$input_output->action(function ($message) {
     echo $message . PHP_EOL;
 }); */
+
+/* $input_output = new InputOutput();
+$input_output->color(ColorsEnum::GREEN);
+$password = $input_output->password("Enter the password");
+echo $password; */
 
 ## TABLE --------------------------------
 
@@ -53,7 +73,7 @@ TableBuilder::formattedArray($pepole); */
 
 ## NEW PROGRESSBAR --------------------------------
 
-$progressbarstyle = new ProgressBarStyle("Downloading", "green", "Kb", 16);
+/* $progressbarstyle = new ProgressBarStyle("Downloading", "green", "Kb", 16);
 $progressbar = new ProgressBar($progressbarstyle, 1000);
 
 //$progressbar->pauseProgressbar();
@@ -64,6 +84,6 @@ for ($i = 0; $i < $progressbar->GetInitialMax(); $i++) {
     //$progressbar->stepTo(2184);
 
     usleep(1000);
-}
+} */
 
 //$progressbar->resetProgressbar();

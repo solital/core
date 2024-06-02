@@ -26,6 +26,8 @@ trait WolfCacheTrait
     protected ?string $time = null;
 
     /**
+     * Create a cache for a single view
+     * 
      * @param array|string $time
      * 
      * @return self
@@ -55,6 +57,54 @@ trait WolfCacheTrait
 
             return $this;
         }
+    }
+
+    /**
+     * Cache a template for one minute
+     * 
+     * @return self
+     */
+    public function forOneMinute(): self
+    {
+        $this->time = date('Hi');
+
+        return $this;
+    }
+
+    /**
+     * Cache a template for one hour
+     * 
+     * @return self
+     */
+    public function forOneHour(): self
+    {
+        $this->time = date('H');
+
+        return $this;
+    }
+
+    /**
+     * Cache a template for one day
+     * 
+     * @return self
+     */
+    public function forOneDay(): self
+    {
+        $this->time = date('N');
+
+        return $this;
+    }
+
+    /**
+     * Cache a template for one week
+     * 
+     * @return self
+     */
+    public function forOneWeek(): self
+    {
+        $this->time = date('W');
+
+        return $this;
     }
 
     /**
@@ -106,45 +156,5 @@ trait WolfCacheTrait
         }
 
         return null;
-    }
-
-    /**
-     * @return self
-     */
-    public function forOneMinute(): self
-    {
-        $this->time = date('Hi');
-
-        return $this;
-    }
-
-    /**
-     * @return self
-     */
-    public function forOneHour(): self
-    {
-        $this->time = date('H');
-
-        return $this;
-    }
-
-    /**
-     * @return self
-     */
-    public function forOneDay(): self
-    {
-        $this->time = date('N');
-
-        return $this;
-    }
-
-    /**
-     * @return self
-     */
-    public function forOneWeek(): self
-    {
-        $this->time = date('W');
-
-        return $this;
     }
 }

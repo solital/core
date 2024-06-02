@@ -3,17 +3,14 @@
 namespace Solital\Core\Console;
 
 use ModernPHPException\ModernPHPException;
-use Solital\Core\Console\CommandException;
-use Solital\Core\Console\DefaultCommandsTrait;
-use Solital\Core\Console\Output\ConsoleOutput;
+use Solital\Core\Console\{CommandException, DefaultCommandsTrait, Output\ConsoleOutput};
 
 class Command
 {
     use DefaultCommandsTrait;
-    use MessageTrait;
 
-    public const VERSION = "4.3.0";
-    public const DATE_VERSION = "Apr 05 2024";
+    public const VERSION = "4.4.0";
+    public const DATE_VERSION = "Jun xx 2024";
     public const SITE_DOC = "https://solital.github.io/site/docs/4.x/vinci-console/";
 
     /**
@@ -41,6 +38,9 @@ class Command
      */
     protected array $arguments = [];
 
+    /**
+     * @var bool
+     */
     private static bool $is_call_method = false;
 
     /**
@@ -134,45 +134,12 @@ class Command
             self::call('list');
         }
 
-        if (is_array($command)) {
-            $this->command = $command[1];
-            self::$command_copy = $command[1];
-            $arguments = array_slice($command, 2);
-        }
-
-        if (is_string($command)) {
-            $this->command = $command;
-            self::$command_copy = $command;
-
-            if (self::$is_call_method == true) {
-                $arguments = $arguments;
-            } else {
-                $arguments = array_slice($arguments, 2);
-            }
-        }
-
-        $this->arguments = $arguments;
-        $this->filter($this->arguments);
-        $this->verifyDefaultCommand($this->command, $this->arguments, (object)$this->all_options);
-
-        $command_class = $this->getCommandClass();
-
-        foreach ($command_class as $command_class) {
-            if (isset($command_class)) {
-                foreach ($command_class as $class) {
-                    if (!class_exists($class)) {
-                        array_push($this->not_found_class, $class);
-                    } else {
-                        $this->validateArguments($class);
-                    }
-                }
-            }
-        }
-
+        $this->filterInputCommand($command, $arguments);
         $this->notFoundClass();
 
         if (isset($this->instance)) {
             $this->validateAttribute($this->instance);
+            $this->saveHistory($this->command);
             return $this->instance->handle((object)$this->all_arguments, (object)$this->all_options);
         }
 
@@ -296,6 +263,44 @@ class Command
         }
     }
 
+    private function filterInputCommand(array|string $command, array $arguments): void
+    {
+        if (is_array($command)) {
+            $this->command = $command[1];
+            self::$command_copy = $command[1];
+            $arguments = array_slice($command, 2);
+        }
+
+        if (is_string($command)) {
+            $this->command = $command;
+            self::$command_copy = $command;
+
+            if (self::$is_call_method == true) {
+                $arguments = $arguments;
+            } else {
+                $arguments = array_slice($arguments, 2);
+            }
+        }
+
+        $this->arguments = $arguments;
+        $this->filter($this->arguments);
+        $this->verifyDefaultCommand($this->command, $this->arguments, (object)$this->all_options);
+
+        $command_class = $this->getCommandClass();
+        
+        foreach ($command_class as $command_class) {
+            if (isset($command_class)) {
+                foreach ($command_class as $class) {
+                    if (!class_exists($class)) {
+                        array_push($this->not_found_class, $class);
+                    } else {
+                        $this->validateArguments($class);
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * @param array $args
      * 
@@ -401,8 +406,6 @@ class Command
      */
     private function validateOptions(array $options, string $command): void
     {
-        //dump_die($this->all_options);
-
         if (empty($this->all_options)) {
             ConsoleOutput::error("Error:")->print();
             ConsoleOutput::line(" This command (" . $command . ") require an option:")->print()->break(true);

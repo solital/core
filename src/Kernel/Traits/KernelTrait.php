@@ -12,26 +12,8 @@ trait KernelTrait
     /**
      * That variables must be changed manually
      */
-    const SOLITAL_VERSION   = "4.3.0";
+    const SOLITAL_VERSION   = "4.4.0";
     const SITE_DOC_DOMAIN   = "https://solital.github.io/site/";
-    
-    /**
-     * @deprecated Use DebugCore::enableCoreDebug()
-     * @var bool
-     */
-    const DEBUG             = false;
-
-    /**
-     * @deprecated Use DebugCore::enableCoreDebug()
-     * @var bool
-     */
-    const DEBUG_DATABASE    = false;
-
-    /**
-     * @deprecated Use DebugCore::enableCoreDebug()
-     * @var bool
-     */
-    const MAILER_TEST_UNIT  = false;
 
     /**
      * Get an component template on Kernel folder
@@ -52,6 +34,8 @@ trait KernelTrait
     }
 
     /**
+     * Check if is executed in CLI
+     * 
      * @return bool
      */
     public static function isCli(): bool
@@ -125,10 +109,12 @@ trait KernelTrait
      *
      * @param string $config_file
      * 
-     * @return ModernPHPException
+     * @return null|ModernPHPException
      */
-    public static function startModernPHPException(string $config_file = ''): ModernPHPException
+    public static function startModernPHPException(string $config_file = ''): ?ModernPHPException
     {
+        if (DebugCore::isCoreDebugEnabled() === true) return null;
+
         $exception = new ModernPHPException($config_file);
 
         if (self::fileExistsWithoutCache($config_file) && $config_file != '') {
@@ -137,6 +123,11 @@ trait KernelTrait
             if (array_key_exists('enable_occurrences', $yaml_data) && $yaml_data['enable_occurrences'] == true) {
                 $exception->enableOccurrences();
             }
+        }
+
+        if (DebugCore::isCoreDebugEnabled() === true) {
+            restore_error_handler();
+            restore_exception_handler();
         }
 
         return $exception->start();
@@ -165,6 +156,21 @@ trait KernelTrait
                     throw new DotenvException("APP_HASH not found. Execute 'php vinci generate:hash' command");
                 }
             }
+        }
+    }
+
+    /**
+     * Check if composer autoload exists
+     *
+     * @return void
+     */
+    private static function composerExists(): void
+    {
+        $autoload = dirname(__DIR__, 2) . '/vendor/autoload.php';
+
+        if (self::fileExistsWithoutCache($autoload)) {
+            echo 'Could not find "autoload.php". Did you run "composer update"?' . PHP_EOL;
+            exit(1);
         }
     }
 }

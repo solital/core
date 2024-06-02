@@ -2,20 +2,17 @@
 
 namespace Solital\Core\Kernel;
 
-use Symfony\Component\Yaml\Yaml;
 use Solital\Core\Course\Course;
 use Solital\Core\Resource\Session;
 use Solital\Core\Security\Guardian;
 use Solital\Core\FileSystem\HandleFiles;
-use Solital\Core\Kernel\Exceptions\{ApplicationException, YamlException};
-use Solital\Core\Kernel\Traits\{KernelTrait, ClassLoaderTrait, DatabaseTrait};
+use Solital\Core\Kernel\Exceptions\ApplicationException;
+use Solital\Core\Kernel\Traits\{KernelTrait, ClassLoaderTrait, DatabaseTrait, YamlTrait};
 use Solital\Core\Container\{Interface\ContainerInterface, Container, DefaultServiceContainer};
 
 abstract class Application
 {
-    use KernelTrait;
-    use ClassLoaderTrait;
-    use DatabaseTrait;
+    use KernelTrait, ClassLoaderTrait, DatabaseTrait, YamlTrait;
 
     /**
      * @var string
@@ -43,48 +40,14 @@ abstract class Application
     private static mixed $container;
 
     /**
-     * Returns variables by YAML file
-     *
-     * @param string $yaml_file       YAML file name
-     * @param bool   $return_dir_name If TRUE, get directory of the YAML files
-     * 
-     * @return mixed
-     * @throws ApplicationException
-     */
-    public static function yamlParse(string $yaml_file, bool $return_dir_name = false, bool $throws = false): mixed
-    {
-        if (DebugCore::isCoreDebugEnabled() == true) {
-            $yaml_dir_file = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Kernel' . DIRECTORY_SEPARATOR . 'Console' . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR;
-        } else {
-            if (!defined('SITE_ROOT')) {
-                throw new ApplicationException("SITE_ROOT constant not defined");
-            }
-
-            $yaml_dir_file = constant('SITE_ROOT') . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR;
-        }
-
-        if (!self::fileExistsWithoutCache($yaml_dir_file)) {
-            if ($throws == true) {
-                throw new YamlException('YAML file "' . $yaml_file . '" not found');
-            }
-
-            return false;
-        }
-
-        if ($return_dir_name == true) {
-            return $yaml_dir_file  . $yaml_file;
-        }
-
-        return Yaml::parseFile($yaml_dir_file . $yaml_file);
-    }
-
-    /**
      * Initiate instance project
      * 
      * @return void
      */
     public static function getInstance(): void
     {
+        self::composerExists();
+
         /* START MODERN PHP EXCEPTION WITHOUT CONFIG FILE*/
         $exception_instance = self::startModernPHPException();
 
@@ -132,7 +95,7 @@ abstract class Application
     }
 
     /**
-     * Get container ID
+     * Get container ID defined in `ServiceContainer` class
      *
      * @param string $provider
      * 
@@ -144,7 +107,7 @@ abstract class Application
     }
 
     /**
-     * Set database connection constants
+     * Get Solital's database connection
      * 
      * @return void
      */

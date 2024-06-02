@@ -142,7 +142,7 @@ class RouterUrlTest extends TestCase
         $params = TestRouter::getUri('home', null, ['jackdaniels' => 'true', 'cola' => 'yeah'])->getParams();
         $params = $this->mapped_implode('&', $params, '=');
 
-        $this->assertEquals('/?jackdaniels=true&cola=yeah', '/?'.$params);
+        $this->assertEquals('/?jackdaniels=true&cola=yeah', '/?' . $params);
 
         TestRouter::router()->reset();
     }

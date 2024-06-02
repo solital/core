@@ -4,6 +4,7 @@ namespace Solital\Core\Wolf\Functions;
 
 use Solital\Core\Kernel\Application;
 use Solital\Core\Logger\Logger;
+use Solital\Core\Resource\Str\Str;
 use Solital\Core\Security\Hash;
 use Solital\Core\Wolf\Exception\WolfException;
 use Solital\Core\Wolf\Wolf;
@@ -13,6 +14,8 @@ trait ExtendsTrait
     use AssetsTrait;
 
     /**
+     * Generate a template
+     * 
      * @param string $view
      * 
      * @return mixed
@@ -44,6 +47,8 @@ trait ExtendsTrait
     }
 
     /**
+     * Extends a template
+     * 
      * @param string $view
      * 
      * @return void
@@ -53,7 +58,7 @@ trait ExtendsTrait
         $all_args = Wolf::getAllArgs();
         extract($all_args, EXTR_SKIP);
 
-        if (str_ends_with($view, ".php")) {
+        if (Str::endsWith($view, ".php")) {
             $view = str_replace(".php", "", $view);
         }
 
@@ -106,6 +111,8 @@ trait ExtendsTrait
     }
 
     /**
+     * Convert Wolf tags to PHP tags for temporary template
+     * 
      * @param string $view
      * 
      * @return string
@@ -120,6 +127,8 @@ trait ExtendsTrait
     }
 
     /**
+     * Generate a temporary template
+     * 
      * @param string $view
      * 
      * @return string

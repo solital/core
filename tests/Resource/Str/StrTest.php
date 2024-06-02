@@ -2,14 +2,12 @@
 
 namespace Kemo;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Solital\Core\Resource\Str\Str;
 
 class StrTest extends TestCase
 {
-    /**
-     * @covers ::__call
-     */
     public function testCallThrowsStrException()
     {
         $this->expectException('BadMethodCallException');
@@ -27,12 +25,9 @@ class StrTest extends TestCase
     }
 
     /**
-     * @covers ::__construct
-     * @covers ::__toString
-     * @covers ::value
-     * @dataProvider providerRenderValue
      * @param        string $string
      */
+    #[DataProvider('providerRenderValue')]
     public function testRenderValue($string)
     {
         $str = new Str($string);
@@ -41,9 +36,6 @@ class StrTest extends TestCase
         $this->assertEquals($string, $str->value());
     }
 
-    /**
-     * @covers ::values
-     */
     public function testValues()
     {
         $str = new Str(' something going on ');
@@ -57,6 +49,20 @@ class StrTest extends TestCase
         ));
     }
 
+    public function testAfter()
+    {
+        $str = new Str("This is a test");
+        $str->after("This is");
+        $this->assertEquals(" a test", $str->value());
+    }
+
+    public function testBefore()
+    {
+        $str = new Str("This is a test");
+        $str->before("a test");
+        $this->assertEquals("This is ", $str->value());
+    }
+
     public static function providerAddCslashes()
     {
         return array(
@@ -66,13 +72,10 @@ class StrTest extends TestCase
     }
 
     /**
-     * @covers ::addCslashes
-     * @covers ::value
-     * @covers ::_set
-     * @dataProvider providerAddCslashes
      * @param string $string
      * @param string $charlist
      */
+    #[DataProvider('providerAddCslashes')]
     public function testAddCslashes($string, $charlist, $expected)
     {
         $str = new Str($string);
@@ -90,13 +93,10 @@ class StrTest extends TestCase
     }
 
     /**
-     * @covers ::addSlashes
-     * @covers ::value
-     * @covers ::_set
-     * @dataProvider providerAddSlashes
      * @param string $string
      * @param string $expected
      */
+    #[DataProvider('providerAddSlashes')]
     public function testAddSlashes($string, $expected)
     {
         $str = new Str($string);
@@ -114,66 +114,18 @@ class StrTest extends TestCase
     }
 
     /**
-     * @covers ::chunkSplit
-     * @covers ::value
-     * @covers ::_default
-     * @covers ::_set
-     * @dataProvider providerChunkSplit
      * @param $string
      * @param $length
      * @param $end
      * @param $expected
      */
+    #[DataProvider('providerChunkSplit')]
     public function testChunkSplit($string, $length, $end, $expected)
     {
         $str = new Str($string);
         $split = (string) $str->chunkSplit($length, $end);
 
         $this->assertEquals($expected, $split);
-    }
-
-    public static function providerCompare()
-    {
-        return array(
-            array('foobar', new Str('fooba'), 1),
-        );
-    }
-
-    /**
-     * @covers ::compare
-     * @dataProvider providerCompare
-     * @param $string
-     * @param $target
-     * @param $expected
-     */
-    public function testCompare($string, $target, $expected)
-    {
-        $str = new Str($string);
-        $result = $str->compare($target);
-
-        $this->assertEquals($expected, $result);
-    }
-
-    public static function providerCompareInsensitive()
-    {
-        return array(
-            array('hello wOrLd', 'HELLO world', 0),
-        );
-    }
-
-    /**
-     * @covers ::compareInsensitive
-     * @dataProvider providerCompareInsensitive
-     * @param $str
-     * @param $target
-     * @param $expected
-     */
-    public function testCompareInsensitive($string, $target, $expected)
-    {
-        $str = new Str($string);
-        $result = $str->compareInsensitive($target);
-
-        $this->assertEquals($expected, $result);
     }
 
     public static function providerConcat()
@@ -185,114 +137,17 @@ class StrTest extends TestCase
     }
 
     /**
-     * @covers ::concat
-     * @covers ::value
-     * @covers ::_set
-     * @dataProvider providerConcat
      * @param $string
      * @param $concat
      * @param $expected
      */
+    #[DataProvider('providerConcat')]
     public function testConcat($string, $concat, $expected)
     {
         $str = new Str($string);
         $str->concat($concat);
 
         $this->assertSame($expected, $str->value());
-    }
-
-    public static function providerContains()
-    {
-        return array(
-            array('containing string', 'ning', TRUE),
-            array('noncontaining', 'foobar', FALSE),
-        );
-    }
-
-    /**
-     * @covers ::contains
-     * @dataProvider providerContains
-     * @param $string
-     * @param $substring
-     * @param $expected
-     */
-    public function testContains($string, $substring, $expected)
-    {
-        $str = new Str($string);
-        $result = $str->contains($substring);
-
-        $this->assertSame($result, $expected);
-    }
-
-    public static function providerCountChars()
-    {
-        return array(
-            array('abababcabc', TRUE, array(ord('a') => 4, ord('b') => 4, ord('c') => 2)),
-            array('abababcabc', FALSE, array('a' => 4, 'b' => 4, 'c' => 2)),
-        );
-    }
-
-    /**
-     * @covers ::countChars
-     * @dataProvider providerCountChars
-     * @param $string
-     * @param $ascii
-     * @param $expected
-     */
-    public function testCountChars($string, $ascii, $expected)
-    {
-        $str = new Str($string);
-        $result = $str->countChars($ascii);
-
-        $this->assertEquals($expected, $result);
-    }
-
-    public static function providerExplode()
-    {
-        return array(
-            array('foo is bar sometimes', ' ', array('foo', 'is', 'bar', 'sometimes')),
-            array('but_Bar_is_never_Foo', '_', array('but', 'Bar', 'is', 'never', 'Foo')),
-        );
-    }
-
-    /**
-     * @covers ::explode
-     * @dataProvider providerExplode
-     * @param $string
-     * @param $delimiter
-     * @param $expected
-     */
-    public function testExplode($string, $delimiter, $expected)
-    {
-        $str = new Str($string);
-        $result = $str->explode($delimiter);
-
-        $this->assertEquals($expected, $result);
-    }
-
-    public static function providerImplode()
-    {
-        return array(
-            array(' ', array('foo'), 'foo'),
-            array('_-_', array('foo', 'bar'), 'foo_-_bar'),
-            array('!', array('foo', 'is', 'bar', 'sometimes'), 'foo!is!bar!sometimes'),
-            array(' ', array('but', 'Bar', 'is', 'never', 'Foo'), 'but Bar is never Foo'),
-        );
-    }
-
-    /**
-     * @covers ::implode
-     * @dataProvider providerImplode
-     * @param $string
-     * @param $elements
-     * @param $expected
-     */
-    public function testImplode($string, array $elements, $expected)
-    {
-        $str = new Str($string);
-        $result = $str->implode($elements);
-
-        $this->assertEquals($expected, $result);
     }
 
     public static function providerIreplace()
@@ -304,13 +159,11 @@ class StrTest extends TestCase
     }
 
     /**
-     * @covers ::ireplace
-     * @covers ::_set
-     * @dataProvider providerIreplace
      * @param $string
      * @param $elements
      * @param $expected
      */
+    #[DataProvider('providerIreplace')]
     public function testIreplace($string, array $replacements, $expected)
     {
         $str = new Str($string);
@@ -328,15 +181,11 @@ class StrTest extends TestCase
     }
 
     /**
-     * @covers ::ltrim
-     * @covers ::_default
-     * @covers ::_formatCharacterMask
-     * @covers ::_set
-     * @dataProvider providerLtrim
      * @param $string
      * @param $mask
      * @param $expected
      */
+    #[DataProvider('providerLtrim')]
     public function testLtrim($string, $mask, $expected)
     {
         $str = new Str($string);
@@ -353,14 +202,11 @@ class StrTest extends TestCase
     }
 
     /**
-     * @covers ::nl2br
-     * @covers ::value
-     * @covers ::_set
-     * @dataProvider providerNl2Br
      * @param $string
      * @param $mask
      * @param $expected
      */
+    #[DataProvider('providerNl2Br')]
     public function testNl2Br($string, $expected)
     {
         $str = new Str($string);
@@ -379,46 +225,19 @@ class StrTest extends TestCase
     }
 
     /**
-     * @covers ::pad
-     * @covers ::value
-     * @covers ::_default
-     * @covers ::_set
-     * @dataProvider providerPad
      * @param $string
      * @param $pad_length
      * @param $pad_string
      * @param $pad_type
      * @param $expected
      */
+    #[DataProvider('providerPad')]
     public function testPad($string, $pad_length, $pad_string, $pad_type, $expected)
     {
         $str = new Str($string);
         $str->pad($pad_length, $pad_string, $pad_type);
 
         $this->assertEquals($expected, $str->value());
-    }
-
-    public static function providerPosition()
-    {
-        return array(
-            array('foo is bar sometimes', ' is ', 0, 3),
-        );
-    }
-
-    /**
-     * @dataProvider providerPosition
-     * @covers ::position
-     * @covers ::value
-     * @param $string
-     * @param $substring
-     * @param $offset
-     * @param $expected
-     */
-    public function testPosition($string, $substring, $offset, $expected)
-    {
-        $str = new Str($string);
-
-        $this->assertEquals($expected, $str->position($substring, $offset));
     }
 
     public static function providerRepeat()
@@ -428,12 +247,14 @@ class StrTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider providerRepeat
-     * @covers ::repeat
-     * @covers ::value
-     * @covers ::_set
-     */
+    public function testRemoveAccents()
+    {
+        $str = new Str("àèìÒ");
+        $str->removeAccents();
+        $this->assertEquals("aeiO", $str->value());
+    }
+
+    #[DataProvider('providerRepeat')]
     public function testRepeat($string, $multiplier, $expected)
     {
         $str = new Str($string);
@@ -453,12 +274,7 @@ class StrTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider providerReplace
-     * @covers ::replace
-     * @covers ::value
-     * @covers ::_set
-     */
+    #[DataProvider('providerReplace')]
     public function testReplace($string, $replacements, $count, $expected)
     {
         $str = new Str($string);
@@ -475,12 +291,7 @@ class StrTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider providerReverse
-     * @covers ::reverse
-     * @covers ::value
-     * @covers ::_set
-     */
+    #[DataProvider('providerReverse')]
     public function testReverse($string, $expected)
     {
         $str = new Str($string);
@@ -498,13 +309,10 @@ class StrTest extends TestCase
     }
 
     /**
-     * @dataProvider providerRot13
-     * @covers ::rot13
-     * @covers ::value
-     * @covers ::_set
      * @param $string
      * @param $expected
      */
+    #[DataProvider('providerRot13')]
     public function testRot13($string, $expected)
     {
         $str = new Str($string);
@@ -522,16 +330,11 @@ class StrTest extends TestCase
     }
 
     /**
-     * @dataProvider providerRTrim
-     * @covers ::rtrim
-     * @covers ::value
-     * @covers ::_default
-     * @covers ::_formatCharacterMask
-     * @covers ::_set
      * @param $string
      * @param $mask
      * @param $expected
      */
+    #[DataProvider('providerRTrim')]
     public function testRTrim($string, $mask, $expected)
     {
         $str = new Str($string);
@@ -539,20 +342,26 @@ class StrTest extends TestCase
         $this->assertEquals($expected, $str->rtrim($mask));
     }
 
-    /**
-     * @covers ::shuffle
-     * @covers ::value
-     * @covers ::_set
-     */
     public function testShuffle()
     {
         $str = new Str('foo bar foobar pebkac fubar');
-
         $original = $str->value();
-
         $str->shuffle();
-
         $this->assertNotEquals($str->value(), $original);
+    }
+
+    public function testShorten()
+    {
+        $str = new Str('This is a test');
+        $str->shorten(10);
+        $this->assertEquals($str->value(), 'This is...');
+    }
+
+    public function testSlug()
+    {
+        $str = new Str('This is a test');
+        $str->slug();
+        $this->assertEquals($str->value(), 'this-is-a-test');
     }
 
     public static function providerSpecialChars()
@@ -563,14 +372,11 @@ class StrTest extends TestCase
     }
 
     /**
-     * @dataProvider providerSpecialChars
-     * @covers ::specialchars
-     * @covers ::value
-     * @covers ::_set
      * @param $string
      * @param $allowed_tags
      * @param $expected
      */
+    #[DataProvider('providerSpecialChars')]
     public function testSpecialChars($string, $expected1, $expected2)
     {
         $str = new Str($string);
@@ -593,14 +399,11 @@ class StrTest extends TestCase
     }
 
     /**
-     * @dataProvider providerStripTags
-     * @covers ::stripTags
-     * @covers ::value
-     * @covers ::_set
      * @param $string
      * @param $allowed_tags
      * @param $expected
      */
+    #[DataProvider('providerStripTags')]
     public function testStripTags($string, $allowed_tags, $expected)
     {
         $str = new Str($string);
@@ -617,14 +420,11 @@ class StrTest extends TestCase
     }
 
     /**
-     * @dataProvider providerTranslate
-     * @covers ::translate
-     * @covers ::value
-     * @covers ::_set
      * @param $string
      * @param $translations
      * @param $expected
      */
+    #[DataProvider('providerTranslate')]
     public function testTranslate($string, $translations, $expected)
     {
         $str = new Str($string);
@@ -635,28 +435,36 @@ class StrTest extends TestCase
     public static function providerTrim()
     {
         return array(
-            array(" \n foo      ", NULL, 'foo'),
+            array(" \n foo      ", null, 'foo'),
             array('offsoooooo', 'o', 'ffs'),
             array('_foobar ="__-', array('_', '-', '=', '"'), 'foobar '),
         );
     }
 
     /**
-     * @dataProvider providerTrim
-     * @covers ::trim
-     * @covers ::value
-     * @covers ::_default
-     * @covers ::_formatCharacterMask
-     * @covers ::_set
      * @param $string
      * @param $mask
      * @param $expected
      */
+    #[DataProvider('providerTrim')]
     public function testTrim($string, $mask, $expected)
     {
         $str = new Str($string);
-
         $this->assertEquals($expected, $str->trim($mask));
+    }
+
+    public function testUpper()
+    {
+        $str = new Str('string');
+        $str->toUpper();
+        $this->assertEquals($str->value(), 'STRING');
+    }
+
+    public function testLower()
+    {
+        $str = new Str('STRING');
+        $str->toLower();
+        $this->assertEquals($str->value(), 'string');
     }
 
     public static function providerUndo()
@@ -669,11 +477,10 @@ class StrTest extends TestCase
     }
 
     /**
-     * @covers ::undo
-     * @dataProvider providerUndo
      * @param $steps
      * @param $expected
      */
+    #[DataProvider('providerUndo')]
     public function testUndo($string, $steps, $expected)
     {
         $str = new Str($string);
@@ -685,7 +492,6 @@ class StrTest extends TestCase
     }
 
     /**
-     * @covers ::undo
      * @param $steps
      * @param $expected
      */
@@ -695,73 +501,5 @@ class StrTest extends TestCase
 
         $str = new Str('unimportant string');
         $str->undo('string');
-    }
-
-    public static function providerUniqueChars()
-    {
-        return array(
-            array('abcabdabcd', 'abcd'),
-            array('zd111cba', '1abcdz'),
-            array('z2d3c88ba', '238abcdz'),
-        );
-    }
-
-    /**
-     * @covers ::uniqueChars
-     * @covers ::value
-     * @dataProvider providerUniqueChars
-     * @param $string
-     * @param $expected
-     */
-    public function testUniqueChars($string, $expected)
-    {
-        $str = new Str($string);
-        $unique = $str->uniqueChars();
-
-        $this->assertEquals($expected, $unique);
-    }
-
-    public static function providerWordCount()
-    {
-        return array(
-            array('foo is here 3 times foo foo', NULL, 6),
-        );
-    }
-
-    /**
-     * @covers ::wordCount
-     * @covers ::value
-     * @dataProvider providerWordCount
-     * @param $string
-     * @param $charlist
-     * @param $expected
-     */
-    public function testWordCount($string, $charlist, $expected)
-    {
-        $str = new Str($string);
-
-        $this->assertEquals($expected, $str->wordCount($charlist));
-    }
-
-    public static function providerWords()
-    {
-        return array(
-            array('foo foo bar foo', NULL, array(0 => 'foo', 4 => 'foo', 8 => 'bar', 12 => 'foo')),
-        );
-    }
-
-    /**
-     * @covers ::words
-     * @covers ::value
-     * @dataProvider providerWords
-     * @param $string
-     * @param $charlist
-     * @param $expected
-     */
-    public function testWords($string, $charlist, $expected)
-    {
-        $str = new Str($string);
-
-        $this->assertEquals($expected, $str->words($charlist));
     }
 }

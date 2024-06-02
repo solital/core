@@ -7,10 +7,10 @@ use Solital\Core\Http\Request;
 class RouteUrl extends LoadableRoute
 {
     /**
-     * @param mixed $url
+     * @param string $url
      * @param mixed $callback
      */
-    public function __construct($url, $callback)
+    public function __construct(string $url, mixed $callback)
     {
         $this->setUri($url);
         $this->setCallback($callback);
@@ -23,7 +23,7 @@ class RouteUrl extends LoadableRoute
      * 
      * @return bool
      */
-    public function matchRoute($url, Request $request): bool
+    public function matchRoute(mixed $url, Request $request): bool
     {
         if ($this->getGroup() !== null && $this->getGroup()->matchRoute($url, $request) === false) {
             return false;

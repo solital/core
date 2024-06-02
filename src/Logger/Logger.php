@@ -2,7 +2,9 @@
 
 namespace Solital\Core\Logger;
 
+use Monolog\Handler\HandlerInterface;
 use Monolog\Logger as Monolog;
+use Monolog\Processor\ProcessorInterface;
 use Solital\Core\Logger\Exception\LoggerException;
 
 class Logger extends AbstractHandlers
@@ -13,6 +15,8 @@ class Logger extends AbstractHandlers
     private static array $channel;
 
     /**
+     * The logging channel
+     * 
      * @param string $channel
      * 
      * @return Monolog
@@ -32,6 +36,34 @@ class Logger extends AbstractHandlers
     }
 
     /**
+     * Custom Handlers
+     *
+     * @param string $channel
+     * @param array $handlers
+     * @param array|null $processors
+     * 
+     * @return Monolog
+     */
+    public static function customHandler(string $channel, array $handlers, ?array $processors = null): Monolog
+    {
+        self::getLogConfig();
+
+        $monolog = new Monolog($channel, $handlers);
+
+        if ($processors != null) {
+            foreach ($processors as $processor) {
+                if ($processor instanceof ProcessorInterface || !is_callable($processor)) {
+                    throw new LoggerException("Processor must be instace of 'ProcessorInterface' or callable");
+                }
+
+                $monolog->pushProcessor($processor);
+            }
+        }
+
+        return $monolog;
+    }
+
+    /**
      * @param string $channel
      * 
      * @return Monolog
@@ -42,7 +74,7 @@ class Logger extends AbstractHandlers
 
         if (self::$log_config['enable_logs'] === true) {
             $level = self::setLevel(self::$channel['level']);
-            $handle = self::setHandler(self::$channel['type'], $level, self::$channel['path']);
+            $handler = self::setHandler(self::$channel['type'], $level, self::$channel['path']);
 
             if (isset(self::$channel['processor'])) {
                 foreach (self::$channel['processor'] as $processor) {
@@ -52,7 +84,7 @@ class Logger extends AbstractHandlers
                 }
             }
 
-            $monolog->pushHandler($handle);
+            $monolog->pushHandler($handler);
         }
 
         return $monolog;

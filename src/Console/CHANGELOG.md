@@ -1,5 +1,22 @@
 # Released Notes
 
+## v4.4.0 - (2024-06-xx)
+
+### Added
+
+- Added history command
+- Added input for passwords
+
+### Changed
+
+- Changed `InputOutput` colors
+
+### Removed
+
+- Removed `MessageTrait` trait
+
+----------------------------------------------------------------------
+
 ## v4.3.0 - (2024-04-05)
 
 ### Added

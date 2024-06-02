@@ -2,9 +2,9 @@
 
 use Solital\Core\Course\Course as Course;
 use Solital\Core\Exceptions\RuntimeException;
-use Solital\Core\Http\{Uri, Request, Response};
+use Solital\Core\Http\Uri;
 use Solital\Core\Kernel\Application;
-use Solital\Core\Resource\Session;
+use Solital\Core\Security\Guardian;
 
 /**
  * Handles the `URI` class
@@ -20,26 +20,6 @@ use Solital\Core\Resource\Session;
 function url(?string $name = null, $parameters = null, ?array $getParams = null): Uri
 {
     return Course::getUri($name, $parameters, $getParams);
-}
-
-/**
- * Handles the `Response` class
- * 
- * @return Response
- */
-function response(): Response
-{
-    return Course::response();
-}
-
-/**
- * Handles the `Request` class
- * 
- * @return Request
- */
-function request(): Request
-{
-    return Course::request();
 }
 
 /**
@@ -77,52 +57,20 @@ function to_route(string $url, ?int $code = null): void
 }
 
 /**
- * Defines a limit on requests that can be made at a certain time
+ * Get atual url
  * 
- * @param string $key
- * @param int $limit = 5
- * @param int $seconds = 60
+ * @param string $uri
+ * 
+ * @return string
  */
-function request_limit(string $key, int $limit = 5, int $seconds = 60)
+function get_url(string $uri = null): string
 {
-    if (Session::has($key) && $_SESSION[$key]['time'] >= time() && $_SESSION[$key]['requests'] < $limit) {
-        Session::set($key, [
-            'time' => time() + $seconds,
-            'requests' => $_SESSION[$key]['requests'] + 1
-        ]);
-
-        return false;
-    }
-
-    if (Session::has($key) && $_SESSION[$key]['time'] >= time() && $_SESSION[$key]['requests'] >= $limit) {
-        return true;
-    }
-
-    Session::set($key, [
-        'time' => time() + $seconds,
-        'requests' => 1
-    ]);
-
-    return false;
+    return Guardian::getUrl($uri);
 }
 
 /**
- * Checks if a value was previously sent in the requisition
- *
- * @param string $key
- * @param string $value
- */
-function request_repeat(string $key, string $value)
-{
-    if (Session::has($key) && Session::get($key) == $value) {
-        return true;
-    }
-
-    Session::set($key, $value);
-    return false;
-}
-
-/**
+ * Get a middleware
+ * 
  * @param string $value
  * 
  * @return string

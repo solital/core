@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__DIR__, 2) . "/src/Resource/Helpers/others.php";
+require_once dirname(__DIR__, 2) . "/src/Resource/Helpers/instances-helpers.php";
 
 use PHPUnit\Framework\TestCase;
 

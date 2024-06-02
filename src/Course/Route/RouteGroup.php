@@ -11,12 +11,12 @@ class RouteGroup extends Route implements GroupRouteInterface
     /**
      * @var string
      */
-    protected $prefix;
+    protected string $prefix = '';
 
     /**
      * @var string
      */
-    protected $name;
+    protected string $name = '';
 
     /**
      * @var array

@@ -209,10 +209,9 @@ abstract class LoadableRoute extends Route implements LoadableRouteInterface
      * 
      * @return static
      */
-    public function setMatch($regex): LoadableRouteInterface
+    public function setMatch(string $regex): LoadableRouteInterface
     {
         $this->regex = $regex;
-
         return $this;
     }
 
@@ -250,22 +249,21 @@ abstract class LoadableRoute extends Route implements LoadableRouteInterface
     public function setName(string $name): LoadableRouteInterface
     {
         $this->name = $name;
-
         return $this;
     }
 
     /**
      * Merge with information from another route.
      *
-     * @param array $values
+     * @param array $settings
      * @param bool $merge
      * 
      * @return static
      */
-    public function setSettings(array $values, bool $merge = false): RouteInterface
+    public function setSettings(array $settings, bool $merge = false): RouteInterface
     {
-        if (isset($values['as']) === true) {
-            $name = $values['as'];
+        if (isset($settings['as']) === true) {
+            $name = $settings['as'];
 
             if ($this->name !== null && $merge !== false) {
                 $name .= '.' . $this->name;
@@ -274,10 +272,10 @@ abstract class LoadableRoute extends Route implements LoadableRouteInterface
             $this->setName($name);
         }
 
-        if (isset($values['prefix']) === true) {
-            $this->prependUrl($values['prefix']);
+        if (isset($settings['prefix']) === true) {
+            $this->prependUrl($settings['prefix']);
         }
 
-        return parent::setSettings($values, $merge);
+        return parent::setSettings($settings, $merge);
     }
 }

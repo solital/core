@@ -4,6 +4,7 @@ namespace Solital\Core\FileSystem;
 
 use Solital\Core\FileSystem\Trait\HandlePermissionsTrait;
 use Solital\Core\FileSystem\Exception\HandleFilesException;
+use Solital\Core\Resource\Str\Str;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -47,6 +48,8 @@ class HandleFiles
     }
 
     /**
+     * Define the folder containing the files
+     * 
      * @param string $folder
      * @return self
      */
@@ -54,7 +57,7 @@ class HandleFiles
     {
         $this->folder = $folder;
 
-        if (str_contains($folder, "/")) {
+        if (Str::contains($folder, "/")) {
             $this->folder = str_replace("/", DIRECTORY_SEPARATOR, $folder);
         }
 
@@ -80,6 +83,8 @@ class HandleFiles
     }
 
     /**
+     * Check if there is a file inside the folder
+     * 
      * @param string $file_exists
      * @param bool   $delete
      * 
@@ -99,6 +104,8 @@ class HandleFiles
     }
 
     /**
+     * Create a folder
+     * 
      * @param string $dir
      * @param int $permission
      * 
@@ -108,7 +115,7 @@ class HandleFiles
     public function create(string $dir, int $permission = 0777): bool
     {
         try {
-            $this->file_system->mkdir($dir);
+            $this->file_system->mkdir($dir, $permission);
             return true;
         } catch (IOExceptionInterface $exception) {
             echo "An error occurred while creating your directory at " . $exception->getPath();
@@ -118,6 +125,8 @@ class HandleFiles
     }
 
     /**
+     * Delete a folder
+     * 
      * @param string $dir
      * @param bool $safe
      * 
@@ -148,6 +157,7 @@ class HandleFiles
     }
 
     /**
+     * Use the native PHP functions `file_get_contents` and `file_put_contents` at the same time
      * @param string $file_name
      * @param string $dir_name
      * 
@@ -162,6 +172,8 @@ class HandleFiles
     }
 
     /**
+     * Make a copy of a file
+     * 
      * @param string $file
      * @param string $new_file
      * 
@@ -169,7 +181,7 @@ class HandleFiles
      */
     public function copy(string $file, string $new_file, bool $delete_original = false): bool
     {
-        if (str_contains($file, "/") && str_contains($new_file, "/")) {
+        if (Str::contains($file, "/") && Str::contains($new_file, "/")) {
             $file = str_replace("/", DIRECTORY_SEPARATOR, $file);
             $new_file = str_replace("/", DIRECTORY_SEPARATOR, $new_file);
         }

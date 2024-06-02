@@ -5,6 +5,7 @@ namespace Solital\Components\Controller\Auth;
 use Solital\Core\Auth\Auth;
 use Solital\Core\Security\Hash;
 use Solital\Core\Http\{Request, Controller\Controller};
+use Solital\Core\Kernel\Model\AuthModel;
 
 class ForgotController extends Controller
 {
@@ -23,7 +24,7 @@ class ForgotController extends Controller
     {
         return view('auth.forgot-form', [
             'title' => 'Forgot Password',
-            'msg' => message('forgot')
+            'msg' => message()->get('forgot')
         ]);
     }
 
@@ -39,7 +40,7 @@ class ForgotController extends Controller
             response()->redirect(url('forgot'));
         }
 
-        $res = Auth::forgot('auth_users')
+        $res = Auth::forgot(AuthModel::class)
             ->columns('username')
             ->values($email, url('change'))
             ->register();
@@ -69,7 +70,7 @@ class ForgotController extends Controller
                 'title' => 'Change Password',
                 'email' => $email,
                 'hash' => $hash,
-                'msg' => message('forgot')
+                'msg' => message()->get('forgot')
             ]);
         }
 
@@ -96,7 +97,7 @@ class ForgotController extends Controller
                 response()->redirect(url('change', ['hash' => $hash]));
             }
 
-            Auth::change('auth_users')
+            Auth::change(AuthModel::class)
                 ->columns('username', 'password')
                 ->values($email, $pass)
                 ->register();

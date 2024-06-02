@@ -79,7 +79,13 @@ class Number
      */
     public static function clamp(int|float $number, int|float $min, int|float $max): int|float
     {
-        return min(max($number, $min), $max);
+        if ($number > $max) {
+            return $max;
+        } elseif ($number < $min) {
+            return $min;
+        }
+        
+        return $number;
     }
 
     /**

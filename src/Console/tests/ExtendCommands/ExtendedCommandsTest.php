@@ -1,14 +1,15 @@
 <?php
 
-namespace Solital\Core\Console\tests\ExtendCommands;
+namespace Solital\Core\Console\Tests\ExtendCommands;
 
 use Solital\Core\Console\Interface\ExtendCommandsInterface;
+use Solital\Core\Console\Tests\Commands\{CustomCommandsTest, CustomTest};
 
 class ExtendedCommandsTest implements ExtendCommandsInterface
 {
     protected array $command_class = [
-        \Solital\Core\Console\tests\CustomCommandsTest::class,
-        \Solital\Core\Console\tests\CustomTest::class
+        CustomCommandsTest::class,
+        CustomTest::class
     ];
 
     #[\Override]

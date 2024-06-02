@@ -7,6 +7,13 @@ use Solital\Core\Security\Hash;
 
 define('SITE_ROOT', dirname(__DIR__, 2));
 
+$autoload = dirname(__DIR__, 2) . '/vendor/autoload.php';
+
+if (Application::fileExistsWithoutCache($autoload)) {
+    echo 'Could not find "autoload.php". Did you run "composer update"?' . PHP_EOL;
+    exit(1);
+}
+
 $_SERVER["REQUEST_METHOD"] = 'get';
 $_SERVER["REQUEST_URI"] = '/';
 

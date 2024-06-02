@@ -3,40 +3,40 @@
     "description": "Official core of Solital framework",
     "license": "MIT",
     "homepage": "https://solital.github.io/site/docs/",
-    "version": "4.3.0",
+    "version": "4.4.0",
     "require": {
         "php": "^8.3",
         "ext-json": "*",
         "ext-pdo": "*",
         "brenno-duarte/modern-php-exception": "3.*",
         "brenno-duarte/php-secure-password": "3.*",
-        "delight-im/http": "2.*",
-        "fig/event-dispatcher-util": "1.*",
-        "matthiasmullie/minify": "1.*",
-        "monolog/monolog": "^3.5",
-        "nette/php-generator": "4.*",
+        "brenno-duarte/phpdeprecated": "^1.0",
+        "delight-im/http": "^2.1",
+        "fig/event-dispatcher-util": "^1.3",
+        "matthiasmullie/minify": "^1.3",
+        "monolog/monolog": "^3.6",
+        "nette/php-generator": "^4.1",
         "peppeocchi/php-cron-scheduler": "^4.0",
-        "phpmailer/phpmailer": "6.*",
-        "psr/cache": "3.*",
-        "psr/container": "2.*",
-        "psr/event-dispatcher": "1.*",
-        "psr/http-factory": "1.*",
+        "phpmailer/phpmailer": "^6.9",
+        "psr/cache": "^3.0",
+        "psr/container": "^2.0",
+        "psr/event-dispatcher": "^1.0",
+        "psr/http-factory": "^1.1",
         "psr/link": "^2.0",
-        "psr/log": "3.*",
-        "psr/simple-cache": "3.*",
-        "respect/validation": "2.*",
+        "psr/log": "^3.0",
+        "psr/simple-cache": "^3.0",
         "solital/katrina": "2.*",
-        "spatie/db-dumper": "^3.4",
+        "spatie/db-dumper": "^3.6",
         "symfony/finder": "^7.0",
         "symfony/filesystem": "^7.0",
         "symfony/yaml": "7.*",
-        "wixel/gump": "^2.0"
+        "wixel/gump": "^2.1"
     },
     "replace": {
         "solital/vinci-console": "self.version"
     },
     "require-dev": {
-        "phpunit/phpunit": "^10",
+        "phpunit/phpunit": "^11",
         "phpstan/phpstan": "^1.9"
     },
     "autoload": {
@@ -46,7 +46,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Solital\\Test\\": "tests/"
+            "Solital\\Test\\": "tests/",
+            "Solital\\Core\\Console\\Tests\\": "src/Console/tests/"
         }
     },
     "config": {

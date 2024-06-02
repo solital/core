@@ -2,16 +2,14 @@
 
 namespace Solital\Core\Schedule;
 
-use GO\Scheduler;
-use GO\Traits\Interval;
-use Solital\Core\Console\MessageTrait;
+use GO\{Scheduler, Traits\Interval};
+use Solital\Core\Console\Output\ConsoleOutput;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Schedule\Exception\ScheduleException;
 
 class Schedule extends Scheduler
 {
     use Interval;
-    use MessageTrait;
 
     /**
      * @var Scheduler
@@ -60,25 +58,25 @@ class Schedule extends Scheduler
                 throw new ScheduleException("Time '" . $time . "' is not valid in " . $class::class);
             }
 
-            //$this->warning("[" . date('Y-m-d H:i:s') . "] Processing job: " . get_class($class))->print()->break();
-            $this->warning("[" . date('Y-m-d H:i:s') . "] Processing job: " . $class::class)->print()->break();
+            //ConsoleOutput::warning("[" . date('Y-m-d H:i:s') . "] Processing job: " . get_class($class))->print()->break();
+            ConsoleOutput::warning("[" . date('Y-m-d H:i:s') . "] Processing job: " . $class::class)->print()->break();
 
             $this->scheduler->call($method_handle)->{$time}()
                 ->before(function () use ($class) {
                     if (method_exists($class::class, 'before')) {
-                        $this->warning("[" . date('Y-m-d H:i:s') . "] Processing 'before' job: " . $class::class)->print()->break();
+                        ConsoleOutput::warning("[" . date('Y-m-d H:i:s') . "] Processing 'before' job: " . $class::class)->print()->break();
                         $class->before();
-                        $this->success("[" . date('Y-m-d H:i:s') . "] Job 'before' processed: " . $class::class)->print()->break();
+                        ConsoleOutput::success("[" . date('Y-m-d H:i:s') . "] Job 'before' processed: " . $class::class)->print()->break();
                     }
                 })->then(function () use ($class) {
                     if (method_exists($class::class, 'after')) {
-                        $this->warning("[" . date('Y-m-d H:i:s') . "] Processing 'after' job: " . $class::class)->print()->break();
+                        ConsoleOutput::warning("[" . date('Y-m-d H:i:s') . "] Processing 'after' job: " . $class::class)->print()->break();
                         $class->after();
-                        $this->success("[" . date('Y-m-d H:i:s') . "] Job 'after' processed: " . $class::class)->print()->break();
+                        ConsoleOutput::success("[" . date('Y-m-d H:i:s') . "] Job 'after' processed: " . $class::class)->print()->break();
                     }
                 })->output($this->schedule_log_dir . basename((string) $class::class, '.php') . '.log', true);
 
-            $this->success("[" . date('Y-m-d H:i:s') . "] Job processed: " . $class::class)->print()->break();
+            ConsoleOutput::success("[" . date('Y-m-d H:i:s') . "] Job processed: " . $class::class)->print()->break();
         }
 
         return $this;
@@ -93,7 +91,7 @@ class Schedule extends Scheduler
     {
         $this->failedJobs = $this->scheduler->getFailedJobs();
         echo PHP_EOL;
-        $this->success("[" . date('Y-m-d H:i:s') . "] Scheduler is executing jobs which are due...")->print()->break();
+        ConsoleOutput::success("[" . date('Y-m-d H:i:s') . "] Scheduler is executing jobs which are due...")->print()->break();
 
         if ($work === true) {
             $this->scheduler->work();

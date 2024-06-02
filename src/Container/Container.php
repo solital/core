@@ -10,6 +10,7 @@ use Solital\Core\Container\Exception\{
 	ImmutableException
 };
 
+#[\AllowDynamicProperties]
 class Container implements ContainerInterface
 {
 	/**
@@ -94,7 +95,7 @@ class Container implements ContainerInterface
 	 * @return mixed      Service instance or parameter value.
 	 */
 	#[\Override]
-	public function get($id)
+	public function get($id): mixed
 	{
 		if (!isset($this->keys[$id])) {
 			throw new NotFoundException($id);
@@ -105,7 +106,6 @@ class Container implements ContainerInterface
 		}
 
 		$this->resolving[$id] = true;
-
 		$definition = $this->entries[$id];
 
 		if (
@@ -268,13 +268,13 @@ class Container implements ContainerInterface
 	 * is an invokable, it will be treated as a global callback
 	 * that should be ran on every resolve.
 	 * 
-	 * @param string $id       Service entry identifier.
-	 * @param mixed  $callback Invokable.
+	 * @param string|callable $id       Service entry identifier.
+	 * @param callable|null   $callback Invokable.
 	 * 
 	 * @return mixed
 	 */
 	#[\Override]
-	public function extend(string $id, mixed $callback = null): mixed
+	public function extend(string|callable $id, callable $callback = null): mixed
 	{
 		if ($callback === null) {
 			$callback = $id;
@@ -311,10 +311,10 @@ class Container implements ContainerInterface
 			throw new ExpectedInvokableException(sprintf('Invalid extend callback supplied'));
 		}
 
-		/* $callback = function ($container) use ($callback, $definition, $id) {
+		$callback = function ($container) use ($callback, $definition, $id) {
 			return $callback($definition($container), $container);
-		}; */
-		$callback = fn($container) => $callback($definition($container), $container);
+		};
+		//$callback = fn($container) => $callback($definition($container), $container);
 
 		if (isset($this->factories[$definition])) {
 			$this->factories->detach($definition);
@@ -354,10 +354,9 @@ class Container implements ContainerInterface
 	 * @return Container        The container instance.        
 	 */
 	#[\Override]
-	public function register(ServiceProviderInterface $provider): self
+	public function register(ServiceProviderInterface $provider): Container
 	{
 		$provider->register($this);
-
 		return $this;
 	}
 
@@ -392,7 +391,7 @@ class Container implements ContainerInterface
 	 * 
 	 * @return void
 	 */
-	private function callGlobals(mixed $value = null)
+	private function callGlobals(mixed $value = null): void
 	{
 		if (!empty($this->globals)) {
 			foreach ($this->globals as $callback) {

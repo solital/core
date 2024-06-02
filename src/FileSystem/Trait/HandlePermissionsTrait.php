@@ -7,6 +7,8 @@ use Symfony\Component\Filesystem\Filesystem;
 trait HandlePermissionsTrait
 {
     /**
+     * Get full permissions
+     * 
      * @param string $file_name
      * 
      * @return string
@@ -63,6 +65,8 @@ trait HandlePermissionsTrait
     }
 
     /**
+     * Lists the permissions that the file or folder has
+     * 
      * @param string $file_name
      * 
      * @return string|null
@@ -80,6 +84,8 @@ trait HandlePermissionsTrait
     }
 
     /**
+     * Changes the permissions that the file or folder will have
+     * 
      * @param int $mode
      * 
      * @return bool
@@ -95,6 +101,8 @@ trait HandlePermissionsTrait
     }
 
     /**
+     * Modify the owner of the file
+     * 
      * @param string $path_file
      * @param string $user_name
      * 

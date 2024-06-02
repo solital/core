@@ -6,6 +6,7 @@ use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\MailHandler;
 use Monolog\Level;
 use PHPMailer\PHPMailer\PHPMailer;
+use Solital\Core\Resource\Str\Str;
 
 class MailerHandler extends MailHandler
 {
@@ -58,7 +59,7 @@ class MailerHandler extends MailHandler
 
         $mailer = clone $this->mailer;
 
-        if (str_starts_with($content, '<')) {
+        if (Str::contains($content, '<')) {
             $mailer->ContentType = $mailer::CONTENT_TYPE_TEXT_HTML;
             $mailer->isHTML(true);
         }

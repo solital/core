@@ -214,7 +214,7 @@ class Migration
      */
     public function runMigrationsDB(object $options): void
     {
-        $migrations_db = Katrina::customQuery("SELECT * FROM migrations", true);
+        $migrations_db = KatrinaStatement::executeQuery("SELECT * FROM migrations", true);
         $migrations_standby = $this->compareFileWithDB($migrations_db, $options);
 
         if (empty($migrations_db)) {

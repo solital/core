@@ -20,31 +20,31 @@ class HandleFilesTest extends TestCase
 
         $res = $files->folder(__DIR__ . "/files")->fileExists('file5.php');
         $this->assertFalse($res);
-
-        /* $res = $files->folder(__DIR__ . "/files")->fileExists('delete.php', true);
-        $this->assertTrue($res); */
     }
 
-    /* public function testCreateFolder()
+    public function testCreateFolder()
     {
         $files = new HandleFiles;
         $res = $files->create(__DIR__ . "/files_test");
         $this->assertTrue($res);
-    } */
+    }
 
-    /* public function testDeleteFolder()
+    public function testDeleteFolder()
     {
         $files = new HandleFiles;
         $res = $files->remove(__DIR__ . "/files_test", false);
         $this->assertTrue($res);
-    } */
+    }
 
-    /* public function testCopyFile()
+    public function testCopyFile()
     {
         $files = new HandleFiles;
         $res = $files->copy(__DIR__ . "/files/file1.php", __DIR__ . "/files/file1_bkp.php", true);
         $this->assertTrue($res);
-    } */
+
+        $res = $files->copy(__DIR__ . "/files/file1_bkp.php", __DIR__ . "/files/file1.php", true);
+        $this->assertTrue($res);
+    }
 
     public function testGetPermissions()
     {

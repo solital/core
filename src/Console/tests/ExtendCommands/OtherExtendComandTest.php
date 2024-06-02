@@ -1,8 +1,9 @@
 <?php
 
-namespace Solital\Core\Console\tests\ExtendCommands;
+namespace Solital\Core\Console\Tests\ExtendCommands;
 
 use Solital\Core\Console\Interface\ExtendCommandsInterface;
+use Solital\Core\Console\Tests\Commands\{CallSameCommand, MyCommandsTest};
 
 class OtherExtendComandTest implements ExtendCommandsInterface
 {
@@ -10,7 +11,8 @@ class OtherExtendComandTest implements ExtendCommandsInterface
      * @var array
      */
     protected array $command_class = [
-        \Solital\Core\Console\tests\MyCommandsTest::class
+        MyCommandsTest::class,
+        CallSameCommand::class
     ];
 
     #[\Override]

@@ -71,7 +71,7 @@ final class Auth extends Reset
      * 
      * @return void
      */
-    public static function check(string $user = '', string $redirect = ''): void
+    public static function check(#[\SensitiveParameter] string $user = '', string $redirect = ''): void
     {
         self::getEnv();
 
@@ -86,6 +86,8 @@ final class Auth extends Reset
     }
 
     /**
+     * Log in using your username and password
+     * 
      * @param string $table
      * 
      * @return static
@@ -93,12 +95,19 @@ final class Auth extends Reset
     public static function login(string $table)
     {
         self::$type = 'login';
-        self::$table_db = $table;
+
+        if (class_exists($table)) {
+            self::$table_db = self::getDatabaseAuthUsers($table);
+        } else {
+            self::$table_db = $table;
+        }
 
         return new static;
     }
 
     /**
+     * Recover password using username
+     * 
      * @param string $table
      * 
      * @return static
@@ -106,12 +115,19 @@ final class Auth extends Reset
     public static function forgot(string $table)
     {
         self::$type = 'forgot';
-        self::$table_db = $table;
+
+        if (class_exists($table)) {
+            self::$table_db = self::getDatabaseAuthUsers($table);
+        } else {
+            self::$table_db = $table;
+        }
 
         return new static();
     }
 
     /**
+     * Change the password
+     * 
      * @param string $table
      * 
      * @return static
@@ -119,7 +135,12 @@ final class Auth extends Reset
     public static function change(string $table)
     {
         self::$type = 'change';
-        self::$table_db = $table;
+
+        if (class_exists($table)) {
+            self::$table_db = self::getDatabaseAuthUsers($table);
+        } else {
+            self::$table_db = $table;
+        }
 
         return new static();
     }
@@ -162,7 +183,7 @@ final class Auth extends Reset
      * @param string $user_post
      * @param string $pass_post
      */
-    public function values(string $user_post, string $pass_post): self
+    public function values(string $user_post, #[\SensitiveParameter] string $pass_post): self
     {
         $this->user_post = $user_post;
         $this->pass_post = $pass_post;
@@ -220,6 +241,8 @@ final class Auth extends Reset
     }
 
     /**
+     * Setting expiration time
+     * 
      * @param string $time
      * 
      * @return Auth
@@ -255,8 +278,12 @@ final class Auth extends Reset
      * 
      * @return Auth
      */
-    public function customMailFields(string $name_sender, string $name_recipient, string $subject, string $html_message = ""): Auth
-    {
+    public function customMailFields(
+        string $name_sender,
+        string $name_recipient,
+        string $subject,
+        string $html_message = ""
+    ): Auth {
         $this->name_sender = $name_sender;
         $this->name_recipient = $name_recipient;
         $this->subject = $subject;
@@ -283,56 +310,65 @@ final class Auth extends Reset
 
         self::deleteUser($user);
         Session::delete('auth_users');
+        Session::delete('db_table');
         Cookie::unset('auth_remember_login');
         Course::response()->redirect($redirect);
         exit;
     }
 
     /**
-     * @param string $message
+     * Authentication using Sodium encryption
+     * 
+     * @param string $password
      * @param string $key
      * 
      * @return string
      */
-    public static function sodium(string $message, string $key): string
+    public static function sodium(#[\SensitiveParameter] string $password, string $key): string
     {
         Hash::checkSodium();
 
-        $ciphertext = sodium_crypto_auth($message, $key);
+        $ciphertext = sodium_crypto_auth($password, $key);
         $encoded = base64_encode($ciphertext);
 
         return $encoded;
     }
 
     /**
+     * Verifying the password with Sodium
+     * 
      * @param string $hash
-     * @param string $message
+     * @param string $password
      * @param string $key
      * 
      * @return bool
      */
-    public static function sodiumVerify(string $hash, string $message, string $key): bool
-    {
+    public static function sodiumVerify(
+        #[\SensitiveParameter] string $hash,
+        #[\SensitiveParameter] string $password,
+        string $key
+    ): bool {
         Hash::checkSodium();
 
         $decoded = base64_decode($hash);
-        $result = sodium_crypto_auth_verify($decoded, $message, $key);
+        $result = sodium_crypto_auth_verify($decoded, $password, $key);
 
         return $result;
     }
 
     /**
+     * Get current user if exists
+     * 
      * @param string $username
      * 
      * @return mixed
      */
-    public static function user(string $username = ''): mixed
+    public static function user(#[\SensitiveParameter] string $username = ''): mixed
     {
         $users = Session::get('auth_users');
 
         if ($username != '') {
             if (!is_null($users)) {
-                //return (array_key_exists($username, $users)) ? $users[$username] : null;
                 return $users[$username] ?? null;
             }
         }
@@ -430,6 +466,22 @@ final class Auth extends Reset
         }
 
         return false;
+    }
+
+    /**
+     * @param string $table
+     * 
+     * @return string
+     */
+    private static function getDatabaseAuthUsers(string $table): string
+    {
+        if (class_exists($table)) {
+            $reflection = new \ReflectionClass($table);
+            $table = $reflection->getProperty('table')->getValue(new $table);
+            return $table;
+        }
+
+        throw new \Exception($table . " class not found");
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Solital\Core\Kernel\Console;
 
 use Solital\Core\Console\InputOutput;
+use Solital\Core\Console\Output\ConsoleOutput;
 use Solital\Core\FileSystem\HandleFiles;
 
 trait HelpersTrait
@@ -47,11 +48,11 @@ trait HelpersTrait
         $input_output->confirm(function () use ($dir, $component, $handle_files) {
             $handle_files->folder($dir)->fileExists($component, true);
 
-            $this->success("Component successfully removed!")->print()->break();
+            ConsoleOutput::success("Component successfully removed!")->print()->break();
         });
 
         $input_output->refuse(function () {
-            $this->success("Abort!")->print()->break()->exit();
+            ConsoleOutput::success("Abort!")->print()->break()->exit();
         });
     }
 
@@ -107,7 +108,7 @@ trait HelpersTrait
         }
 
         if (empty($exists)) {
-            $this->success("No component found")->print()->break()->exit();
+            ConsoleOutput::success("No component found")->print()->break()->exit();
         }
 
         $input_output = new InputOutput('green');
@@ -119,11 +120,11 @@ trait HelpersTrait
                 }
             }
 
-            $this->success("Components successfully removed!")->print()->break();
+            ConsoleOutput::success("Components successfully removed!")->print()->break();
         });
 
         $input_output->refuse(function () {
-            $this->line("Abort!")->print()->break()->exit();
+            ConsoleOutput::line("Abort!")->print()->break()->exit();
         });
     }
 }

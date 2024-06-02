@@ -2,8 +2,11 @@
 
 namespace Solital\Core\Console;
 
-use Solital\Core\Console\Output\ConsoleOutput;
+use Solital\Core\Console\Output\{ColorsEnum, ConsoleOutput};
 
+/**
+ * Enter an input value on the command line
+ */
 class InputOutput
 {
     /**
@@ -27,47 +30,43 @@ class InputOutput
     private bool $case_sensitive;
 
     /**
-     * @var string
+     * @var ColorsEnum
      */
-    private string $color = '';
+    private ?ColorsEnum $color = null;
 
     /**
-     * @param string $color
+     * Customize the colors of the message that is displayed from the CLI
+     *
+     * @param ColorsEnum $color
+     * 
+     * @return InputOutput
      */
-    public function __construct(string $color = '')
+    public function color(ColorsEnum $color): InputOutput
     {
-        if ($color != '') {
-            $this->color = match ($color) {
-                'green' => 'green',
-                'yellow' => 'yellow',
-                'blue' => 'blue',
-                default => throw new CommandException("Color '" . $color . "' not exists")
-            };
-        }
+        $this->color = $color;
+        return $this;
     }
 
     /**
+     * Use a "yes/no" confirmation
+     * 
      * @param string $message
      * @param string $confirm
      * @param string $refuse
      * 
      * @return InputOutput
      */
-    public function confirmDialog(string $message, string $confirm, string $refuse, bool $case_sensitive = true): InputOutput
-    {
-        $read_message = $message . ": [$confirm, $refuse] ";
+    public function confirmDialog(
+        string $message,
+        string $confirm,
+        string $refuse,
+        bool $case_sensitive = true
+    ): InputOutput {
+        if (is_null($this->color)) $this->color = ColorsEnum::WHITE;
 
-        if ($this->color != '') {
-            if ($this->color == 'green') {
-                $read_message = ConsoleOutput::success($read_message)->getMessage();
-            } else if ($this->color == 'yellow') {
-                $read_message = ConsoleOutput::warning($read_message)->getMessage();
-            } else if ($this->color == 'blue') {
-                $read_message = ConsoleOutput::info($read_message)->getMessage();
-            }
-        } else {
-            $read_message = ConsoleOutput::line($read_message)->getMessage();
-        }
+        $opt = ConsoleOutput::warning("[$confirm, $refuse]")->getMessage();
+        $message = ConsoleOutput::message($message, $this->color)->getMessage();
+        $read_message = $message . ": " . $opt . " ";
 
         $this->message_console = $this->readlineWithUnicodeSupport($read_message);
         $this->confirm = $confirm;
@@ -78,39 +77,37 @@ class InputOutput
     }
 
     /**
+     * Display a message to the user to inform a input value
+     * 
      * @param string $message
      * 
      * @return InputOutput
      */
     public function dialog(string $message): InputOutput
     {
-        if ($this->color != '') {
-            if ($this->color == 'green') {
-                $message = ConsoleOutput::success($message)->getMessage();
-            } else if ($this->color == 'yellow') {
-                $message = ConsoleOutput::warning($message)->getMessage();
-            } else if ($this->color == 'blue') {
-                $message = ConsoleOutput::info($message)->getMessage();
-            }
-        } else {
-            $message = ConsoleOutput::line($message)->getMessage();
-        }
+        if (is_null($this->color)) $this->color = ColorsEnum::WHITE;
+        $message = ConsoleOutput::message($message, $this->color)->getMessage();
 
         $this->message_console = $this->readlineWithUnicodeSupport($message);
         return $this;
     }
 
     /**
+     * Performs an action using the previously entered value
+     * 
      * @param callable $callback
      * 
-     * @return void
+     * @return never
      */
-    public function action(callable $callback): void
+    public function action(callable $callback): never
     {
         call_user_func($callback, $this->message_console);
+        exit;
     }
 
     /**
+     * Confirm dialog
+     * 
      * @param callable $callback
      * 
      * @return InputOutput
@@ -133,11 +130,13 @@ class InputOutput
     }
 
     /**
+     * Refuse dialog
+     * 
      * @param callable $callback
      * 
-     * @return void
+     * @return never
      */
-    public function refuse(callable $callback): void
+    public function refuse(callable $callback): never
     {
         if ($this->case_sensitive == true) {
             if (str_contains($this->refuse, $this->message_console)) {
@@ -155,6 +154,33 @@ class InputOutput
     }
 
     /**
+     * Hide the user input and not echo it to screen
+     *
+     * @param string $message
+     * 
+     * @return string
+     */
+    public function password(string $message): string
+    {
+        if (is_null($this->color)) $this->color = ColorsEnum::WHITE;
+        $message = ConsoleOutput::message($message, $this->color)->getMessage();
+
+        if (PHP_OS == 'WINNT') {
+            $pwd = shell_exec('C:\Windows\system32\WindowsPowerShell\v1.0\powershell.exe -Command "$Password=Read-Host -assecurestring \"' . $message . '\" ; $PlainPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Password)) ; echo $PlainPassword;"');
+            $pwd = explode("\n", $pwd);
+            $pwd = $pwd[0];
+            return $pwd;
+        }
+
+        if ($message) print $message;
+        $f = popen("read -s; echo \$REPLY", "r");
+        $input = fgets($f, 100);
+        pclose($f);
+        print "\n";
+        return $input;
+    }
+
+    /**
      * For some reason readline() doesn't support unicode, readline STRIPS æøåÆØÅ - 
      * for a readline function with unicode support, try
      *
@@ -162,7 +188,7 @@ class InputOutput
      * 
      * @return string|false
      */
-    private function readlineWithUnicodeSupport(?string $prompt = null): string|false /*: string|false*/
+    private function readlineWithUnicodeSupport(?string $prompt = null): string|false
     {
         if ($prompt !== null && $prompt !== '') {
             echo $prompt;

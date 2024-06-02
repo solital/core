@@ -109,9 +109,6 @@ class MakeAuth extends Command implements CommandInterface
             $this->createForgotSkeleton($forgot_components);
             return true;
         }
-
-        //$this->error('You must inform options: --login/--forgot/--remove')->print();
-        //return true;
     }
 
     /**
@@ -204,12 +201,12 @@ class MakeAuth extends Command implements CommandInterface
      */
     public function createUserAuth(): MakeAuth
     {
-        $users = (new AuthModel())->createUserTable();
+        $users = AuthModel::createUserTable();
 
         if (empty($users)) {
             $db = new AuthModel();
             $db->username = 'solital@email.com';
-            $db->password = '$2y$10$4gjz66edZG.bNYIabcxkgerycCXYazTu8QOWKBhWZKcUr6gikxjYa'; // pass = solital
+            $db->password = pass_hash('solital');
             $db->save();
 
             ConsoleOutput::success("User created successfully!")->print()->break();

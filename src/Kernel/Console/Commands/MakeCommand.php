@@ -2,7 +2,6 @@
 
 namespace Solital\Core\Kernel\Console\Commands;
 
-use Override;
 use Solital\Core\Console\Output\ConsoleOutput;
 use Solital\Core\Console\Command;
 use Solital\Core\Console\Interface\CommandInterface;
@@ -105,7 +104,7 @@ class MakeCommand extends Command implements CommandInterface
                 (new Parameter('arguments'))->setType('object'),
                 (new Parameter('options'))->setType('object')
             ])
-            ->addAttribute(Override::class)
+            ->addAttribute(\Override::class)
             ->addComment("@param object " . '$arguments' . "\n@param object " . '$options' . "\n@return mixed");
 
         $class = (new ClassType($controller_name))

@@ -11,11 +11,15 @@ trait DefaultCommandsTrait
      */
     protected array $default_commands = [
         'help' => 'help',
+        'history' => 'history',
+        'clearHistory' => 'clear-history',
         'about' => 'about',
         'list' => 'list'
     ];
 
     /**
+     * Verify if command is internal
+     * 
      * @param string $command
      * @param array $arguments
      * 
@@ -24,9 +28,12 @@ trait DefaultCommandsTrait
     public function verifyDefaultCommand(string $command, array $arguments = [], object $options = null): void
     {
         foreach ($this->default_commands as $method => $class) {
-            if (strcmp($command, (string) $method) === 0) {
-                if (method_exists(__TRAIT__, $command)) {
-                    $this->$method($command, $arguments, $options);
+            $command = str_replace(["-"], "", $command);
+
+            if (strcasecmp($command, $method) === 0) {
+                if (method_exists(__TRAIT__, $method)) {
+                    $this->saveHistory($command);
+                    call_user_func_array([$this, $method], [$command, $arguments, $options]);
                     exit;
                 }
             }
@@ -34,6 +41,8 @@ trait DefaultCommandsTrait
     }
 
     /**
+     * Help about a command
+     * 
      * @param string $command
      * @param array $arguments
      * 
@@ -85,6 +94,8 @@ trait DefaultCommandsTrait
     }
 
     /**
+     * List all internal Vinci commands
+     * 
      * @return void
      */
     private function list(): void
@@ -140,6 +151,8 @@ trait DefaultCommandsTrait
     }
 
     /**
+     * Info about Vinci Console
+     * 
      * @return void
      */
     private function about(): void
@@ -155,5 +168,70 @@ trait DefaultCommandsTrait
         echo $about . $version . $date . PHP_EOL;
         echo $about2 . $php_version . PHP_EOL . PHP_EOL;
         echo $about3 . $docs . PHP_EOL;
+    }
+
+    /**
+     * Get all command history
+     *
+     * @return never
+     */
+    private function history(): never
+    {
+        $cmd_history_file = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'vinci-console' . DIRECTORY_SEPARATOR . 'vinci-history.log';
+        clearstatcache($cmd_history_file, true);
+
+        if (file_exists($cmd_history_file)) {
+            $commands = file_get_contents($cmd_history_file);
+            $commands = explode("\n", $commands);
+            $commands = array_slice($commands, 0, 10);
+
+            foreach ($commands as $command) {
+                ConsoleOutput::info($command)->print()->break();
+            }
+
+            exit;
+        }
+
+        ConsoleOutput::warning("History file not found")->print()->break()->exit();
+    }
+
+    /**
+     * Clear a command history
+     *
+     * @return never
+     */
+    private function clearHistory(): never
+    {
+        $cmd_history_file = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'vinci-console' . DIRECTORY_SEPARATOR . 'vinci-history.log';
+        clearstatcache($cmd_history_file, true);
+
+        if (file_exists($cmd_history_file)) {
+            unlink($cmd_history_file);
+            ConsoleOutput::success("History file deleted with successfully!")->print()->exit();
+        }
+
+        exit;
+    }
+
+    /**
+     * Create a command history
+     *
+     * @param string $command
+     * 
+     * @return void
+     */
+    protected function saveHistory(string $command): void
+    {
+        $cmd_history_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'vinci-console' . DIRECTORY_SEPARATOR;
+
+        if (!is_dir($cmd_history_dir)) {
+            mkdir($cmd_history_dir);
+        }
+
+        file_put_contents(
+            $cmd_history_dir . 'vinci-history.log',
+            "[" . date('Y-m-d H:i:s') . "] " . $command . "\n",
+            FILE_APPEND
+        );
     }
 }

@@ -82,5 +82,5 @@ interface LoadableRouteInterface extends RouteInterface
      * @param string $regex
      * @return static
      */
-    public function setMatch($regex): self;
+    public function setMatch(string $regex): self;
 }

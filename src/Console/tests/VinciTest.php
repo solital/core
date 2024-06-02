@@ -1,8 +1,8 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use Solital\Core\Console\Command;
-use Solital\Core\Console\tests\ExtendCommands\{ExtendedCommandsTest, OtherExtendComandTest};
+use Solital\Core\Console\{Command, CommandException};
+use Solital\Core\Console\Tests\ExtendCommands\{ExtendedCommandsTest, OtherExtendComandTest};
 
 class VinciTest extends TestCase
 {
@@ -33,5 +33,11 @@ class VinciTest extends TestCase
     {
         $res = (new Command($this->class_commands))->read('create:testsecond', ['', '', 'Vinci']);
         $this->assertEquals("Vinci", $res);
+    }
+
+    public function testExceptionSameCommand()
+    {
+        $this->expectException(CommandException::class);
+        (new Command($this->class_commands))->read('same:command');
     }
 }

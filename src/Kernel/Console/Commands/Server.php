@@ -39,16 +39,15 @@ class Server extends Command implements CommandInterface
 	public function handle(object $arguments, object $options): mixed
 	{
 		if (DebugCore::isCoreDebugEnabled() == true) {
-            ConsoleOutput::error("Debug mode enabled! Server won't working!")->print()->break();
+			ConsoleOutput::error("Debug mode enabled! Server won't working!")->print()->break();
 			return false;
-        }
-
-		if (isset($options->host)) {
-			$this->host = $options->host;
 		}
 
+		if (isset($options->host)) $this->host = $options->host;
+		(isset($options->https)) ? $http = "https://" : $http = "http://";
+
 		ConsoleOutput::success("Server started at " . date("H:i:s"))->print()->break();
-		ConsoleOutput::success("Host: " . $this->host)->print()->break();
+		ConsoleOutput::success("Host: " . $http . $this->host)->print()->break();
 		ConsoleOutput::info("Press Ctrl+C to cancel host")->print()->break();
 
 		$process = Process::executeCommand("php -S " . $this->host . " -t public/");

@@ -1,16 +1,13 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use Solital\Test\Course\Dummy\UserTest;
+use Solital\Test\Course\Dummy\User;
 use Solital\Core\Course\Event\Psr14\EventDispatcher;
 use Solital\Core\Course\Event\Psr14\ListenerProvider;
 
 class EventPsr14Test extends TestCase
 {
-    /**
-     * @test
-     */
-    public function eventTest()
+    public function testPsr14()
     {
         $low = "";
         $normal = "";
@@ -19,24 +16,24 @@ class EventPsr14Test extends TestCase
         $provider = new ListenerProvider();
         $event = new EventDispatcher($provider);
 
-        $user = new UserTest();
+        $user = new User();
 
-        $provider->addListener(function (UserTest $user) use (&$high) {
+        $provider->addListener(function (User $user) use (&$high) {
             $high = $user->testHigh();
         }, 3);
 
-        $provider->addListener(function (UserTest $user) use (&$low) {
+        $provider->addListener(function (User $user) use (&$low) {
             $low = $user->testLow();
         }, 1);
 
-        $provider->addListener(function (UserTest $user) use (&$normal) {
+        $provider->addListener(function (User $user) use (&$normal) {
             $normal = $user->testNormal();
         }, 2);
 
         $event->dispatch($user);
 
-        $this->assertEquals($high, "Running High...");
-        $this->assertEquals($normal, "Running Normal...");
-        $this->assertEquals($low, "Running Low...");
+        $this->assertEquals("Running High...", $high);
+        $this->assertEquals("Running Normal...", $normal);
+        $this->assertEquals("Running Low...", $low);
     }
 }

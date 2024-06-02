@@ -2,12 +2,8 @@
 
 namespace Solital\Core\Security\Scanner\Traits;
 
-use Solital\Core\Console\MessageTrait;
-
 trait PrintTrait
 {
-    use MessageTrait;
-
     /**
      * @var string
      */

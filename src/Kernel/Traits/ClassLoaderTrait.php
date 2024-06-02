@@ -10,17 +10,17 @@ trait ClassLoaderTrait
     /**
      * Load class in directory
      * 
-     * @param string $dir
+     * @param string $directory
      * 
      * @return array
      */
-    public static function classLoaderInDirectory(string $dir): array
+    public static function classLoaderInDirectory(string $directory): array
     {
         // store already declared classes:
         $predeclaredClasses = get_declared_classes();
 
         // Load classes inside the given folder:
-        $i = new \FileSystemIterator($dir, \FileSystemIterator::SKIP_DOTS);
+        $i = new \FileSystemIterator($directory, \FileSystemIterator::SKIP_DOTS);
 
         foreach ($i as $f) {
             require_once $f->getPathname();
@@ -35,13 +35,14 @@ trait ClassLoaderTrait
      *
      * @param string $directory
      *
-     * @throws \Exception
+     * @throws RuntimeException
+     * @return null|true
      */
-    public static function autoload(string $directory)
+    public static function autoload(string $directory): ?true
     {
         // Ensure this path exists
         if (!is_dir($directory)) {
-            return;
+            return null;
         }
 
         // Get a listing of the current directory
@@ -57,7 +58,7 @@ trait ClassLoaderTrait
         $scanned_dir = array_diff($scanned_dir, $ignore);
 
         if (empty($scanned_dir)) {
-            return;
+            return null;
         }
 
         if (count($scanned_dir) > 250) {
@@ -65,7 +66,6 @@ trait ClassLoaderTrait
         }
 
         foreach ($scanned_dir as $item) {
-
             $filename  = $directory . '/' . $item;
             $real_path = realpath($filename);
 
@@ -131,6 +131,8 @@ trait ClassLoaderTrait
                 require_once($real_path);
             }
         }
+
+        return true;
     }
 
     /**
@@ -162,6 +164,11 @@ trait ClassLoaderTrait
         return $command_class;
     }
 
+    /**
+     * Return all boot managers in app/Boot/
+     *
+     * @return array
+     */
     public static function getBootManagers(): array
     {
         $boot_manager = [];

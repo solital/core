@@ -5,16 +5,14 @@ namespace Solital\Core\Wolf;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Logger\Logger;
 use Solital\Core\Resource\Collection\ArrayCollection;
-use Solital\Core\Wolf\{WolfCacheTrait, WolfMinifyTrait};
+use Solital\Core\Resource\Str\Str;
 use Solital\Core\Wolf\Exception\WolfException;
+use Solital\Core\Wolf\{WolfCacheTrait, WolfMinifyTrait};
 use Solital\Core\Wolf\Functions\{AssetsTrait, ExtendsTrait};
 
 class Wolf
 {
-    use WolfCacheTrait;
-    use WolfMinifyTrait;
-    use AssetsTrait;
-    use ExtendsTrait;
+    use WolfCacheTrait, WolfMinifyTrait, AssetsTrait, ExtendsTrait;
 
     /**
      * @var null|string
@@ -74,6 +72,8 @@ class Wolf
     }
 
     /**
+     * Display data for your view
+     * 
      * @param array|null $args
      * 
      * @return Wolf
@@ -102,17 +102,19 @@ class Wolf
     }
 
     /**
+     * Set template view
+     * 
      * @param string $view
      * 
      * @return Wolf
      */
     public function setView(string $view): Wolf
     {
-        if (str_contains($view, '.php')) {
+        if (Str::contains($view, '.php')) {
             $view = str_replace('.php', '', $view);
         }
 
-        if (str_contains($view, '.') || str_contains($view, '/')) {
+        if (Str::contains($view, '.') || Str::contains($view, '/')) {
             $view = str_replace(['.', '/'], DIRECTORY_SEPARATOR, $view);
         }
 
@@ -134,7 +136,7 @@ class Wolf
 
         if (!empty($this->getArgs())) {
             foreach ($this->getArgs() as $key => $value) {
-                if (str_contains($template, '<?= $' . $key . ' ?>')) {
+                if (Str::contains($template, '<?= $' . $key . ' ?>')) {
                     $template = str_replace('<?= $' . $key . ' ?>', $value, $template);
                 }
             }
@@ -144,6 +146,17 @@ class Wolf
     }
 
     /**
+     * @return bool
+     */
+    private function viewExists(): bool
+    {
+        $view = Application::getRoot('view/');
+        return Application::fileExistsWithoutCache($view) ? true : false;
+    }
+
+    /**
+     * Render template with arguments
+     * 
      * @return string
      */
     public function render(): ?string
@@ -167,6 +180,8 @@ class Wolf
     }
 
     /**
+     * Escape HTML tags
+     * 
      * @param mixed $args
      * 
      * @return mixed

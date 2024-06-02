@@ -4,6 +4,8 @@ namespace Solital\Components\Controller\Auth;
 
 use Solital\Core\Auth\Auth;
 use Solital\Core\Http\{Request, Controller\Controller};
+use Solital\Core\Kernel\Model\AuthModel;
+use Solital\Core\Security\Guardian;
 
 class LoginController extends Controller
 {
@@ -24,7 +26,7 @@ class LoginController extends Controller
 
         return view('auth.auth-form', [
             'title' => 'Login',
-            'msg' => message('login')
+            'msg' => (message()->get('login') ?? message()->get(Guardian::GUARDIAN_MESSAGE_INDEX))
         ]);
     }
 
@@ -34,11 +36,11 @@ class LoginController extends Controller
     public function authPost(): void
     {
         if (Request::limit('email.login', 3)) {
-            message('login', 'You have already made 3 login attempts! Please wait 60 seconds and try again.');
+            message()->get('login', 'You have already made 3 login attempts! Please wait 60 seconds and try again.');
             response()->redirect(url('auth'));
         }
 
-        $res = Auth::login('auth_users')
+        $res = Auth::login(AuthModel::class)
             ->columns('username', 'password')
             ->values('inputEmail', 'inputPassword')
             ->remember('inputRemember')
@@ -55,6 +57,8 @@ class LoginController extends Controller
      */
     public function dashboard(): mixed
     {
+        Guardian::allowFromTable('auth_users');
+
         return view('auth.auth-dashboard', [
             'title' => 'Dashboard',
         ]);

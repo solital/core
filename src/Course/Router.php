@@ -376,12 +376,12 @@ class Router
      * Start the routing
      *
      * @return string|null
-     * @throws \Solital\Course\Exceptions\NotFoundHttpException
-     * @throws \Solital\Http\Middleware\Exceptions\TokenMismatchException
+     * @throws NotFoundHttpException
+     * @throws TokenMismatchException
      * @throws HttpException
      * @throws \Exception
      */
-    public function start(bool $send_console = false)
+    public function start(bool $send_console = false): ?string
     {
         $this->debug('Router starting');
         $this->send_console = $send_console;

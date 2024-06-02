@@ -2,7 +2,6 @@
 
 namespace Solital\Core\Kernel\Console\Commands;
 
-use Override;
 use Solital\Core\Http\Request;
 use Solital\Core\Console\Command;
 use Solital\Core\Console\Interface\CommandInterface;
@@ -81,7 +80,7 @@ class MakeBoot extends Command implements CommandInterface
                 (new Parameter('router'))->setType(Router::class),
                 (new Parameter('request'))->setType(Request::class)
             ])
-            ->addAttribute(Override::class)
+            ->addAttribute(\Override::class)
             ->addComment("Called when router is booting and before the routes is loaded\n\n@param Router " . '$router' . "\n@param Request " . '$request' . "\n@return void");
 
         $class = (new ClassType($boot_name))

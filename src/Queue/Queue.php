@@ -3,14 +3,12 @@
 namespace Solital\Core\Queue;
 
 use Solital\Core\Kernel\Application;
-use Solital\Core\Console\MessageTrait;
 use Solital\Core\Queue\Exception\QueueException;
+use Solital\Core\Console\Output\ConsoleOutput;
 use Nette\PhpGenerator\{ClassType, Method, PhpNamespace};
 
 class Queue
 {
-    use MessageTrait;
-
     /**
      * @var string
      */
@@ -26,12 +24,11 @@ class Queue
      */
     public function __construct()
     {
-        $this->queue_dir = Application::getRootApp('Queue/', Application::DEBUG);
+        $this->queue_dir = Application::getRootApp('Queue/');
 
         if (!is_dir($this->queue_dir)) {
             $handle = Application::provider('handler-file');
             $handle->create($this->queue_dir);
-            //(new HandleFiles)->create($this->queue_dir);
         }
     }
 
@@ -64,15 +61,15 @@ class Queue
         $queue_file_name = $this->queue_dir . $queue_name . ".php";
 
         if (file_exists($queue_file_name)) {
-            $this->error("Queue '{$queue_name}' already exists. Aborting!")->print()->break()->exit();
+            ConsoleOutput::error("Queue '{$queue_name}' already exists. Aborting!")->print()->break()->exit();
         }
 
         try {
             file_put_contents($this->queue_dir . $queue_name . '.php', "<?php \n\n" . $data);
 
-            $this->success("Queue created successfully!")->print()->break();
+            ConsoleOutput::success("Queue created successfully!")->print()->break();
         } catch (QueueException $e) {
-            $this->error("Queue not created: " . $e->getMessage())->print()->break()->exit();
+            ConsoleOutput::error("Queue not created: " . $e->getMessage())->print()->break()->exit();
         }
 
         return $this;
@@ -88,14 +85,13 @@ class Queue
         $start_time = microtime(true);
 
         if (isset($options->class)) {
-            $this->warning("[" . date('Y-m-d H:i:s') . "] Processing queue: " . $options->class)->print()->break();
+            ConsoleOutput::warning("[" . date('Y-m-d H:i:s') . "] Processing queue: " . $options->class)->print()->break();
 
             $instance = $this->initiateQueue($this->queue_dir . $options->class);
             $instance->dispatch();
 
-            $this->success("[" . date('Y-m-d H:i:s') . "] Queue executed: " . $options->class)->print()->break();
+            ConsoleOutput::success("[" . date('Y-m-d H:i:s') . "] Queue executed: " . $options->class)->print()->break();
         } else {
-            //$handle = new HandleFiles();
             $handle = Application::provider('handler-file');
             $queue = $handle->folder($this->queue_dir)->files();
 
@@ -103,14 +99,14 @@ class Queue
 
             foreach ($queue as $queue) {
                 $loop->defer(function () use ($loop, $queue) {
-                    $this->warning("[" . date('Y-m-d H:i:s') . "] Processing queue: " . basename((string)$queue))->print()->break();
+                    ConsoleOutput::warning("[" . date('Y-m-d H:i:s') . "] Processing queue: " . basename((string)$queue))->print()->break();
 
                     $instance = $this->initiateQueue($queue);
                     $sleep_time = $instance->getSleep();
                     $loop->sleep($sleep_time);
                     $instance->dispatch();
 
-                    $this->success("[" . date('Y-m-d H:i:s') . "] Queue executed: " . basename((string)$queue))->print()->break();
+                    ConsoleOutput::success("[" . date('Y-m-d H:i:s') . "] Queue executed: " . basename((string)$queue))->print()->break();
 
                     $loop->next();
                 });
@@ -123,7 +119,7 @@ class Queue
         $execution_time = ($end_time - $start_time);
 
         echo PHP_EOL;
-        $this->success("Queues performed on: " . $execution_time . " sec")->print()->break()->exit();
+        ConsoleOutput::success("Queues performed on: " . $execution_time . " sec")->print()->break()->exit();
 
         return $this;
     }

@@ -1,5 +1,42 @@
 # Released Notes
 
+## v4.4.0 - (2024-06-02)
+
+### Added
+
+- Added helpers for `Application`, `Reflection` and server
+- Added method to add values on YAML file
+- Added custom flash messages
+- Added multibyte to `Str` component
+- Added authorization for login
+- Added HTTPS for server
+
+### Changed
+
+- Changed helpers file names
+- Changed `Str` component
+- Changed files using `str_*` functions to `Str` component
+
+### Fixed
+
+- Fixed server link in `server` command
+- Fixed `Number::clamp()` method
+- Fixed `viewExists` method on Wolf class
+- Fixed `extend` method in `Container` class
+
+### Removed
+
+- Removed `respect/validation` package
+- Removed class, methods and constants deprecated:
+    - `AuthDatabase` class
+    - `ConnectionDatabase` class
+    - Constants on `KernelTrait`
+    - `MessageTrait` trait
+    - `convertime` helper
+    - `Convertime` and `Valid` class
+
+--------------------------------------------------------------------------
+
 ## v4.3.0 - (2024-04-05)
 
 ### Added

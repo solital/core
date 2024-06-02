@@ -1,12 +1,12 @@
 <?php
 
-namespace Solital\Test\Container;
+namespace Solital\Test\Container\Dummy;
 
-class UserTest
+class User
 {
     private $mailer;
 
-    public function __construct(MailTest $mailer)
+    public function __construct(Mail $mailer)
     {
         $this->mailer = $mailer;
     }

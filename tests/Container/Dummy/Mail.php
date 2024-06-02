@@ -1,8 +1,8 @@
 <?php
 
-namespace Solital\Test\Container;
+namespace Solital\Test\Container\Dummy;
 
-class MailTest
+class Mail
 {
     public function setTransport($transport)
     {

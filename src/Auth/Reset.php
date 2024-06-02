@@ -3,11 +3,9 @@
 namespace Solital\Core\Auth;
 
 use Katrina\Sql\KatrinaStatement;
-use Katrina\Connection\Connection;
 use Solital\Core\Mail\Mailer;
 use Solital\Core\Auth\Password;
 use Solital\Core\Kernel\Application;
-use Solital\Core\Validation\Valid;
 use Solital\Core\Security\{Guardian, Hash};
 
 abstract class Reset
@@ -120,18 +118,9 @@ abstract class Reset
         string $value
     ): bool {
         $value_hash = (new Password())->create($value);
+        $sql = "UPDATE $table SET $column_pass = '$value_hash' WHERE $column_user = '$email'";
 
-        $sql = "UPDATE $table SET $column_pass = ? WHERE $column_user = '$email'";
-
-        try {
-            $stmt = Connection::getInstance()->prepare($sql);
-            $stmt->bindValue(1, $value_hash, \PDO::PARAM_STR);
-            $stmt->execute();
-
-            return true;
-        } catch (\PDOException) {
-            return false;
-        }
+        return KatrinaStatement::executePrepare($sql);
     }
 
     /**

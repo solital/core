@@ -1,6 +1,6 @@
 <?php
 
-namespace Solital\Core\Console\tests;
+namespace Solital\Core\Console\Tests\Commands;
 
 use Solital\Core\Console\Command;
 use Solital\Core\Console\Interface\CommandInterface;
@@ -14,8 +14,6 @@ class MyCommandsTest extends Command implements CommandInterface
     #[\Override]
     public function handle(object $arguments, object $options): mixed
     {
-        print_r(Command::call('user:test'));
-
         return $this->getCommand() . " - Command OK" . PHP_EOL;
     }
 }

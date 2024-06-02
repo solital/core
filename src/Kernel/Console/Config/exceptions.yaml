@@ -13,6 +13,9 @@ enable_cdn_assets: true
 # Enable occurrences
 enable_occurrences: false
 
+# Enable logs
+enable_logs: false
+
 # Database for Modern PHP Exceptions
 db_drive: 
 db_host: 

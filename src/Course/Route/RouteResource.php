@@ -3,11 +3,7 @@
 namespace Solital\Core\Course\Route;
 
 use Solital\Core\Http\Request;
-use Solital\Core\Course\Route\{
-    RouteInterface,
-    LoadableRouteInterface,
-    ControllerRouteInterface
-};
+use Solital\Core\Course\Route\{RouteInterface, LoadableRouteInterface, ControllerRouteInterface};
 
 class RouteResource extends LoadableRoute implements ControllerRouteInterface
 {
@@ -258,21 +254,21 @@ class RouteResource extends LoadableRoute implements ControllerRouteInterface
     /**
      * Merge with information from another route.
      *
-     * @param array $values
+     * @param array $settings
      * @param bool $merge
      * @return static
      */
-    public function setSettings(array $values, bool $merge = false): RouteInterface
+    public function setSettings(array $settings, bool $merge = false): RouteInterface
     {
-        if (isset($values['names']) === true) {
-            $this->names = $values['names'];
+        if (isset($settings['names']) === true) {
+            $this->names = $settings['names'];
         }
 
-        if (isset($values['methods']) === true) {
-            $this->methodNames = $values['methods'];
+        if (isset($settings['methods']) === true) {
+            $this->methodNames = $settings['methods'];
         }
 
-        return parent::setSettings($values, $merge);
+        return parent::setSettings($settings, $merge);
     }
 
     /**

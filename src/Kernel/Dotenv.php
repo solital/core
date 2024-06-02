@@ -3,6 +3,7 @@
 namespace Solital\Core\Kernel;
 
 use Solital\Core\Kernel\Exceptions\DotenvException;
+use Solital\Core\Resource\Str\Str;
 
 abstract class Dotenv
 {
@@ -38,7 +39,7 @@ abstract class Dotenv
             $array_multi = [];
 
             foreach ($lines as $line) {
-                if (str_contains($line, "#")) {
+                if (Str::contains($line, "#")) {
                     $line = str_replace($line, '', $line);
                 }
 

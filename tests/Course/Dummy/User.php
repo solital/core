@@ -2,7 +2,7 @@
 
 namespace Solital\Test\Course\Dummy;
 
-class UserTest
+class User
 {
     public function testLow()
     {

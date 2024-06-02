@@ -14,7 +14,6 @@ trait HandleMigrationTrait
     public function setMigrationsDirectory(string $migrations_directory): self
     {
         $this->migrations_directory = $migrations_directory;
-
         return $this;
     }
 

@@ -3,6 +3,7 @@
 namespace Solital\Core\Kernel\Model;
 
 use Katrina\Katrina;
+use Katrina\Sql\KatrinaStatement;
 use Solital\Core\Console\Output\ConsoleOutput;
 
 class AuthModel extends Katrina
@@ -20,31 +21,35 @@ class AuthModel extends Katrina
     /**
      * @return mixed
      */
-    public function createUserTable(): mixed
+    public static function createUserTable(): mixed
     {
         $users = self::checkTableExists('auth_users');
 
         if (empty($users)) {
             if (DB_CONFIG['DRIVE'] != "") {
+                $user_table = self::createTable("auth_users");
+
                 if (DB_CONFIG['DRIVE'] == "mysql") {
-                    $res = self::createTable("auth_users")
-                        ->int('id')->primary()->increment()
-                        ->varchar("username", 50)->notNull()
-                        ->varchar("password", 150)->notNull()
-                        ->createdUpdatedAt()
-                        ->closeTable();
-                } elseif (DB_CONFIG['DRIVE'] == "pgsql") {
-                    $res = self::createTable("auth_users")
-                        ->serial('id')->primary()
-                        ->varchar("username", 50)->notNull()
-                        ->varchar("password", 150)->notNull()
-                        ->closeTable();
+                    $user_table->int('id')->primary()->increment();
+                }
+                
+                if (DB_CONFIG['DRIVE'] == "pgsql") {
+                    $user_table->serial('id')->primary();
                 }
 
-                if ($res == true) {
+                $user_table->varchar("username", 50)->notNull();
+                $user_table->varchar("password", 150)->notNull();
+
+                if (DB_CONFIG['DRIVE'] == "mysql") {
+                    $user_table->createdUpdatedAt();
+                }
+
+                $user_table->closeTable();
+
+                if ($user_table == true) {
                     ConsoleOutput::success("Table created successfully!")->print()->break();
 
-                    $users = self::customQuery("SELECT * FROM auth_users", true);
+                    $users = KatrinaStatement::executeQuery("SELECT * FROM auth_users", true);
                     return $users;
                 }
 

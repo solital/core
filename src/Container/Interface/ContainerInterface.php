@@ -46,10 +46,10 @@ interface ContainerInterface extends PsrContainerInterface, \ArrayAccess
 	/**
 	 * Invokable to be ran after a service is created.
 	 * 
-	 * @param string $id
-	 * @param mixed|null $callback
+	 * @param string|callable $id
+	 * @param callable|null $callback
 	 */
-	public function extend(string $id, mixed $callback = null);
+	public function extend(string|callable $id, callable $callback = null);
 
 	/**
 	 * Get a list of entry names in the container.

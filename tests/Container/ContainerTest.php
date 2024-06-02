@@ -2,8 +2,10 @@
 
 namespace Solital\Test\Container;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Solital\Core\Container\Container;
+use Solital\Test\Container\Dummy\Service;
 
 /**
  * Container testing.
@@ -34,19 +36,16 @@ class ContainerTest extends TestCase
 	/**
 	 * Test that a container can be instantiated
 	 * with an array of entries.
-	 * 
 	 */
 	public function testInstantiateWithEntries()
 	{
 		$container = new Container($this->entries);
-
 		$this->assertCount(2, $container->keys());
 	}
 
 	/**
 	 * Test that the container can check whether
 	 * or not it has entries.
-	 * 
 	 */
 	public function testHas()
 	{
@@ -56,7 +55,6 @@ class ContainerTest extends TestCase
 
 	/**
 	 * Test the ability to add entries to the container.
-	 * 
 	 */
 	public function testAdd()
 	{
@@ -83,12 +81,10 @@ class ContainerTest extends TestCase
 
 	/**
 	 * Test that you can get all entry names.
-	 * 
 	 */
 	public function testGetAllEntryKeys()
 	{
 		$container = new Container($this->entries);
-
 		$this->assertEquals(['foo', 'foo2'], $container->keys());
 	}
 
@@ -99,7 +95,7 @@ class ContainerTest extends TestCase
 	public function testRegisterServiceProvider()
 	{
 		$container = new Container();
-		$container = $container->register(new ServiceTest);
+		$container = $container->register(new Service);
 
 		$this->assertInstanceOf(Container::class, $container);
 	}
@@ -107,19 +103,16 @@ class ContainerTest extends TestCase
 	/**
 	 * Test that can get services and parameters from the container
 	 * correctly.
-	 * 
 	 */
 	public function testGetParameterAndServiceEntries()
 	{
 		$container = new Container($this->entries);
-
 		$this->assertEquals('bar', $container->get('foo'));
 	}
 
 	/**
 	 * Test that we can get a protected entry in the container
 	 * that is interpreted as a literal value.
-	 * 
 	 */
 	public function testGetProtectedEntry()
 	{
@@ -138,7 +131,6 @@ class ContainerTest extends TestCase
 	/**
 	 * Test that we can get an entry from the container that
 	 * is marked as a factory.
-	 * 
 	 */
 	public function testGetFactoryService()
 	{
@@ -153,7 +145,6 @@ class ContainerTest extends TestCase
 	/**
 	 * Test that, by default, the container will "share" service
 	 * instances.
-	 * 
 	 */
 	public function testGetSharesInstanceByDefault()
 	{
@@ -171,7 +162,6 @@ class ContainerTest extends TestCase
 	 * Test that, if a service is marked as a factory, the container
 	 * will return a new instance of the service every time it is
 	 * resolved.
-	 * 
 	 */
 	public function testGetFactoryReturnsNewInstance()
 	{
@@ -191,9 +181,8 @@ class ContainerTest extends TestCase
 
 	/**
 	 * Test that we can get a service via an invokable class.
-	 * 
-	 * @dataProvider invokableProvider
 	 */
+	#[DataProvider('invokableProvider')]
 	public function testGetViaInvokeMethod($invokable)
 	{
 		$container = new Container();
@@ -204,22 +193,18 @@ class ContainerTest extends TestCase
 
 	/**
 	 * Test that we can remove entries.
-	 * 
 	 */
 	public function testRemoveServiceEntry()
 	{
 		$container = new Container($this->entries);
-
 		$this->assertIsString('bar', $container->get('foo'));
 
 		$container->remove('foo');
-
 		$this->assertFalse($container->has('foo'));
 	}
 
 	/**
 	 * Test that can can remove services marked as factories.
-	 * 
 	 */
 	public function testRemoveServiceFactoryEntry()
 	{
@@ -238,7 +223,6 @@ class ContainerTest extends TestCase
 
 	/**
 	 * Test that we can also remove protected entries.
-	 * 
 	 */
 	public function testRemoveProtectedEntry()
 	{
@@ -256,30 +240,28 @@ class ContainerTest extends TestCase
 
 	/**
 	 * Test that callbacks marked as global get called correctly
-	 * on every resolve.
-	 * 
+	 * on every resolve. 
 	 */
-	/* public function testCallGlobalExtendCallbackOnEveryResolve()
+	public function testCallGlobalExtendCallbackOnEveryResolve()
 	{
-		$container = new Container($this->entries);
+		$resolved = new \stdClass;
+		$container = new Container(['foo' => $resolved]);
 		$container->counter = 1;
-		$container->extend(function($resolved, $container) {
+		$container->extend(function ($resolved, $container) {
 			if (is_object($resolved)) {
 				$resolved->container = $container;
 			}
-			
+
 			$container->counter++;
 		});
 
 		$foo = $container->get('foo');
-
 		$this->assertInstanceOf(Container::class, $foo->container);
-	} */
+	}
 
 	/**
 	 * Test that when we extend a service that is marked as a factory,
 	 * that the factory array updates.
-	 * 
 	 */
 	public function testExtendFactoryUpdatesFactoryDefinition()
 	{
@@ -301,7 +283,6 @@ class ContainerTest extends TestCase
 	/**
 	 * Test that when extending a definition, the callback is passed 
 	 * the object instance and the container instance.
-	 * 
 	 */
 	public function testExtendPassesObjectInstanceAndContainer()
 	{

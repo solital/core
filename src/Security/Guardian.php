@@ -2,16 +2,18 @@
 
 namespace Solital\Core\Security;
 
-use Katrina\Katrina;
-use Respect\Validation\Validator;
+use Katrina\Sql\KatrinaStatement;
 use Solital\Core\Mail\Mailer;
-use Solital\Core\Auth\Password;
 use Solital\Core\Exceptions\InvalidArgumentException;
+use Solital\Core\Auth\{Auth, Password};
 use Solital\Core\Kernel\{Application, DebugCore, Dotenv};
+use Solital\Core\Resource\{Message, Session};
 
 /** @phpstan-consistent-constructor */
 class Guardian
 {
+    const GUARDIAN_MESSAGE_INDEX = 'guardian.message.index';
+
     /**
      * @var string
      */
@@ -40,7 +42,6 @@ class Guardian
     public function table(string $table): Guardian
     {
         $this->table = $table;
-
         return $this;
     }
 
@@ -55,17 +56,96 @@ class Guardian
     public function fields(string $email_column, string $pass_column, string $email, string $password): mixed
     {
         $sql = "SELECT * FROM " . $this->table . " WHERE $email_column = '$email';";
-        $res = Katrina::customQuery($sql, false);
-
+        $res = KatrinaStatement::executeQuery($sql, false);
+        
         if (!is_object($res) || $res == false) {
             return false;
         }
 
         if ((new Password())->verify($password, $res->$pass_column)) {
+            Session::set('db_table', $this->table);
             return $res;
         }
 
         return false;
+    }
+
+    /**
+     * Allows a user to access the page
+     *
+     * @param string $user
+     * @param string|null $message
+     * 
+     * @return void
+     */
+    public static function allowUser(#[\SensitiveParameter] string $user, ?string $message = null): void
+    {
+        if (Auth::user($user) != $user) {
+            self::redirectAllowOrDeny($message);
+        }
+    }
+
+    /**
+     * Allows a user coming from a specific database table. If it comes from another table, that user will not access the page
+     *
+     * @param string $db_table
+     * @param string|null $message
+     * 
+     * @return void
+     */
+    public static function allowFromTable(#[\SensitiveParameter] string $db_table, ?string $message = null): void
+    {
+        if (Session::get('db_table') != $db_table) {
+            self::redirectAllowOrDeny($message);
+        }
+    }
+
+    /**
+     * Denies a user access to the page
+     *
+     * @param string $user
+     * @param string|null $message
+     * 
+     * @return void
+     */
+    public static function denyUser(#[\SensitiveParameter] string $user, ?string $message = null): void
+    {
+        if (Auth::user($user) == $user) {
+            self::redirectAllowOrDeny($message);
+        }
+    }
+
+    /**
+     * Denies a user coming from a specific database table. If it comes from this table, that user will not access the page
+     *
+     * @param string $db_table
+     * @param string|null $message
+     * 
+     * @return void
+     */
+    public static function denyFromTable(#[\SensitiveParameter] string $db_table, ?string $message = null): void
+    {
+        if (Session::get('db_table') == $db_table) {
+            self::redirectAllowOrDeny($message);
+        }
+    }
+
+    /**
+     * Redirect a user with a message and logoff
+     *
+     * @param string|null $message
+     * 
+     * @return void
+     */
+    private static function redirectAllowOrDeny(?string $message = null): void
+    {
+        if ($message == null) {
+            $message = "You haven't permission to access this page";
+        }
+
+        $msg = new Message();
+        $msg->new(self::GUARDIAN_MESSAGE_INDEX, $message);
+        Auth::logoff();
     }
 
     /**
@@ -78,7 +158,7 @@ class Guardian
     public static function verifyEmail(string $table, string $email_column, string $email): bool
     {
         $sql = "SELECT * FROM $table WHERE $email_column = '$email';";
-        $res = Katrina::customQuery($sql, false);
+        $res = KatrinaStatement::executeQuery($sql, false);
 
         if ($res) {
             return true;
@@ -126,7 +206,7 @@ class Guardian
         }
 
         $url = self::getUrl();
-        $email_validation = Validator::email()->validate($send_to);
+        $email_validation = filter_var($send_to, FILTER_VALIDATE_EMAIL);
 
         if ($email_validation == false) {
             throw new InvalidArgumentException("Recipient e-mail not valid");

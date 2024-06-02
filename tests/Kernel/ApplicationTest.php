@@ -33,4 +33,13 @@ class ApplicationTest extends TestCase
         $provider_wolf = Application::provider('solital-wolf');
         $this->assertInstanceOf(Wolf::class, $provider_wolf);
     }
+
+    public function testAddYamlValue()
+    {
+        $result = Application::addYamlValue('auth.yaml', 'test', 'value');
+        $this->assertTrue($result);
+
+        $values = app_get_yaml('auth.yaml');
+        $this->assertEquals('value', $values['test']);
+    }
 }
