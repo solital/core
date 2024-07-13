@@ -1,0 +1,13 @@
+# Generated file by Solital Framework
+
+# This sets the maximum amount of memory in bytes that a script is allowed to allocate
+memory_limit: "150M"
+
+# "UTF-8" is the default value and its value is used as the default character encoding
+default_charset: "UTF-8"
+
+# This sets the maximum time in seconds a script is allowed to run before it is terminated by the parser
+max_execution_time: 50
+
+# The default national language setting (NLS) used in mbstring
+mbstring_language: "UTF-8"

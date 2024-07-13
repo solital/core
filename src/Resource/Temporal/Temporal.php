@@ -2,7 +2,6 @@
 
 namespace Solital\Core\Resource\Temporal;
 
-use DateTime;
 use DateTimeImmutable;
 use Solital\Core\Resource\Temporal\Trait\IntervalTrait;
 
@@ -36,6 +35,19 @@ class Temporal extends DateTimeHandle
     {
         self::$date_time = self::getDateTimeInstance($date, $timezone);
         self::$date_time_immutable = self::$date_time;
+        return new static;
+    }
+
+    /**
+     * Alters the timestamp
+     *
+     * @param string $modifier
+     * 
+     * @return static
+     */
+    public function modify(string $modifier): static
+    {
+        self::$date_time_immutable = self::$date_time->modify($modifier);
         return new static;
     }
 

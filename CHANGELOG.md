@@ -1,5 +1,21 @@
 # Released Notes
 
+## v4.5.0 - (2024-07-13)
+
+### Added
+
+- Added helpers `encrypt` and `decrypt`
+- Added `runtime.yaml` config
+- Added `crypt` option on `bootstrap.yaml`
+- Added `session_regenerate_id` function on `Auth` class
+
+### Deprecated
+
+- Deprecated sodium methods in `Hash` and `Auth` class
+- Deprecated `start` method on `Session` class
+
+--------------------------------------------------------------------------
+
 ## v4.4.0 - (2024-06-02)
 
 ### Added

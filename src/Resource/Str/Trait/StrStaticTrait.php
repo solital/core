@@ -49,7 +49,7 @@ trait StrStaticTrait
     {
         return self::mbCountChars($string, $mode);
     }
-
+    
     /**
      * Binary safe string comparison
      * [!!] Not chainable
@@ -61,8 +61,10 @@ trait StrStaticTrait
      *
      * @link   http://php.net/manual/en/function.strcmp.php
      *
-     * @param  Str|string $target to compare current string to
-     *
+     * @param string $string1
+     * @param string $string2
+     * @param string|null $encoding
+     * 
      * @return int
      */
     public static function compare(string $string1, string $string2, ?string $encoding = null): int

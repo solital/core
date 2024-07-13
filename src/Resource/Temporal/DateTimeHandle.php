@@ -33,8 +33,10 @@ abstract class DateTimeHandle
      * 
      * @return DateTimeImmutable
      */
-    protected static function getDateTimeInstance(string $date = 'now', ?string $timezone = null): DateTimeImmutable
-    {
+    protected static function getDateTimeInstance(
+        string $date = 'now',
+        ?string $timezone = null
+    ): DateTimeImmutable {
         if (!is_null($timezone)) {
             self::setTimezone($timezone);
         }
@@ -58,7 +60,7 @@ abstract class DateTimeHandle
     protected static function setTimezone(string $timezone): void
     {
         try {
-            self::$timezone = new \DateTimeZone($timezone);
+            self::$timezone = new DateTimeZone($timezone);
         } catch (\Exception $e) {
             die($e->getMessage());
         }

@@ -3,6 +3,7 @@
 use Solital\Core\Cache\SimpleCache;
 use Solital\Core\Resource\{Collection\ArrayCollection, JSON, Message, Session, Str\Str};
 use Solital\Core\Resource\Memorize\{Memorizator, Storage, Utils};
+use Solital\Core\Security\Hash;
 
 /**
  * Manipulate the `ArrayCollection` class without having to instantiate it.
@@ -72,7 +73,7 @@ function decodeJSON($value, bool $toArray = false): mixed
  * @param string $key
  * @param string $message
  * 
- * @return Messsage
+ * @return Message
  */
 function message(?string $key = null, ?string $message = null): Message
 {
@@ -81,10 +82,6 @@ function message(?string $key = null, ?string $message = null): Message
     if ($key !== null && $message !== null) {
         $msg->new($key, $message);
     }
-
-    /* if ($message === null) {
-        return $msg->get($key);
-    } */
 
     return $msg;
 }
@@ -108,7 +105,8 @@ function session(
     bool $take = false
 ): mixed {
     if ($value != null) {
-        return Session::set($key, $value);
+        Session::set($key, $value);
+        return true;
     } elseif ($delete == true) {
         return Session::delete($key);
     } elseif ($take == true) {
@@ -167,4 +165,29 @@ function memorize(Closure $lambda, $paramsHash = null)
 
     $contextName = Utils::stringify($lambda);
     return Memorizator::memorize($contextName, $lambda, $paramsHash, $getStorage($lambda));
+}
+
+/**
+ * Generates an encrypted key
+ * 
+ * @param string $value
+ * @param string $time
+ * 
+ * @return string
+ */
+function encrypt(string $value, string $time = '+1 hour'): string
+{
+    return Hash::encrypt($value, $time);    
+}
+
+/**
+ * Decrypts a key
+ *
+ * @param string $key
+ * 
+ * @return Hash
+ */
+function decrypt(string $key): Hash
+{
+    return Hash::decrypt($key);    
 }

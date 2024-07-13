@@ -2,6 +2,7 @@
 
 namespace Solital\Core\Auth;
 
+use Deprecated\Deprecated;
 use Solital\Core\Auth\Reset;
 use Solital\Core\Course\Course;
 use Solital\Core\Http\Controller\HttpControllerTrait;
@@ -312,6 +313,7 @@ final class Auth extends Reset
         Session::delete('auth_users');
         Session::delete('db_table');
         Cookie::unset('auth_remember_login');
+        session_regenerate_id();
         Course::response()->redirect($redirect);
         exit;
     }
@@ -323,7 +325,9 @@ final class Auth extends Reset
      * @param string $key
      * 
      * @return string
+     * @deprecated
      */
+    #[Deprecated(since: "2024-06-25")]
     public static function sodium(#[\SensitiveParameter] string $password, string $key): string
     {
         Hash::checkSodium();
@@ -342,7 +346,9 @@ final class Auth extends Reset
      * @param string $key
      * 
      * @return bool
+     * @deprecated
      */
+    #[Deprecated(since: "2024-06-25")]
     public static function sodiumVerify(
         #[\SensitiveParameter] string $hash,
         #[\SensitiveParameter] string $password,
@@ -421,6 +427,7 @@ final class Auth extends Reset
             }
 
             self::registerUser($user);
+            session_regenerate_id();
             Course::response()->redirect($redirect);
 
             return true;
@@ -434,17 +441,14 @@ final class Auth extends Reset
      */
     private function registerForgot(): bool
     {
-        if (is_null($this->mail_sender)) {
-            $this->mail_sender = getenv('MAIL_USER');
-        }
+        if (is_null($this->mail_sender)) $this->mail_sender = getenv('MAIL_USER');
 
         $res = $this->tableForgot(self::$table_db, $this->user_column)
             ->forgotPass($this->user_post, $this->pass_post);
 
-        if ($res == true) {
-            return true;
-        }
+        session_regenerate_id();
 
+        if ($res == true) return true;
         return false;
     }
 
@@ -461,10 +465,9 @@ final class Auth extends Reset
             $this->pass_post
         );
 
-        if ($res == true) {
-            return true;
-        }
+        session_regenerate_id();
 
+        if ($res == true) return true;
         return false;
     }
 

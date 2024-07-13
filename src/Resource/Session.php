@@ -3,6 +3,7 @@
 namespace Solital\Core\Resource;
 
 use Delight\Http\ResponseHeader;
+use Deprecated\Deprecated;
 
 final class Session
 {
@@ -15,7 +16,9 @@ final class Session
 	 *
 	 * @param string|null $sameSiteRestriction indicates that the cookie should not be sent 
 	 * 					  along with cross-site requests (either `null`, `None`, `Lax` or `Strict`)
+	 * @deprecated
 	 */
+	#[Deprecated("2024-06-26")]
 	public static function start(?string $sameSiteRestriction = Cookie::SAME_SITE_RESTRICTION_LAX)
 	{
 		// run PHP's built-in equivalent

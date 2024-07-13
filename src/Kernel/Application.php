@@ -6,6 +6,7 @@ use Solital\Core\Course\Course;
 use Solital\Core\Resource\Session;
 use Solital\Core\Security\Guardian;
 use Solital\Core\FileSystem\HandleFiles;
+use Solital\Core\Kernel\Ini\IniCore;
 use Solital\Core\Kernel\Exceptions\ApplicationException;
 use Solital\Core\Kernel\Traits\{KernelTrait, ClassLoaderTrait, DatabaseTrait, YamlTrait};
 use Solital\Core\Container\{Interface\ContainerInterface, Container, DefaultServiceContainer};
@@ -27,7 +28,7 @@ abstract class Application
     /**
      * @var string
      */
-    private static string $default_timezone = "America/Fortaleza";
+    //private static string $default_timezone = "America/Fortaleza";
 
     /**
      * @var HandleFiles
@@ -47,6 +48,7 @@ abstract class Application
     public static function getInstance(): void
     {
         self::composerExists();
+        self::startIniConfig();
 
         /* START MODERN PHP EXCEPTION WITHOUT CONFIG FILE*/
         $exception_instance = self::startModernPHPException();
@@ -58,15 +60,6 @@ abstract class Application
         /* LOAD SERVICE PROVIDER */
         self::$container = new Container();
         self::loadServiceContainer(self::$container);
-
-        /* LOAD DEFAULT TIMEZONE */
-        date_default_timezone_set(self::$default_timezone);
-
-        if (is_array($bootstrap_config)) {
-            if (array_key_exists('default_timezone', $bootstrap_config) && $bootstrap_config['default_timezone'] != "") {
-                date_default_timezone_set($bootstrap_config['default_timezone']);
-            }
-        }
 
         /* IF CONFIG FILE EXISTS, UNSET OLD INSTANCE AND CREATE NEW MODERN PHP EXCEPTION INSTANCE */
         if (self::fileExistsWithoutCache($exception_config)) {
@@ -386,5 +379,23 @@ abstract class Application
             'message' => $message,
             'theme_dark' => $theme_dark
         ];
+    }
+
+    /**
+     * Start custom ini configurations
+     *
+     * @return void
+     */
+    public static function startIniConfig(): void
+    {
+        $config = self::yamlParse("runtime.yaml");
+        $timezone = self::yamlParse('bootstrap.yaml');
+
+        $ini = new IniCore();
+        $ini->setDefaultTimestamp($timezone["default_timezone"] ?? date_default_timezone_get());
+        $ini->setMemoryLimit($config["memory_limit"] ?? ini_get("memory_limit"));
+        $ini->setDefaultCharset($config["default_charset"] ?? ini_get("default_charset"));
+        $ini->setMaxExecutionTime($config["max_execution_time"] ?? ini_get("max_execution_time"));
+        $ini->setMbstringLanguage($config["mbstring_language"] ?? ini_get("mbstring.language"));
     }
 }

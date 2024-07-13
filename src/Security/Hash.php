@@ -2,9 +2,10 @@
 
 namespace Solital\Core\Security;
 
-use Solital\Core\Kernel\Dotenv;
-use Solital\Core\Kernel\Exceptions\DotenvException;
-use Solital\Core\Exceptions\NotFoundException;
+use Deprecated\Deprecated;
+use Solital\Core\Security\Exception\HashException;
+use Solital\Core\Resource\Temporal\Temporal;
+use Solital\Core\Kernel\{Application, Dotenv, Exceptions\DotenvException};
 use SecurePassword\Encrypt\{Encryption, Adapter\OpenSslEncryption, Adapter\SodiumEncryption};
 
 final class Hash
@@ -13,6 +14,25 @@ final class Hash
      * @var string
      */
     private static string $decoded;
+
+    /**
+     * Get default crypt on `bootstrap.yaml`
+     *
+     * @param string|null $default If `crypt` key not exists, OpenSSL will be used
+     * 
+     * @return string
+     */
+    private static function getCryptConfig(?string $default = null): string
+    {
+        $crypt = Application::yamlParse("bootstrap.yaml");
+
+        if (array_key_exists("crypt", $crypt)) {
+            if ($crypt["crypt"] == "sodium") self::checkSodium();
+            return $crypt["crypt"];
+        }
+
+        return $default;
+    }
 
     /**
      * Return a Encryption instance
@@ -46,13 +66,10 @@ final class Hash
      */
     public static function encrypt(string $value, string $time = '+1 hour'): string
     {
-        $date = new \DateTime(date('Y-m-d H:i'));
-        $date->modify($time);
-        $res = $date->format('Y-m-d H:i');
-
+        $expire_at = Temporal::createDatetime(date("Y-m-d H:i"))->modify($time)->toFormat("Y-m-d H:i");
         $data = [
             'value' => $value,
-            'expire_at' => $res
+            'expire_at' => $expire_at
         ];
 
         if (
@@ -62,7 +79,7 @@ final class Hash
         ) {
             $key = self::legacyOpenSSLEncryption('encrypt', $data);
         } else {
-            $key =  self::encryption('openssl', getenv('APP_HASH'))->encrypt(json_encode($data));
+            $key =  self::encryption(self::getCryptConfig('openssl'), getenv('APP_HASH'))->encrypt(json_encode($data));
             $key = str_replace("==", "EQUALS", $key);
         }
 
@@ -86,7 +103,7 @@ final class Hash
             $decode = self::legacyOpenSSLEncryption('decrypt', key: $key);
         } else {
             $key = str_replace("EQUALS", "==", $key);
-            $decode = self::encryption('openssl', getenv('APP_HASH'))->decrypt($key);
+            $decode = self::encryption(self::getCryptConfig('openssl'), getenv('APP_HASH'))->decrypt($key);
         }
 
         self::$decoded = $decode;
@@ -112,11 +129,7 @@ final class Hash
     public function isValid(): bool
     {
         $json = json_decode(self::$decoded, true);
-
-        if ($json['expire_at'] < date("Y-m-d H:i:s")) {
-            return false;
-        }
-
+        if ($json['expire_at'] < date("Y-m-d H:i:s")) return false;
         return true;
     }
 
@@ -124,7 +137,9 @@ final class Hash
      * Generates a sodium secret key
      * 
      * @return string
+     * @deprecated Use `crypt` option in `bootstrap.yaml`
      */
+    #[Deprecated("Use `crypt` option in `bootstrap.yaml`", "2024-06-25")]
     public static function getSodiumKey(): string
     {
         self::checkSodium();
@@ -138,7 +153,9 @@ final class Hash
      * @param null|string $key
      * 
      * @return string
+     * @deprecated Use `crypt` option in `bootstrap.yaml`
      */
+    #[Deprecated("Use `crypt` option in `bootstrap.yaml`", "2024-06-25")]
     public static function sodiumCrypt(string $data, ?string $key = null): string
     {
         self::checkSodium();
@@ -167,7 +184,9 @@ final class Hash
      * @param null|string $key
      * 
      * @return string|null
+     * @deprecated Use `crypt` option in `bootstrap.yaml`
      */
+    #[Deprecated("Use `crypt` option in `bootstrap.yaml`", "2024-06-25")]
     public static function sodiumDecrypt(string $encoded, ?string $key = null): ?string
     {
         self::checkSodium();
@@ -200,7 +219,7 @@ final class Hash
      * Check if sodium is installed
      * 
      * @return true
-     * @throws NotFoundException
+     * @throws HashException
      */
     public static function checkSodium(): true
     {
@@ -209,7 +228,7 @@ final class Hash
             !defined('SODIUM_LIBRARY_MINOR_VERSION') &&
             !defined('SODIUM_LIBRARY_VERSION')
         ) {
-            throw new NotFoundException("libsodium not installed", 404);
+            throw new HashException("libsodium not installed", 404);
         }
 
         return true;
@@ -236,11 +255,12 @@ final class Hash
      * @param string|null $key
      * 
      * @return string
+     * @throws HashException
      */
     private static function legacyOpenSSLEncryption(string $type, ?array $data = null, ?string $key = null): string
     {
         if (getenv('FIRST_SECRET') == "" || getenv('SECOND_SECRET') == "") {
-            throw new NotFoundException(
+            throw new HashException(
                 "Empty FIRST_SECRET and/or SECOND_SECRET secrets. Verify '.env' file or use APP_HASH",
                 404
             );
@@ -259,5 +279,7 @@ final class Hash
             $decode = openssl_decrypt($decode, "AES-128-CBC", pack('a16', getenv('FIRST_SECRET')), 0, pack('a16', getenv('SECOND_SECRET')));
             return $decode;
         }
+
+        return '';
     }
 }

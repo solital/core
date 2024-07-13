@@ -16,7 +16,7 @@ verify_domain:
   send_to: 
   recipient_name: 
 
-# Set default timezone
+# Sets the default timezone used by all date/time functions in a script
 default_timezone: America/Fortaleza
 
 # Throws error in JSON class
@@ -24,3 +24,6 @@ json_exception: false
 
 # Custom CSRF verifier class
 custom_csrf: BaseCsrfVerifier
+
+# Change default crypt
+crypt: openssl
