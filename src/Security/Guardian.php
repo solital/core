@@ -3,6 +3,7 @@
 namespace Solital\Core\Security;
 
 use Katrina\Sql\KatrinaStatement;
+use SensitiveParameter;
 use Solital\Core\Mail\Mailer;
 use Solital\Core\Exceptions\InvalidArgumentException;
 use Solital\Core\Auth\{Auth, Password};
@@ -53,11 +54,15 @@ class Guardian
      * 
      * @return mixed
      */
-    public function fields(string $email_column, string $pass_column, string $email, string $password): mixed
-    {
+    public function fields(
+        #[SensitiveParameter] string $email_column,
+        #[SensitiveParameter] string $pass_column,
+        #[SensitiveParameter] string $email,
+        #[SensitiveParameter] string $password
+    ): mixed {
         $sql = "SELECT * FROM " . $this->table . " WHERE $email_column = '$email';";
         $res = KatrinaStatement::executeQuery($sql, false);
-        
+
         if (!is_object($res) || $res == false) {
             return false;
         }
@@ -78,26 +83,23 @@ class Guardian
      * 
      * @return void
      */
-    public static function allowUser(#[\SensitiveParameter] string $user, ?string $message = null): void
+    public static function allowUser(#[SensitiveParameter] string $user, ?string $message = null): void
     {
-        if (Auth::user($user) != $user) {
-            self::redirectAllowOrDeny($message);
-        }
+        if (Auth::user($user) != $user) self::redirectAllowOrDeny($message);
     }
 
     /**
-     * Allows a user coming from a specific database table. If it comes from another table, that user will not access the page
+     * Allows a user coming from a specific database table. 
+     * If it comes from another table, that user will not access the page
      *
      * @param string $db_table
      * @param string|null $message
      * 
      * @return void
      */
-    public static function allowFromTable(#[\SensitiveParameter] string $db_table, ?string $message = null): void
+    public static function allowFromTable(#[SensitiveParameter] string $db_table, ?string $message = null): void
     {
-        if (Session::get('db_table') != $db_table) {
-            self::redirectAllowOrDeny($message);
-        }
+        if (Session::get('db_table') != $db_table) self::redirectAllowOrDeny($message);
     }
 
     /**
@@ -108,26 +110,23 @@ class Guardian
      * 
      * @return void
      */
-    public static function denyUser(#[\SensitiveParameter] string $user, ?string $message = null): void
+    public static function denyUser(#[SensitiveParameter] string $user, ?string $message = null): void
     {
-        if (Auth::user($user) == $user) {
-            self::redirectAllowOrDeny($message);
-        }
+        if (Auth::user($user) == $user) self::redirectAllowOrDeny($message);
     }
 
     /**
-     * Denies a user coming from a specific database table. If it comes from this table, that user will not access the page
+     * Denies a user coming from a specific database table. 
+     * If it comes from this table, that user will not access the page
      *
      * @param string $db_table
      * @param string|null $message
      * 
      * @return void
      */
-    public static function denyFromTable(#[\SensitiveParameter] string $db_table, ?string $message = null): void
+    public static function denyFromTable(#[SensitiveParameter] string $db_table, ?string $message = null): void
     {
-        if (Session::get('db_table') == $db_table) {
-            self::redirectAllowOrDeny($message);
-        }
+        if (Session::get('db_table') == $db_table) self::redirectAllowOrDeny($message);
     }
 
     /**
@@ -139,9 +138,7 @@ class Guardian
      */
     private static function redirectAllowOrDeny(?string $message = null): void
     {
-        if ($message == null) {
-            $message = "You haven't permission to access this page";
-        }
+        if ($message == null) $message = "You haven't permission to access this page";
 
         $msg = new Message();
         $msg->new(self::GUARDIAN_MESSAGE_INDEX, $message);
@@ -155,15 +152,15 @@ class Guardian
      * 
      * @return bool
      */
-    public static function verifyEmail(string $table, string $email_column, string $email): bool
-    {
+    public static function verifyEmail(
+        #[SensitiveParameter] string $table,
+        #[SensitiveParameter] string $email_column,
+        #[SensitiveParameter] string $email
+    ): bool {
         $sql = "SELECT * FROM $table WHERE $email_column = '$email';";
         $res = KatrinaStatement::executeQuery($sql, false);
 
-        if ($res) {
-            return true;
-        }
-
+        if ($res) return true;
         return false;
     }
 
@@ -199,7 +196,7 @@ class Guardian
      * @return void
      * @throws InvalidArgumentException
      */
-    private static function sendTo(?string $send_to, ?string $recipient_name): void
+    private static function sendTo(#[SensitiveParameter] ?string $send_to, ?string $recipient_name): void
     {
         if (!$send_to || !$recipient_name) {
             throw new InvalidArgumentException("Variables not defined in 'bootstrap.yaml' file: verify_domain");
@@ -267,8 +264,10 @@ class Guardian
      * 
      * @return void
      */
-    public static function protectBasicAuth(string $user, #[\SensitiveParameter] string $pass): void
-    {
+    public static function protectBasicAuth(
+        #[SensitiveParameter] string $user,
+        #[SensitiveParameter] string $pass
+    ): void {
         $url = self::getUrl();
 
         if (!isset($_SERVER['PHP_AUTH_USER'])) {
@@ -289,7 +288,7 @@ class Guardian
      * 
      * @return void
      */
-    public static function protectDigestAuth(#[\SensitiveParameter] array $users_with_pass): void
+    public static function protectDigestAuth(#[SensitiveParameter] array $users_with_pass): void
     {
         if (empty($_SERVER['PHP_AUTH_DIGEST'])) {
             header('WWW-Authenticate: Digest realm="Restricted area",qop="auth",nonce="' . uniqid() . '",opaque="' . md5('Restricted area') . '"');

@@ -1,5 +1,13 @@
 # Released Notes
 
+## v4.5.1 - (2024-07-17)
+
+### Fixed
+
+- Added `SensitiveParameter` attribute in lot of classes
+
+--------------------------------------------------------------------------
+
 ## v4.5.0 - (2024-07-13)
 
 ### Added

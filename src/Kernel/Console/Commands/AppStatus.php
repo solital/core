@@ -2,7 +2,8 @@
 
 namespace Solital\Core\Kernel\Console\Commands;
 
-use Solital\Core\Console\{Interface\CommandInterface, Command};
+use Solital\Core\Console\Interface\CommandInterface;
+use Solital\Core\Console\Command;
 use Solital\Core\Console\Output\ConsoleOutput;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Kernel\Console\HelpersTrait;

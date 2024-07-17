@@ -29,7 +29,6 @@ trait ExtendsTrait
         }
 
         ob_start();
-
         $args = $this->getArgs();
         extract($args, EXTR_SKIP);
 
@@ -58,10 +57,7 @@ trait ExtendsTrait
         $all_args = Wolf::getAllArgs();
         extract($all_args, EXTR_SKIP);
 
-        if (Str::endsWith($view, ".php")) {
-            $view = str_replace(".php", "", $view);
-        }
-
+        if (Str::endsWith($view, ".php")) $view = str_replace(".php", "", $view);
         $view = str_replace(["/", "."], DIRECTORY_SEPARATOR, $view);
         $view = $this->dir_view . $view . ".php";
 
@@ -139,10 +135,7 @@ trait ExtendsTrait
         $basename_view = basename($view, ".php");
         $view_in_temp = sys_get_temp_dir() . DIRECTORY_SEPARATOR .  $basename_view . ".temp.php";
 
-        if (Application::fileExistsWithoutCache($view_in_temp)) {
-            unlink($view_in_temp);
-        }
-
+        if (Application::fileExistsWithoutCache($view_in_temp)) unlink($view_in_temp);
         file_put_contents($view_in_temp, $render);
         return $view_in_temp;
     }

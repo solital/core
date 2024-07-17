@@ -17,7 +17,7 @@ abstract class QueueMail
      * @param string $alt_body
      * @return bool
      */
-    public function queue(string $subject, string $body, string $alt_body = null): bool
+    public function queue(#[\SensitiveParameter] string $subject, string $body, string $alt_body = null): bool
     {
         MailModel::checkTableQueue();
 

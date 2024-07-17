@@ -2,7 +2,8 @@
 
 namespace Solital\Core\Kernel\Console\Commands;
 
-use Solital\Core\Console\{Command, Interface\CommandInterface};
+use Solital\Core\Console\Interface\CommandInterface;
+use Solital\Core\Console\Command;
 use Solital\Core\Console\Output\ConsoleOutput;
 use Solital\Core\Kernel\{Application, Console\HelpersTrait, DebugCore};
 use Solital\Core\Kernel\Model\AuthModel;
@@ -109,6 +110,8 @@ class MakeAuth extends Command implements CommandInterface
             $this->createForgotSkeleton($forgot_components);
             return true;
         }
+
+        return $this;
     }
 
     /**

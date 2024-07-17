@@ -2,7 +2,8 @@
 
 namespace Solital\Core\Resource\Str;
 
-use Solital\Core\Resource\Str\{Exceptions\StrException, Trait\StrStaticTrait};
+use Solital\Core\Resource\Str\Exceptions\StrException;
+use Solital\Core\Resource\Str\Trait\StrStaticTrait;
 
 final class Str
 {
@@ -484,7 +485,7 @@ final class Str
      */
     public function slug(string $glue = '-'): string
     {
-        $normalized = self::removeAccents($this->value());
+        $normalized = self::removeAccents();
         $lower = strtolower($normalized);
 
         $string = preg_replace('/[\W_]+/', $glue, $lower);

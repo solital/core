@@ -85,16 +85,12 @@ abstract class Reset
     public function forgotPass(string $email, string $uri): bool
     {
         $sql = "SELECT * FROM " . $this->table . " WHERE " . $this->column . " = '$email';";
-
         $res = KatrinaStatement::executeQuery($sql, false);
 
         if (!$res == false) {
             $res = $this->sendHash($email, $uri, $this->time_hash);
 
-            if ($res == true) {
-                return true;
-            }
-
+            if ($res == true) return true;
             return false;
         }
 
@@ -152,10 +148,7 @@ abstract class Reset
     private function sendHash(string $email, string $uri, string $time): bool
     {
         $valid = filter_var($email, FILTER_VALIDATE_EMAIL);
-
-        if ($valid == null) {
-            return false;
-        }
+        if ($valid == null) return false;
 
         $this->generateDefaultLink($uri, $email, $time);
 
@@ -174,10 +167,7 @@ abstract class Reset
             exit;
         }
 
-        if ($res == true) {
-            return true;
-        }
-
+        if ($res == true) return true;
         return false;
     }
 }

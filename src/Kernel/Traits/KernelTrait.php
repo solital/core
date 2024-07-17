@@ -12,7 +12,7 @@ trait KernelTrait
     /**
      * That variables must be changed manually
      */
-    const SOLITAL_VERSION   = "4.5.0";
+    const SOLITAL_VERSION   = "4.5.1";
     const SITE_DOC_DOMAIN   = "https://solital.github.io/site/";
 
     /**
@@ -40,21 +40,10 @@ trait KernelTrait
      */
     public static function isCli(): bool
     {
-        if (defined('STDIN')) {
-            return true;
-        }
-
-        if (php_sapi_name() === "cli") {
-            return true;
-        }
-
-        if (PHP_SAPI === 'cli') {
-            return true;
-        }
-
-        if (stristr(PHP_SAPI, 'cgi') and getenv('TERM')) {
-            return true;
-        }
+        if (defined('STDIN')) return true;
+        if (php_sapi_name() === "cli") return true;
+        if (PHP_SAPI === 'cli') return true;
+        if (stristr(PHP_SAPI, 'cgi') and getenv('TERM')) return true;
 
         if (
             empty($_SERVER['REMOTE_ADDR']) and
@@ -114,7 +103,6 @@ trait KernelTrait
     public static function startModernPHPException(string $config_file = ''): ?ModernPHPException
     {
         if (DebugCore::isCoreDebugEnabled() === true) return null;
-
         $exception = new ModernPHPException($config_file);
 
         if (self::fileExistsWithoutCache($config_file) && $config_file != '') {

@@ -57,6 +57,8 @@ trait WolfCacheTrait
 
             return $this;
         }
+
+        return $this;
     }
 
     /**
@@ -67,7 +69,6 @@ trait WolfCacheTrait
     public function forOneMinute(): self
     {
         $this->time = date('Hi');
-
         return $this;
     }
 
@@ -79,7 +80,6 @@ trait WolfCacheTrait
     public function forOneHour(): self
     {
         $this->time = date('H');
-
         return $this;
     }
 
@@ -91,7 +91,6 @@ trait WolfCacheTrait
     public function forOneDay(): self
     {
         $this->time = date('N');
-
         return $this;
     }
 
@@ -103,7 +102,6 @@ trait WolfCacheTrait
     public function forOneWeek(): self
     {
         $this->time = date('W');
-
         return $this;
     }
 
@@ -118,10 +116,7 @@ trait WolfCacheTrait
             $this->cache_dir = Application::getRootApp("Storage/cache/wolf/");
         }
 
-        if (!is_dir($this->cache_dir)) {
-            (new HandleFiles)->create($this->cache_dir);
-        }
-
+        if (!is_dir($this->cache_dir)) Application::provider('handler-file')->create($this->cache_dir);
         return $this->cache_dir;
     }
 

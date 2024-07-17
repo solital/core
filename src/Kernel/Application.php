@@ -8,8 +8,9 @@ use Solital\Core\Security\Guardian;
 use Solital\Core\FileSystem\HandleFiles;
 use Solital\Core\Kernel\Ini\IniCore;
 use Solital\Core\Kernel\Exceptions\ApplicationException;
+use Solital\Core\Container\Interface\ContainerInterface;
+use Solital\Core\Container\{Container, DefaultServiceContainer};
 use Solital\Core\Kernel\Traits\{KernelTrait, ClassLoaderTrait, DatabaseTrait, YamlTrait};
-use Solital\Core\Container\{Interface\ContainerInterface, Container, DefaultServiceContainer};
 
 abstract class Application
 {
@@ -150,7 +151,7 @@ abstract class Application
      * @param string $dir
      * 
      * @return string
-     * @throws Exception
+     * @throws ApplicationException
      */
     public static function getRoot(string $dir = "", ?bool $cli_test = false): string
     {
@@ -278,9 +279,7 @@ abstract class Application
         $custom_csrf = self::yamlParse('bootstrap.yaml', throws: true);
         $class = 'Solital\Core\Http\Middleware\\' . $custom_csrf['custom_csrf'];
 
-        if (!class_exists($class)) {
-            $class = 'Solital\Middleware\\' . $custom_csrf['custom_csrf'];
-        }
+        if (!class_exists($class)) $class = 'Solital\Middleware\\' . $custom_csrf['custom_csrf'];
 
         $reflection = new \ReflectionClass($class);
         $instance = $reflection->newInstance();

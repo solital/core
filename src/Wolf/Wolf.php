@@ -110,10 +110,7 @@ class Wolf
      */
     public function setView(string $view): Wolf
     {
-        if (Str::contains($view, '.php')) {
-            $view = str_replace('.php', '', $view);
-        }
-
+        if (Str::contains($view, '.php')) $view = str_replace('.php', '', $view);
         if (Str::contains($view, '.') || Str::contains($view, '/')) {
             $view = str_replace(['.', '/'], DIRECTORY_SEPARATOR, $view);
         }
@@ -148,9 +145,8 @@ class Wolf
     /**
      * @return bool
      */
-    private function viewExists(): bool
+    private function viewExists(string $view): bool
     {
-        $view = Application::getRoot('view/');
         return Application::fileExistsWithoutCache($view) ? true : false;
     }
 
@@ -190,20 +186,12 @@ class Wolf
     {
         foreach ($this->getAllowIndex() as $key => $value) {
             if (is_array($args)) {
-                if (array_key_exists($key, $args)) {
-                    unset($args[$key]);
-                }
+                if (array_key_exists($key, $args)) unset($args[$key]);
             }
         }
 
-        if (is_array($args)) {
-            return array_map($this->htmlspecialcharsRecursive(...), $args);
-        }
-
-        if (is_scalar($args)) {
-            return htmlspecialchars($args, ENT_COMPAT | ENT_HTML401, 'UTF-8', false);
-        }
-
+        if (is_array($args)) return array_map($this->htmlspecialcharsRecursive(...), $args);
+        if (is_scalar($args)) return htmlspecialchars($args, ENT_COMPAT | ENT_HTML401, 'UTF-8', false);
         return $args;
     }
 }

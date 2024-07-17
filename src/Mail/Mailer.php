@@ -3,6 +3,7 @@
 namespace Solital\Core\Mail;
 
 use PHPMailer\PHPMailer\PHPMailer;
+use SensitiveParameter;
 use Solital\Core\Mail\QueueMail;
 use Solital\Core\Kernel\{Application, DebugCore};
 
@@ -56,8 +57,12 @@ class Mailer extends QueueMail
      * 
      * @return Mailer
      */
-    public function add(string $sender_mail, string $sender_name, string $recipient, string $recipient_name): Mailer
-    {
+    public function add(
+        #[SensitiveParameter] string $sender_mail,
+        string $sender_name,
+        #[SensitiveParameter] string $recipient,
+        string $recipient_name
+    ): Mailer {
         $this->sender = $sender_mail;
         $this->sender_name = $sender_name;
         $this->recipient = $recipient;
@@ -109,7 +114,7 @@ class Mailer extends QueueMail
      * 
      * @return bool
      */
-    public function send(string $subject, string $body, string $alt_body = ""): bool
+    public function send(#[SensitiveParameter] string $subject, string $body, string $alt_body = ""): bool
     {
         try {
             $this->mail->isHTML(true);

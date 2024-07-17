@@ -75,10 +75,7 @@ final class Auth extends Reset
     public static function check(#[\SensitiveParameter] string $user = '', string $redirect = ''): void
     {
         self::getEnv();
-
-        if ($redirect == "") {
-            $redirect = self::$login_url;
-        }
+        if ($redirect == "") $redirect = self::$login_url;
 
         if (is_null(self::user($user))) {
             Course::response()->redirect($redirect);
@@ -232,10 +229,7 @@ final class Auth extends Reset
         if (Cookie::exists('auth_remember_login') == true) {
             Cookie::get('auth_remember_login');
 
-            if ($redirect == "") {
-                $redirect = self::$dashboard_url;
-            }
-
+            if ($redirect == "") $redirect = self::$dashboard_url;
             Course::response()->redirect($redirect);
             exit;
         }
@@ -251,7 +245,6 @@ final class Auth extends Reset
     public function timeHash(string $time): Auth
     {
         $this->time_hash = $time;
-
         return $this;
     }
 
@@ -265,7 +258,6 @@ final class Auth extends Reset
     public function customMailSender(string $mail_sender): Auth
     {
         $this->mail_sender = $mail_sender;
-
         return $this;
     }
 
@@ -304,10 +296,7 @@ final class Auth extends Reset
     public static function logoff(string $user = '', string $redirect = ""): void
     {
         self::getEnv();
-
-        if ($redirect == "") {
-            $redirect = self::$login_url;
-        }
+        if ($redirect == "") $redirect = self::$login_url;
 
         self::deleteUser($user);
         Session::delete('auth_users');
@@ -374,9 +363,7 @@ final class Auth extends Reset
         $users = Session::get('auth_users');
 
         if ($username != '') {
-            if (!is_null($users)) {
-                return $users[$username] ?? null;
-            }
+            if (!is_null($users)) return $users[$username] ?? null;
         }
 
         return $users;

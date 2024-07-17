@@ -37,7 +37,6 @@ trait YamlTrait
         }
 
         if ($return_dir_name == true) return $full_yaml_file;
-
         return Yaml::parseFile($full_yaml_file);
     }
 
@@ -55,20 +54,14 @@ trait YamlTrait
         $yaml_file_dir = self::yamlParse($yaml_file, true);
         $file = fopen($yaml_file_dir, "a+");
 
-        if (!$file) {
-            throw new YamlException("Failed to open '" . $yaml_file . "' file");
-        }
-
+        if (!$file) throw new YamlException("Failed to open '" . $yaml_file . "' file");
         fwrite($file, "\n" . $key . ': ' . $value);
 
         while (($line = fgets($file)) !== false) {
             echo $line;
         }
 
-        if (!feof($file)) {
-            throw new YamlException("fgets() unexpected failure");
-        }
-
+        if (!feof($file)) throw new YamlException("fgets() unexpected failure");
         fclose($file);
         return true;
     }

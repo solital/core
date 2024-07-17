@@ -5,6 +5,7 @@ namespace Solital\Core\Auth;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Exceptions\NotFoundException;
 use SecurePassword\{SecurePassword, HashAlgorithm};
+use SensitiveParameter;
 use Solital\Core\Kernel\Dotenv;
 use Solital\Core\Kernel\Exceptions\DotenvException;
 
@@ -77,12 +78,9 @@ class Password
      * 
      * @return mixed
      */
-    public function create(#[\SensitiveParameter] string $password, bool $info = false): mixed
+    public function create(#[SensitiveParameter] string $password, bool $info = false): mixed
     {
-        if ($info == true) {
-            return $this->password->createHash($password)->getHashInfo();
-        }
-
+        if ($info == true) return $this->password->createHash($password)->getHashInfo();
         return $this->password->createHash($password)->getHash();
     }
 
@@ -92,8 +90,10 @@ class Password
      * 
      * @return bool
      */
-    public function verify(#[\SensitiveParameter] string $password, string $hash): bool
-    {
+    public function verify(
+        #[SensitiveParameter] string $password,
+        #[SensitiveParameter] string $hash
+    ): bool {
         return $this->password->verifyHash($password, $hash, $this->wait_microseconds);
     }
 
@@ -103,8 +103,10 @@ class Password
      * 
      * @return mixed
      */
-    public function needsRehash(#[\SensitiveParameter] string $password, string $hash): mixed
-    {
+    public function needsRehash(
+        #[SensitiveParameter] string $password,
+        #[SensitiveParameter] string $hash
+    ): mixed {
         return $this->password->needsRehash($password, $hash);
     }
 

@@ -2,6 +2,7 @@
 
 namespace Solital\Core\Security;
 
+use SensitiveParameter;
 use Deprecated\Deprecated;
 use Solital\Core\Security\Exception\HashException;
 use Solital\Core\Resource\Temporal\Temporal;
@@ -42,8 +43,10 @@ final class Hash
      * 
      * @return Encryption
      */
-    private static function encryption(string $adapter_name, string $crypt_key): Encryption
-    {
+    private static function encryption(
+        string $adapter_name,
+        #[SensitiveParameter] string $crypt_key
+    ): Encryption {
         if (getenv('APP_HASH') == '' || !Dotenv::isset('APP_HASH')) {
             throw new DotenvException("APP_HASH not found. Execute 'php vinci generate:hash' command");
         }
@@ -64,7 +67,7 @@ final class Hash
      * 
      * @return string
      */
-    public static function encrypt(string $value, string $time = '+1 hour'): string
+    public static function encrypt(#[SensitiveParameter] string $value, string $time = '+1 hour'): string
     {
         $expire_at = Temporal::createDatetime(date("Y-m-d H:i"))->modify($time)->toFormat("Y-m-d H:i");
         $data = [
@@ -79,7 +82,10 @@ final class Hash
         ) {
             $key = self::legacyOpenSSLEncryption('encrypt', $data);
         } else {
-            $key =  self::encryption(self::getCryptConfig('openssl'), getenv('APP_HASH'))->encrypt(json_encode($data));
+            $key =  self::encryption(
+                self::getCryptConfig('openssl'),
+                getenv('APP_HASH')
+            )->encrypt(json_encode($data));
             $key = str_replace("==", "EQUALS", $key);
         }
 
@@ -93,7 +99,7 @@ final class Hash
      * 
      * @return static
      */
-    public static function decrypt(string $key): static
+    public static function decrypt(#[SensitiveParameter] string $key): static
     {
         if (
             Dotenv::isset('FIRST_SECRET') == true &&
@@ -156,8 +162,10 @@ final class Hash
      * @deprecated Use `crypt` option in `bootstrap.yaml`
      */
     #[Deprecated("Use `crypt` option in `bootstrap.yaml`", "2024-06-25")]
-    public static function sodiumCrypt(string $data, ?string $key = null): string
-    {
+    public static function sodiumCrypt(
+        #[SensitiveParameter] string $data,
+        #[SensitiveParameter] ?string $key = null
+    ): string {
         self::checkSodium();
 
         if (is_null($key)) {
@@ -187,8 +195,10 @@ final class Hash
      * @deprecated Use `crypt` option in `bootstrap.yaml`
      */
     #[Deprecated("Use `crypt` option in `bootstrap.yaml`", "2024-06-25")]
-    public static function sodiumDecrypt(string $encoded, ?string $key = null): ?string
-    {
+    public static function sodiumDecrypt(
+        #[SensitiveParameter] string $encoded,
+        #[SensitiveParameter] ?string $key = null
+    ): ?string {
         self::checkSodium();
 
         if (is_null($key)) {
@@ -257,8 +267,11 @@ final class Hash
      * @return string
      * @throws HashException
      */
-    private static function legacyOpenSSLEncryption(string $type, ?array $data = null, ?string $key = null): string
-    {
+    private static function legacyOpenSSLEncryption(
+        string $type,
+        #[SensitiveParameter] ?array $data = null,
+        ?string $key = null
+    ): string {
         if (getenv('FIRST_SECRET') == "" || getenv('SECOND_SECRET') == "") {
             throw new HashException(
                 "Empty FIRST_SECRET and/or SECOND_SECRET secrets. Verify '.env' file or use APP_HASH",
