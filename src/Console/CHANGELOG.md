@@ -1,6 +1,18 @@
 # Released Notes
 
-## v4.4.0 - (2024-06-xx)
+## v4.5.0 - (2024-08-14)
+
+### Added
+
+- Added colors in `status` method
+
+### Fixed
+
+- Fixed colors in `banner` method
+
+----------------------------------------------------------------------
+
+## v4.4.0 - (2024-06-02)
 
 ### Added
 

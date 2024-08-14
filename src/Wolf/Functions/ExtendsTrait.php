@@ -115,6 +115,7 @@ trait ExtendsTrait
      */
     private function convertPhpTags(string $view): string
     {
+        if (!file_exists($view)) throw new \Exception("Template `" . basename($view) . "` not extended because it wasn't found. This file is in another folder?");
         $render = file_get_contents($view);
         $render = $this->checkInternalFunctions($render);
         $render = str_replace(["{{", "}}"], ["<?=", "?>"], (string) $render);

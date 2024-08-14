@@ -34,12 +34,20 @@ abstract class JobStatusConsole
      *
      * @param string $job_name
      * @param \Closure|callable $closure
+     * @param ColorsEnum|null $job_color
      * 
-     * @return static
+     * @return static 
      */
-    public static function status(string $job_name, \Closure|callable $closure): static
-    {
-        self::$job_name = $job_name;
+    public static function status(
+        string $job_name,
+        \Closure|callable $closure,
+        ColorsEnum $job_color = null
+    ): static {
+        
+        (!is_null($job_color)) ?
+            self::$job_name = $job_color->value . $job_name . ColorsEnum::RESET->value :
+            self::$job_name = $job_name;
+
         self::$start = floor(microtime(true) * 1000);
         self::$callable = call_user_func($closure);
         self::$end = floor(microtime(true) * 1000);
@@ -65,9 +73,7 @@ abstract class JobStatusConsole
 
         ConsoleOutput::line($job_name)->print();
 
-        if ($show_microtime === true) {
-            ConsoleOutput::line(str_pad($total_time . "ms", 7))->print();
-        }
+        if ($show_microtime === true) ConsoleOutput::line(str_pad($total_time . "ms", 7))->print();
 
         if (is_bool(self::$callable)) {
             if (self::$callable === true) {

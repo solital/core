@@ -16,6 +16,9 @@ enable_occurrences: false
 # Enable logs
 enable_logs: false
 
+# Ignores some errors
+ignore_errors: [E_USER_DEPRECATED]
+
 # Database for Modern PHP Exceptions
 db_drive: 
 db_host: 

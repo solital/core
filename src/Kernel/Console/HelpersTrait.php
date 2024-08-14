@@ -2,9 +2,9 @@
 
 namespace Solital\Core\Kernel\Console;
 
-use Solital\Core\Console\InputOutput;
-use Solital\Core\Console\Output\ConsoleOutput;
 use Solital\Core\FileSystem\HandleFiles;
+use Solital\Core\Console\InputOutput;
+use Solital\Core\Console\Output\{ConsoleOutput, ColorsEnum};
 
 trait HelpersTrait
 {
@@ -17,14 +17,10 @@ trait HelpersTrait
     public function createComponent(string $data, array $config): bool
     {
         $folder = new HandleFiles();
-
         $file_exists = $config['directory'] . $config['component_name'] . ".php";
 
         if (!file_exists($file_exists)) {
-            if (!is_dir($config['directory'])) {
-                $folder->create($config['directory']);
-            }
-
+            if (!is_dir($config['directory'])) $folder->create($config['directory']);
             file_put_contents($config['directory'] . $config['component_name'] . '.php', "<?php \n\n" . $data);
             return true;
         }
@@ -40,9 +36,9 @@ trait HelpersTrait
      */
     public function removeComponent(string $dir, string $component): void
     {
-        $input_output = new InputOutput('green');
         $handle_files = new HandleFiles();
-
+        $input_output = new InputOutput();
+        $input_output->color(ColorsEnum::LIGHT_GREEN);
         $input_output->confirmDialog("Are you sure you want to delete this components? (this process cannot be undone)? ", "Y", "N", false);
 
         $input_output->confirm(function () use ($dir, $component, $handle_files) {
@@ -75,7 +71,6 @@ trait HelpersTrait
         if (!is_dir($auth_controller_dir)) {
             $handle_files->create($auth_controller_dir);
             $handle_files->getAndPutContents($auth_template_dir, $auth_controller_dir . $file_name);
-
             return true;
         }
 
@@ -83,7 +78,6 @@ trait HelpersTrait
 
         if ($file_exists == false) {
             $handle_files->getAndPutContents($auth_template_dir, $auth_controller_dir . $file_name);
-
             return true;
         }
 
@@ -100,24 +94,17 @@ trait HelpersTrait
         $exists = [];
 
         foreach ($components as $file) {
-            if (!file_exists($file)) {
-                $exists[] = "";
-            } else {
-                $exists[] = $file;
-            }
+            (!file_exists($file)) ? $exists[] = "" : $exists[] = $file;
         }
 
-        if (empty($exists)) {
-            ConsoleOutput::success("No component found")->print()->break()->exit();
-        }
+        if (empty($exists)) ConsoleOutput::success("No component found")->print()->break()->exit();
 
-        $input_output = new InputOutput('green');
+        $input_output = new InputOutput();
+        $input_output->color(ColorsEnum::LIGHT_GREEN);
         $input_output->confirmDialog("Are you sure you want to delete this components? (this process cannot be undone)? ", "Y", "N", false);
         $input_output->confirm(function () use ($components) {
             foreach ($components as $file) {
-                if (is_file($file)) {
-                    unlink($file);
-                }
+                if (is_file($file)) unlink($file);
             }
 
             ConsoleOutput::success("Components successfully removed!")->print()->break();

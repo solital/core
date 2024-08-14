@@ -171,7 +171,7 @@ class Migration
             $up_body = "Katrina::createTable('" . $table_name . "')
     ->int('id')->primary()->increment()
     // ...
-    ->createdUpdateAt()
+    ->createdUpdatedAt()
     ->closeTable();";
             $down_body = "Katrina::dropTable('" . $table_name . "');";
         } else {
@@ -253,18 +253,18 @@ class Migration
             $migrations_db = $this->convertMigrationsObject($migrations_db, $options);
         }
 
-        foreach ($migrations_db as $migrations_db) {
-            ConsoleOutput::warning("Rollback migration: " . $migrations_db->name)->print()->break();
+        foreach ($migrations_db as $migration_db) {
+            ConsoleOutput::warning("Rollback migration: " . $migration_db->name)->print()->break();
 
-            ConsoleOutput::status($migrations_db->name, function () use ($migrations_db) {
+            ConsoleOutput::status($migration_db->name, function () use ($migration_db) {
                 try {
-                    $instance = $this->instantiateMigration($migrations_db->name);
+                    $instance = $this->instantiateMigration($migration_db->name);
 
                     if ($instance === null) {
                         return false;
                     }
 
-                    $this->provider->delete("name", $migrations_db->name);
+                    $this->provider->delete("name", $migration_db->name);
                     $instance->down();
 
                     return true;

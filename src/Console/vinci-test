@@ -3,21 +3,30 @@
 
 require_once 'vendor/autoload.php';
 
+use SebastianBergmann\Environment\Console;
 use Solital\Core\Console\Command;
 use Solital\Core\Console\TableBuilder;
 use Solital\Core\Console\ProgressBar\ProgressBar;
 use Solital\Core\Console\ProgressBar\ProgressBarStyle;
 use Solital\Core\Console\InputOutput;
 use Solital\Core\Console\Output\ColorsEnum;
+use Solital\Core\Console\Output\ConsoleOutput;
 use Solital\Core\Console\tests\ExtendCommands\{ExtendedCommandsTest, OtherExtendComandTest};
 
 //dd($argv);
 
-$cmd = new Command([ExtendedCommandsTest::class, OtherExtendComandTest::class]);
+/* $cmd = new Command([ExtendedCommandsTest::class, OtherExtendComandTest::class]);
 $res = $cmd->read($argv, $argv);
 
 //print_r($res);
-exit;
+exit; */
+
+## JOB STATUS --------------------------------
+
+//ConsoleOutput::banner("Debug", 45)->print()->break();
+
+/* ConsoleOutput::debugMessage("Debug", color: 49)->print()->break(true);
+ConsoleOutput::status("job", fn () => true, ColorsEnum::YELLOW)->printStatus(); */
 
 ## INPUT-OUTPUT --------------------------------
 

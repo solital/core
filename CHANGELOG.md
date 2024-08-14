@@ -1,5 +1,32 @@
 # Released Notes
 
+## v4.5.2 - (2024-08-14)
+
+### Improved
+
+- Added `ignoreErrors` in `KernelTrait`
+- Added `mask` in `Str` class
+- Added polyfill for PHP 8.4
+- Improved `Str` methods with Steroids for PHP
+- Improved APCu cache adapter
+- Improved `Schedule` component
+
+### Changed
+
+- Changed `StrMask` class
+
+### Fixed
+
+- Fixed migrations query builder with table
+- Fixed template not found in Wolf
+
+### Removed
+
+- Removed old `EventDispatcher` and old `ListenerProvider` classes
+- Removed `MiddlewareCallableInterface` interface
+
+--------------------------------------------------------------------------
+
 ## v4.5.1 - (2024-07-17)
 
 ### Fixed

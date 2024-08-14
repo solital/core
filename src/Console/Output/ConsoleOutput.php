@@ -152,11 +152,9 @@ class ConsoleOutput extends JobStatusConsole
     {
         self::generateColors();
 
-        if (!is_int($color)) {
-            $color_value = $color->value;
-        } else {
+        (!is_int($color)) ?
+            $color_value = $color->value :
             $color_value = ColorsEnum::CUSTOM->value . $color . "m";
-        }
 
         self::$message = self::prepareColor($message, $color_value, $space);
         return new static;
@@ -183,15 +181,13 @@ class ConsoleOutput extends JobStatusConsole
 
             $color_value = $color->value;
         } else {
-            $color_value = ColorsEnum::CUSTOM->value . $color . "m";
+            $color_value = ColorsEnum::CUSTOM->value . 234 . 'm' . ColorsEnum::BG_CUSTOM->value . $color . "m";
         }
 
         self::$message = PHP_EOL;
-
         self::$message .= $color_value . str_pad('', $lenght, pad_type: STR_PAD_BOTH) . ColorsEnum::RESET->value . PHP_EOL;
         self::$message .= $color_value . str_pad($message, $lenght, pad_type: STR_PAD_BOTH) . ColorsEnum::RESET->value . PHP_EOL;
         self::$message .= $color_value . str_pad('', $lenght, pad_type: STR_PAD_BOTH) . ColorsEnum::RESET->value . PHP_EOL;
-
         self::$message .= PHP_EOL;
         return new static;
     }
@@ -238,10 +234,7 @@ class ConsoleOutput extends JobStatusConsole
      */
     public static function clear(?int $seconds = null): void
     {
-        if (!is_null($seconds)) {
-            sleep($seconds);
-        }
-
+        if (!is_null($seconds)) sleep($seconds);
         echo ColorsEnum::CLEAR->value;
     }
 
@@ -253,7 +246,6 @@ class ConsoleOutput extends JobStatusConsole
     public function print(): ConsoleOutput
     {
         echo self::$message;
-
         return $this;
     }
 
@@ -274,10 +266,7 @@ class ConsoleOutput extends JobStatusConsole
             }
         }
 
-        if ($repeat == true) {
-            echo PHP_EOL . PHP_EOL;
-        }
-
+        if ($repeat == true) echo PHP_EOL . PHP_EOL;
         return $this;
     }
 
@@ -300,10 +289,7 @@ class ConsoleOutput extends JobStatusConsole
      */
     public static function getForegroundColors(): mixed
     {
-        if (self::generateColors() == false) {
-            return "Color not supported for your terminal";
-        }
-
+        if (self::generateColors() == false) return "Color not supported for your terminal";
         ob_start();
 
         for ($i = 1; $i <= 256; $i++) {
@@ -311,10 +297,8 @@ class ConsoleOutput extends JobStatusConsole
         }
 
         echo ColorsEnum::RESET->value;
-
         $colors = ob_get_contents();
         ob_end_clean();
-
         return $colors;
     }
 
@@ -325,10 +309,7 @@ class ConsoleOutput extends JobStatusConsole
      */
     public static function getBackgroundColors(): mixed
     {
-        if (self::generateColors() == false) {
-            return "Color not supported for your terminal";
-        }
-
+        if (self::generateColors() == false) return "Color not supported for your terminal";
         ob_start();
 
         for ($i = 1; $i <= 256; $i++) {
@@ -336,10 +317,8 @@ class ConsoleOutput extends JobStatusConsole
         }
 
         echo ColorsEnum::RESET->value;
-
         $colors = ob_get_contents();
         ob_end_clean();
-
         return $colors;
     }
 
@@ -354,12 +333,7 @@ class ConsoleOutput extends JobStatusConsole
      */
     private static function prepareColor(mixed $message, string $color, bool $space): string
     {
-        $space_value = "";
-
-        if ($space == true) {
-            $space_value = "  ";
-        }
-
+        ($space == true) ? $space_value = "  " : $space_value = "";
         return $space_value . $color . $message . self::$color_reset;
     }
 
@@ -371,9 +345,7 @@ class ConsoleOutput extends JobStatusConsole
      */
     protected static function generateColors(): bool
     {
-        if (self::isCli() == false) {
-            throw new OutputException("Console Output is used only in CLI mode");
-        }
+        if (self::isCli() == false) throw new OutputException("Console Output is used only in CLI mode");
 
         if (self::colorIsSupported() || self::are256ColorsSupported()) {
             self::$color_reset = ColorsEnum::RESET->value;
@@ -382,7 +354,6 @@ class ConsoleOutput extends JobStatusConsole
             self::$color_warning = ColorsEnum::LIGHT_YELLOW->value;
             self::$color_error = ColorsEnum::BG_RED->value;
             self::$color_line = ColorsEnum::WHITE->value;
-
             return true;
         }
 
@@ -424,14 +395,11 @@ class ConsoleOutput extends JobStatusConsole
      */
     private static function isCli(): bool
     {
-        if (defined('STDIN')) {
-            return true;
-        }
+        if (defined('STDIN')) return true;
 
         if (
             empty($_SERVER['REMOTE_ADDR']) &&
-            !isset($_SERVER['HTTP_USER_AGENT']) &&
-            count($_SERVER['argv']) > 0
+            !isset($_SERVER['HTTP_USER_AGENT'])
         ) {
             return true;
         }

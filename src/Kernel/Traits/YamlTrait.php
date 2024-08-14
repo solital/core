@@ -37,6 +37,7 @@ trait YamlTrait
         }
 
         if ($return_dir_name == true) return $full_yaml_file;
+        if (extension_loaded("yaml") && function_exists("yaml_parse_file")) return yaml_parse_file($full_yaml_file);
         return Yaml::parseFile($full_yaml_file);
     }
 

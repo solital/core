@@ -12,7 +12,7 @@ trait KernelTrait
     /**
      * That variables must be changed manually
      */
-    const SOLITAL_VERSION   = "4.5.1";
+    const SOLITAL_VERSION   = "4.5.2";
     const SITE_DOC_DOMAIN   = "https://solital.github.io/site/";
 
     /**
@@ -25,11 +25,7 @@ trait KernelTrait
     public static function getConsoleComponent(string $component_name): ?string
     {
         $component_file = Application::getRootCore('/Kernel/Console/Templates/' . $component_name);
-
-        if (file_exists($component_file)) {
-            return $component_file;
-        }
-
+        if (file_exists($component_file)) return $component_file;
         return null;
     }
 
@@ -47,8 +43,7 @@ trait KernelTrait
 
         if (
             empty($_SERVER['REMOTE_ADDR']) and
-            !isset($_SERVER['HTTP_USER_AGENT']) and
-            count($_SERVER['argv']) > 0
+            !isset($_SERVER['HTTP_USER_AGENT'])
         ) {
             return true;
         }
@@ -89,7 +84,6 @@ trait KernelTrait
 
         //$file_exists = is_file($file_path);
         $file_exists = file_exists($file_path);
-
         return $file_exists;
     }
 
@@ -110,6 +104,15 @@ trait KernelTrait
 
             if (array_key_exists('enable_occurrences', $yaml_data) && $yaml_data['enable_occurrences'] == true) {
                 $exception->enableOccurrences();
+            }
+
+            if (array_key_exists('ignore_errors', $yaml_data) && $yaml_data["ignore_errors"] != []) {
+                $errors = [];
+                foreach ($yaml_data["ignore_errors"] as $error) {
+                    $errors[] = constant($error);
+                }
+
+                $exception->ignoreErrors($errors);
             }
         }
 

@@ -8,7 +8,7 @@ use Solital\Core\Console\Output\ConsoleOutput;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Kernel\Console\HelpersTrait;
 use Solital\Core\Kernel\DebugCore;
-use Solital\Core\Schedule\Schedule as TaskSchedule;
+use Solital\Core\Schedule\TaskSchedule;
 
 class Schedule extends Command implements CommandInterface
 {
@@ -56,9 +56,7 @@ class Schedule extends Command implements CommandInterface
         $this->handle = Application::provider('handler-file');
         $this->schedule_dir = Application::getRootApp('Schedule/', DebugCore::isCoreDebugEnabled());
 
-        if (isset($options->remove)) {
-            $this->removeComponent($this->schedule_dir, $arguments->schedule_name . ".php");
-        }
+        if (isset($options->remove)) $this->removeComponent($this->schedule_dir, $arguments->schedule_name . ".php");
 
         if (isset($options->work) || isset($options->run)) {
             $this->startSchedule($options);
@@ -89,14 +87,10 @@ class Schedule extends Command implements CommandInterface
         }
 
         $schedule = new TaskSchedule();
-        $schedule->add($schedules);
+        $schedule->setScheduleLogs(Application::getRootApp('Storage/schedules/'));
+        $schedule->addTasks($schedules);
 
-        if (isset($options->work)) {
-            $schedule->execute(true);
-        }
-
-        if (isset($options->run)) {
-            $schedule->execute();
-        }
+        if (isset($options->work)) $schedule->runTasks(true);
+        if (isset($options->run)) $schedule->runTasks();
     }
 }

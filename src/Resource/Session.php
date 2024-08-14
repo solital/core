@@ -18,7 +18,7 @@ final class Session
 	 * 					  along with cross-site requests (either `null`, `None`, `Lax` or `Strict`)
 	 * @deprecated
 	 */
-	#[Deprecated("2024-06-26")]
+	#[Deprecated(since: "4.5")]
 	public static function start(?string $sameSiteRestriction = Cookie::SAME_SITE_RESTRICTION_LAX)
 	{
 		// run PHP's built-in equivalent

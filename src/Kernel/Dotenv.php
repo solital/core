@@ -39,7 +39,7 @@ abstract class Dotenv
             $array_multi = [];
 
             foreach ($lines as $line) {
-                if (Str::contains($line, "#")) {
+                if (str_starts_with($line, "#")) {
                     $line = str_replace($line, '', $line);
                 }
 
@@ -68,7 +68,6 @@ abstract class Dotenv
             }
 
             self::required([
-                'ERRORS_DISPLAY',
                 'DB_HOST', 'DB_NAME', 'DB_USER', 'DB_PASS',
                 'MAIL_DEBUG', 'MAIL_HOST', 'MAIL_USER', 'MAIL_PASS', 'MAIL_SECURITY', 'MAIL_PORT'
             ]);
@@ -87,11 +86,7 @@ abstract class Dotenv
     public static function isset(string $field): bool
     {
         $field = strtoupper($field);
-
-        if (isset($_ENV[$field]) && isset($_SERVER[$field]) && isset(getenv()[$field])) {
-            return true;
-        }
-
+        if (isset($_ENV[$field]) && isset($_SERVER[$field]) && isset(getenv()[$field])) return true;
         return false;
     }
 

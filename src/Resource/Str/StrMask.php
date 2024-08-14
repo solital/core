@@ -2,7 +2,7 @@
 
 namespace Solital\Core\Resource\Str;
 
-final class StrMask
+class StrMask
 {
     /**
      * List of available patterns
@@ -65,13 +65,8 @@ final class StrMask
      */
     public static function apply(string $inputValue, string $maskExpression, ?array $config = null): mixed
     {
-        if (!$inputValue || !$maskExpression) {
-            return '';
-        }
-
-        if ($config === null) {
-            $config = array();
-        }
+        if (!$inputValue || !$maskExpression) return '';
+        if ($config === null) $config = [];
 
         $cursor = 0;
         $result = '';
@@ -86,19 +81,18 @@ final class StrMask
             $inputValue = substr($inputValue, strlen($prefix));
         }
 
-        if (self::startsWith($maskExpression, 'percent')) {
+        if (str_starts_with($maskExpression, 'percent')) {
             $inputValue = self::checkInput($inputValue);
             $precision = self::getPrecision($maskExpression);
             $inputValue = self::checkInputPrecision($inputValue, $precision, '.');
-            if (intval($inputValue) >= 0 && intval($inputValue) <= 100) {
-                $result = $inputValue;
-            } else {
+            
+            (intval($inputValue) >= 0 && intval($inputValue) <= 100) ?
+                $result = $inputValue :
                 $result = substr($inputValue, 0, strlen($inputValue) - 1);
-            }
         } elseif (
-            self::startsWith($maskExpression, 'separator') ||
-            self::startsWith($maskExpression, 'dot_separator') ||
-            self::startsWith($maskExpression, 'comma_separator')
+            str_starts_with($maskExpression, 'separator') ||
+            str_starts_with($maskExpression, 'dot_separator') ||
+            str_starts_with($maskExpression, 'comma_separator')
         ) {
             // Clean input
             if (
@@ -109,17 +103,17 @@ final class StrMask
                 $inputValue = self::checkInput($inputValue);
             }
 
-            if (self::startsWith($maskExpression, 'separator')) {
+            if (str_starts_with($maskExpression, 'separator')) {
                 if (
                     (strpos($inputValue, ',') >= 0) &&
-                    self::endsWith($inputValue, ',') &&
+                    str_ends_with($inputValue, ',') &&
                     strpos($inputValue, ',') !== strrpos($inputValue, ',')
                 ) {
                     $inputValue = substr($inputValue, 0, strlen($inputValue) - 1);
                 }
             }
 
-            if (self::startsWith($maskExpression, 'dot_separator')) {
+            if (str_starts_with($maskExpression, 'dot_separator')) {
                 if (
                     (strpos($inputValue, ',') > 0) &&
                     strpos($inputValue, ',') === strrpos($inputValue, ',')
@@ -128,7 +122,7 @@ final class StrMask
                 }
             }
 
-            if (self::startsWith($maskExpression, 'comma_separator')) {
+            if (str_starts_with($maskExpression, 'comma_separator')) {
                 $inputValue = strlen($inputValue) > 1 && substr($inputValue, 0, 1) === '0' && substr($inputValue, 1, 1) !== '.'
                     ? substr($inputValue, 1)
                     : $inputValue;
@@ -141,29 +135,25 @@ final class StrMask
 
             $inputValue = floatval($inputValue);
 
-            if (self::startsWith($maskExpression, 'separator')) {
+            if (str_starts_with($maskExpression, 'separator')) {
                 if (preg_match("/[@#!$%^&*()_+|~=`{}\[\]:.\";<>?\/]/", $inputValue)) {
                     $inputValue = substr($inputValue, 0, strlen($inputValue) - 1);
                 }
                 $result = number_format($inputValue, $precision, ",", " ");
-            } elseif (self::startsWith($maskExpression, 'dot_separator')) {
+            } elseif (str_starts_with($maskExpression, 'dot_separator')) {
                 if (preg_match("/[@#!$%^&*()_+|~=`{}\[\]:\s\";<>?\/]/", $inputValue)) {
                     $inputValue = substr($inputValue, 0, strlen($inputValue) - 1);
                 }
                 $result = number_format($inputValue, $precision, ",", ".");
-            } elseif (self::startsWith($maskExpression, 'comma_separator')) {
+            } elseif (str_starts_with($maskExpression, 'comma_separator')) {
                 $result = number_format($inputValue, $precision, ".", ",");
             }
 
             // TODO: Implement line 139 to 160 ?
 
         } else {
-
             for ($i = 0, $inputSymbol = substr($inputValue, 0, 1); $i < strlen($inputValue); $i++, $inputSymbol = substr($inputValue, $i, 1)) {
-                if ($cursor === strlen($maskExpression)) {
-                    break;
-                }
-
+                if ($cursor === strlen($maskExpression)) break;
                 $maskCursor = substr($maskExpression, $cursor, 1);
                 $maskCursorP1 = substr($maskExpression, $cursor + 1, 1);
                 $maskCursorP2 = substr($maskExpression, $cursor + 1, 1);
@@ -288,13 +278,8 @@ final class StrMask
         // TODO: Implement line 324 and 323
 
         // Add prefix and suffix
-        if ($prefix != "") {
-            $result = $prefix . $result;
-        }
-        if ($suffix != "") {
-            $result = $result . $suffix;
-        }
-
+        if ($prefix != "") $result = $prefix . $result;
+        if ($suffix != "") $result = $result . $suffix;
         return $result;
     }
 
@@ -334,37 +319,6 @@ final class StrMask
     }
 
     /**
-     * Determine if a string $haystack starts with $needle
-     * 
-     * @param mixed $haystack
-     * @param mixed $needle
-     * 
-     * @return bool
-     */
-    private static function startsWith(mixed $haystack, mixed $needle): bool
-    {
-        $length = strlen($needle);
-        return (substr($haystack, 0, $length) === $needle);
-    }
-
-    /**
-     * Determine if a string $haystack ends with $needle
-     * @param mixed $haystack
-     * @param mixed $needle
-     * 
-     * @return bool
-     */
-    private static function endsWith(mixed $haystack, mixed $needle): bool
-    {
-        $length = strlen($needle);
-        if ($length == 0) {
-            return true;
-        }
-
-        return (substr($haystack, -$length) === $needle);
-    }
-
-    /**
      * Check that input is a number as string
      * 
      * @param string $str
@@ -377,9 +331,7 @@ final class StrMask
         $strRet = "";
 
         foreach ($strArr as $char) {
-            if (preg_match("/\d/", $char) || ($char === '.') || ($char === ',')) {
-                $strRet .= $char;
-            }
+            if (preg_match("/\d/", $char) || ($char === '.') || ($char === ',')) $strRet .= $char;
         }
 
         return $strRet;
@@ -397,10 +349,7 @@ final class StrMask
         $pos = strrpos($maskExpression, ".");
         $precision = null;
 
-        if ($pos) {
-            $precision = intval(substr($maskExpression, $pos + 1));
-        }
-
+        if ($pos) $precision = intval(substr($maskExpression, $pos + 1));
         return $precision;
     }
 

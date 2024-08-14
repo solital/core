@@ -2,6 +2,7 @@
 
 namespace Solital\Core\Cache\Adapter;
 
+use APCu\APCu;
 use Solital\Core\Cache\Adapter\CacheAdapterInterface;
 use Solital\Core\Cache\Exception\CacheAdapterException;
 
@@ -13,11 +14,18 @@ class APCuAdapter implements CacheAdapterInterface
     private int $ttl = 600;
 
     /**
+     * @var APCu
+     */
+    private APCu $apcu;
+
+    /**
      * @param string $ttl
      */
     public function __construct(string $ttl)
     {
-        if (!apcu_enabled()) {
+        $this->apcu = new APCu();
+
+        if (!$this->apcu->enabled()) {
             throw new CacheAdapterException('Not connected to apcu cache');
         }
 
@@ -32,7 +40,7 @@ class APCuAdapter implements CacheAdapterInterface
     #[\Override]
     public function get(string $key): mixed
     {
-        return apcu_fetch($key);
+        return $this->apcu->fetch($key);
     }
 
     /**
@@ -60,7 +68,7 @@ class APCuAdapter implements CacheAdapterInterface
     #[\Override]
     public function delete(string $key): mixed
     {
-        return apcu_delete($key);
+        return $this->apcu->delete($key);
     }
 
     /**
@@ -72,6 +80,6 @@ class APCuAdapter implements CacheAdapterInterface
     #[\Override]
     public function save(string $key, mixed $data): mixed
     {
-        return apcu_store($key, $data, $this->ttl);
+        return $this->apcu->store($key, $data, $this->ttl);
     }
 }
