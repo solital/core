@@ -30,7 +30,7 @@
         "spatie/db-dumper": "^3.6",
         "symfony/finder": "^7.0",
         "symfony/filesystem": "^7.0",
-        "symfony/polyfill-php84": "1.x-dev",
+        "symfony/polyfill-php84": "^1.30.0",
         "symfony/yaml": "7.*",
         "wixel/gump": "^2.1"
     },
