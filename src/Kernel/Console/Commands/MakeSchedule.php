@@ -7,7 +7,7 @@ use Solital\Core\Console\Interface\CommandInterface;
 use Solital\Core\Kernel\Console\HelpersTrait;
 use Solital\Core\Console\Output\ConsoleOutput;
 use Solital\Core\Kernel\{Application, DebugCore};
-use Solital\Core\Schedule\{Schedule, ScheduleInterface};
+use Solital\Core\Schedule\{Schedule, ScheduleInterface, TaskSchedule};
 use Nette\PhpGenerator\{ClassType, Method, PhpNamespace};
 
 class MakeSchedule extends Command implements CommandInterface
@@ -51,13 +51,8 @@ class MakeSchedule extends Command implements CommandInterface
         $this->handle = Application::provider('handler-file');
         $this->schedule_dir = Application::getRootApp('Schedule/', DebugCore::isCoreDebugEnabled());
 
-        if (isset($options->remove)) {
-            $this->removeComponent($this->schedule_dir, $arguments->schedule_name . ".php");
-        }
-
-        if (isset($arguments->schedule_name)) {
-            return $this->createSchedule(ucfirst($arguments->schedule_name));
-        }
+        if (isset($options->remove)) $this->removeComponent($this->schedule_dir, $arguments->schedule_name . ".php");
+        if (isset($arguments->schedule_name)) return $this->createSchedule(ucfirst($arguments->schedule_name));
 
         return $this;
     }
@@ -80,7 +75,7 @@ class MakeSchedule extends Command implements CommandInterface
             ->addComment("Construct with schedule time");
 
         $class = (new ClassType($controller_name))
-            ->setExtends(Schedule::class)
+            ->setExtends(TaskSchedule::class)
             ->addImplement(ScheduleInterface::class)
             ->addMember($constructor)
             ->addMember($handle_method)
@@ -89,7 +84,7 @@ class MakeSchedule extends Command implements CommandInterface
         $data = (new PhpNamespace("Solital\Schedule"))
             ->add($class)
             ->addUse(ScheduleInterface::class)
-            ->addUse(Schedule::class);
+            ->addUse(TaskSchedule::class);
 
         return $data;
     }

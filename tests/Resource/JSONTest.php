@@ -1,5 +1,7 @@
 <?php
 
+require_once dirname(__DIR__) . '/bootstrap.php';
+
 use PHPUnit\Framework\TestCase;
 use Solital\Core\Resource\JSON;
 
@@ -8,49 +10,45 @@ class JSONTest extends TestCase
     public function testJsonEncode()
     {
         $array = ["foo", "bar", "baz", "blong"];
-
-        $json = new JSON();
-        $res = $json->encode($array);
+        $res = encodeJSON($array);
         $this->assertIsString($res);
     }
 
     public function testJsonEncodeError()
     {
-        $json_encode = "\xB1\x31";
-
-        $json = new JSON();
-        $res = $json->encode($json_encode, true);
-        $value = $json->decode($res, true);
+        $value = "\xB1\x31";
+        $res = encodeJSON($value);
+        $value = decodeJSON($res, true);
         $this->assertArrayHasKey('json_error', $value);
     }
 
     public function testJsonDecode()
     {
-        $json_encode = '{"a":1,"b":2,"c":3,"d":4,"e":5}';
-
-        $json = new JSON();
-        $res = $json->decode($json_encode);
+        $value = '{"a":1,"b":2,"c":3,"d":4,"e":5}';
+        $res = decodeJSON($value);
         $this->assertIsObject($res);
     }
 
     public function testJsonDecodeArray()
     {
-        $json_encode = '{"a":1,"b":2,"c":3,"d":4,"e":5}';
-
-        $json = new JSON();
-        $res = $json->decode($json_encode, true);
+        $value = '{"a":1,"b":2,"c":3,"d":4,"e":5}';
+        $res = decodeJSON($value, true);
         $this->assertIsArray($res);
     }
 
     public function testJsonDecodeError()
     {
-        //$this->expectException('JsonException');
+        $value = "{'Organization': 'PHP Documentation Team'}";
+        $res = decodeJSON($value, true);
+        $this->assertArrayHasKey('json_error', $res);
+    }
 
-        $json_encode = "{'Organization': 'PHP Documentation Team'}";
-
+    public function testJsonDecodeException()
+    {
+        $this->expectException('JsonException');
+        $value = "{'Organization': 'PHP Documentation Team'}";
         $json = new JSON();
-        $res = $json->decode($json_encode, true);
-
-        $this->assertStringContainsString('json_error', $res);
+        $json->enableJsonException();
+        $json->decode($value, true);
     }
 }

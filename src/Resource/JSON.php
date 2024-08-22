@@ -2,141 +2,123 @@
 
 namespace Solital\Core\Resource;
 
-use Solital\Core\Kernel\Application;
-
 class JSON
 {
     /**
-     * @var array
+     * @var int
      */
-    private array $throws_error;
+    private int $constants = JSON_UNESCAPED_UNICODE;
 
     /**
-     * @param int $constants
+     * Exception thrown if `JSON_THROW_ON_ERROR` option is set for `encode()` or `decode()`
+     *
+     * @return JSON
      */
-    public function __construct(
-        private int $constants = JSON_UNESCAPED_UNICODE,
-    ) {
-        $this->throws_error = Application::yamlParse('bootstrap.yaml');
-        $this->throwsError($constants);
+    public function enableJsonException(): JSON
+    {
+        $this->constants = $this->constants | JSON_THROW_ON_ERROR;
+        return $this;
     }
 
     /**
-     * @param mixed $value
+     * Options for JSON encode and decode
      *
-     * @return string
+     * @param int $constants
+     * 
+     * @return JSON
+     * @see https://www.php.net/manual/en/json.constants.php
      */
-    public function encode(mixed $value): string
+    public function setConstants(int $constants): JSON
     {
-        $json = json_encode($value, $this->constants);
+        $this->constants = $constants;
+        return $this;
+    }
 
-        if (json_validate($json) == false) {
-            return $this->error();
-        }
-
+    /**
+     * Returns the JSON representation of a value
+     *
+     * @param mixed $value
+     * @param int $depth
+     * 
+     * @return string 
+     */
+    public function encode(mixed $value, int $depth = 512): string
+    {
+        $json = json_encode($value, $this->constants, $depth);
+        $last_error = json_last_error();
+        if (json_validate($json, $depth) == false) return $this->error($last_error, false);
         return $json;
     }
 
     /**
-     * @param mixed $value
-     * @param bool $associative_array
+     * Decodes a JSON string
      *
-     * @return mixed
+     * @param string $value
+     * @param bool $associative
+     * @param int $depth
+     * 
+     * @return mixed 
      */
-    public function decode(mixed $value, bool $associative_array = false): mixed
+    public function decode(string $value, bool $associative = false, int $depth = 512): mixed
     {
-        if (json_validate($value) == false) {
-            return $this->error();
-        }
-
-        $array = json_decode($value, flags: $this->constants);
-
-        if ($associative_array == true) {
-            $array = json_decode($value, true, flags: $this->constants);
-        }
-
-        return $array;
+        $decode = json_decode($value, $associative, $depth, $this->constants);
+        $last_error = json_last_error();
+        if (json_validate($value, $depth) == false) return $this->error($last_error, $associative);
+        return $decode;
     }
 
     /**
-     * @return mixed
-     */
-    private function error(): mixed
-    {
-        switch (json_last_error()) {
-            case JSON_ERROR_DEPTH:
-                $error = 'Maximum stack depth exceeded';
-                break;
-            case JSON_ERROR_STATE_MISMATCH:
-                $error = 'Underflow or the modes mismatch';
-                break;
-            case JSON_ERROR_CTRL_CHAR:
-                $error = 'Unexpected control character found';
-                break;
-            case JSON_ERROR_SYNTAX:
-                $error = 'Syntax error, malformed JSON';
-                break;
-            case JSON_ERROR_UTF8:
-                $error = 'Malformed UTF-8 characters, possibly incorrectly encoded';
-                break;
-        }
-
-        $error = ['json_error' => $error];
-        return json_encode($error);
-    }
-
-    /**
-     * @param mixed $json
+     * Read a value from the JSON file
+     * 
+     * @param string $json
      * @param string $value
      *
      * @return string|null
      */
-    public function inJson($json, string $value): ?string
+    public function inJson(string $json, string $value): ?string
     {
         $array = $this->decode($json, true);
-
-        if ($array[$value]) {
-            return $array[$value];
-        } else {
-            return null;
-        }
+        return ($array[$value]) ? $array[$value] : null;
     }
 
     /**
-     * @param string $filename
+     * Read an external file
      *
-     * @return array|null
+     * @param string $filename
+     * @param bool $associative
+     * @param int $depth
+     * 
+     * @return mixed
      */
-    public function readFile(string $filename, bool $assoc = false): ?array
+    public function readFile(string $filename, bool $associative = false, int $depth = 512): mixed
     {
         $data = file_get_contents($filename);
-
-        $data_decoded = $this->decode($data, $assoc);
-
-        if ($data_decoded) {
-            return $data_decoded;
-        } else {
-            return null;
-        }
+        $data_decoded = $this->decode($data, $associative, $depth);
+        return ($data_decoded) ? $data_decoded : null;
     }
 
     /**
-     * @param int $constants
+     * Get json last error
      * 
-     * @return void
+     * @param int $last_error
+     * 
+     * @return string|array
      */
-    private function throwsError(int $constants): void
+    private function error(int $last_error, bool $associative): string|array
     {
-        if (array_key_exists('json_exception', $this->throws_error)) {
-            $this->constants = $constants;
+        $error = match ($last_error) {
+            JSON_ERROR_DEPTH => "The maximum stack depth has been exceeded",
+            JSON_ERROR_STATE_MISMATCH => "Invalid or malformed JSON",
+            JSON_ERROR_CTRL_CHAR => "Control character error, possibly incorrectly encoded",
+            JSON_ERROR_SYNTAX => "Syntax error",
+            JSON_ERROR_UTF8 => "Malformed UTF-8 characters, possibly incorrectly encoded",
+            JSON_ERROR_RECURSION => "One or more recursive references in the value to be encoded",
+            JSON_ERROR_INF_OR_NAN => "One or more NAN or INF values in the value to be encoded",
+            JSON_ERROR_UNSUPPORTED_TYPE => "A value of a type that cannot be encoded was given",
+            JSON_ERROR_INVALID_PROPERTY_NAME => "A property name that cannot be encoded was given",
+            JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
+        };
 
-            if ($this->throws_error['json_exception'] == true) {
-                $this->constants = $constants | JSON_THROW_ON_ERROR;
-            } else {
-                $this->constants = $constants;
-            }
-        } else {
-            $this->constants = $constants;
-        }
+        return ($associative == true) ? ["json_error" => $error] : json_encode(["json_error" => $error]);
     }
 }

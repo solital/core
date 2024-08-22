@@ -51,7 +51,9 @@ function cache(?string $drive = null): SimpleCache
  */
 function encodeJSON($value, int $constants = JSON_UNESCAPED_UNICODE): string
 {
-    return (new JSON($constants))->encode($value);
+    $json = container("solital-json");
+    $json->setConstants($constants);
+    return $json->encode($value);
 }
 
 /**
@@ -64,7 +66,8 @@ function encodeJSON($value, int $constants = JSON_UNESCAPED_UNICODE): string
  */
 function decodeJSON($value, bool $toArray = false): mixed
 {
-    return (new JSON())->decode($value, $toArray);
+    $json = container("solital-json");
+    return $json->decode($value, $toArray);
 }
 
 /**
@@ -78,11 +81,7 @@ function decodeJSON($value, bool $toArray = false): mixed
 function message(?string $key = null, ?string $message = null): Message
 {
     $msg = new Message();
-
-    if ($key !== null && $message !== null) {
-        $msg->new($key, $message);
-    }
-
+    if ($key !== null && $message !== null) $msg->new($key, $message);
     return $msg;
 }
 
@@ -104,14 +103,13 @@ function session(
     bool $delete = false,
     bool $take = false
 ): mixed {
-    if ($value != null) {
+    if ($value != null && $take == false) {
         Session::set($key, $value);
         return true;
-    } elseif ($delete == true) {
-        return Session::delete($key);
-    } elseif ($take == true) {
-        return Session::take($key, $defaultValue);
     }
+    
+    if ($delete == true) return Session::delete($key);
+    if ($take == true) return Session::take($key, $defaultValue);
 
     return Session::get($key, $defaultValue);
 }
@@ -140,7 +138,7 @@ function memorize(Closure $lambda, $paramsHash = null)
             $reflection_class = new \ReflectionClass($class);
             $attr = $reflection_class->getAttributes();
 
-            $values = array_map(fn ($attribute) => $attribute->getName(), $attr);
+            $values = array_map(fn($attribute) => $attribute->getName(), $attr);
 
             if (!in_array("AllowDynamicProperties", $values)) {
                 throw new \Exception("You must add 'AllowDynamicProperties' attribute on " . $class);
@@ -177,7 +175,7 @@ function memorize(Closure $lambda, $paramsHash = null)
  */
 function encrypt(string $value, string $time = '+1 hour'): string
 {
-    return Hash::encrypt($value, $time);    
+    return Hash::encrypt($value, $time);
 }
 
 /**
@@ -189,5 +187,5 @@ function encrypt(string $value, string $time = '+1 hour'): string
  */
 function decrypt(string $key): Hash
 {
-    return Hash::decrypt($key);    
+    return Hash::decrypt($key);
 }

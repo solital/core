@@ -1,5 +1,15 @@
 # Released Notes
 
+## v4.5.3 - (2024-08-22)
+
+### Fixed
+
+- Fixed `Schedule` class not found
+- Fixed `JSON` class
+- Fixed `take` param in `session` helper
+
+--------------------------------------------------------------------------
+
 ## v4.5.2 - (2024-08-14)
 
 ### Improved

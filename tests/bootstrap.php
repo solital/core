@@ -14,6 +14,9 @@ if (Application::fileExistsWithoutCache($autoload)) {
     exit(1);
 }
 
+DebugCore::enableCoreDebug();
+Application::getInstance();
+
 $_SERVER["REQUEST_METHOD"] = 'get';
 $_SERVER["REQUEST_URI"] = '/';
 
@@ -25,7 +28,6 @@ $secret = Hash::randomString();
 $_ENV['APP_HASH'] = $secret;
 putenv("APP_HASH=$secret");
 
-DebugCore::enableCoreDebug();
 DebugCore::setDatabaseConnection('mysql', 'localhost', 'db_debug', 'user', 'pass');
 
 Application::autoload(dirname(__DIR__) . '/src/Resource/Helpers/');

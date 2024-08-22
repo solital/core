@@ -97,9 +97,7 @@ class Container implements ContainerInterface
 	#[\Override]
 	public function get($id): mixed
 	{
-		if (!isset($this->keys[$id])) {
-			throw new NotFoundException($id);
-		}
+		if (!isset($this->keys[$id])) throw new NotFoundException($id);
 
 		if (isset($this->resolving[$id])) {
 			throw new ContainerException(sprintf('Cyclic dependency detected while resolving "%s"', $id));
@@ -162,17 +160,16 @@ class Container implements ContainerInterface
 	 * @param string $id    Entry identifier.
 	 * @param mixed $value  Entry definition.
 	 * 
+	 * @return self
 	 * @throws ImmutableException
 	 */
 	#[\Override]
-	public function add(string $id, mixed $value)
+	public function add(string $id, mixed $value): self
 	{
-		if (isset($this->resolved[$id])) {
-			throw new ImmutableException($id);
-		}
-
+		if (isset($this->resolved[$id])) throw new ImmutableException($id);
 		$this->keys[$id] = true;
 		$this->entries[$id] = $value;
+		return $this;
 	}
 
 	/**
@@ -224,7 +221,6 @@ class Container implements ContainerInterface
 		}
 
 		$this->factories->attach($callback);
-
 		return $callback;
 	}
 
@@ -250,7 +246,6 @@ class Container implements ContainerInterface
 		}
 
 		$this->protected->attach($callback);
-
 		return $callback;
 	}
 
@@ -287,9 +282,7 @@ class Container implements ContainerInterface
 			return $this->globals[] = $callback;
 		}
 
-		if (!isset($this->keys[$id])) {
-			throw new NotFoundException($id);
-		}
+		if (!isset($this->keys[$id])) throw new NotFoundException($id);
 
 		if (isset($this->resolving[$id])) {
 			throw new ImmutableException(sprintf('Cannot mutate "%s" while it\'s resolving', $id));
@@ -373,10 +366,7 @@ class Container implements ContainerInterface
 	 */
 	private function invokable(mixed $callback): bool
 	{
-		if (is_callable($callback)) {
-			return true;
-		}
-
+		if (is_callable($callback)) return true;
 		return false;
 	}
 

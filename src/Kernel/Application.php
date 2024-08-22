@@ -260,10 +260,7 @@ abstract class Application
         $session_dir = self::getRootApp('Storage/session');
 
         if (!session_id()) {
-            if (!is_dir($session_dir)) {
-                self::$handle->create($session_dir);
-            }
-
+            if (!is_dir($session_dir)) self::$handle->create($session_dir);
             session_save_path($session_dir);
             Session::start();
         }
