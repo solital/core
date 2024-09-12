@@ -2,6 +2,7 @@
 
 namespace Solital\Core\Console;
 
+use Solital\Core\Console\Output\ColorsEnum;
 use Solital\Core\Console\Output\ConsoleOutput;
 
 trait DefaultCommandsTrait
@@ -25,7 +26,7 @@ trait DefaultCommandsTrait
      * 
      * @return void
      */
-    public function verifyDefaultCommand(string $command, array $arguments = [], object $options = null): void
+    public function verifyDefaultCommand(string $command, array $arguments = [], ?object $options = null): void
     {
         foreach ($this->default_commands as $method => $class) {
             $command = str_replace(["-"], "", $command);
@@ -51,9 +52,9 @@ trait DefaultCommandsTrait
     private function help(string $command, array $arguments = []): void
     {
         $exists = null;
-        $res = $this->getCommandClass();
+        $result = $this->getCommandClass();
 
-        foreach ($res as $res) {
+        foreach ($result as $res) {
             if (isset($res)) {
                 foreach ($res as $class) {
                     $reflection = new \ReflectionClass($class);
@@ -100,10 +101,8 @@ trait DefaultCommandsTrait
      */
     private function list(): void
     {
-        $all = [
-            'cmd' => [],
-            'type' => []
-        ];
+        $all_commands = [];
+        $all = ['cmd' => [], 'type' => []];
 
         $command_class = $this->getCommandClass();
         $type_commands = $this->getTypeCommands();
@@ -133,16 +132,17 @@ trait DefaultCommandsTrait
             }
         }
 
-        $console = ConsoleOutput::line("Vinci Console ")->getMessage();
-        $version = ConsoleOutput::success($this->getVersion())->getMessage();
+        if (empty($all_commands))
+            ConsoleOutput::success("No commands found")->print()->exit();
 
-        echo $console . $version . PHP_EOL . PHP_EOL;
-
-        ConsoleOutput::warning("Usage:")->print()->break();
-        ConsoleOutput::line("command <argument>", true)->print()->break(true);
+        ConsoleOutput::banner("Commands available", ColorsEnum::BG_GREEN, 40)->print();
+        ConsoleOutput::info(ColorsEnum::ITALIC->value . "Usage:")->print();
+        ConsoleOutput::line("command <argument> <options>", true)->print()->break();
+        echo PHP_EOL;
 
         for ($i = 0; $i < count($all['cmd']); $i++) {
-            ConsoleOutput::warning($all['type'][$i])->print()->break();
+            echo PHP_EOL;
+            ConsoleOutput::warning(ColorsEnum::ITALIC->value . $all['type'][$i])->print()->break();
 
             if (isset($all_commands[$i])) {
                 Table::formattedRowData($all_commands[$i], margin: true);
@@ -157,17 +157,18 @@ trait DefaultCommandsTrait
      */
     private function about(): void
     {
-        $about = ConsoleOutput::info("Vinci Console ")->getMessage();
-        $version = ConsoleOutput::success(self::getVersion())->getMessage();
-        $date = ConsoleOutput::line(" (" . self::getDateVersion() . ")")->getMessage();
-        $about2 = ConsoleOutput::info("PHP Version ")->getMessage();
-        $php_version = ConsoleOutput::success(PHP_VERSION)->getMessage();
-        $about3 = ConsoleOutput::line("By Solital Framework. Access ")->getMessage();
-        $docs = ConsoleOutput::warning(Command::SITE_DOC)->getMessage();
+        ConsoleOutput::banner(
+            "Vinci Console " . self::getVersion() . " (" . self::getDateVersion() . ")",
+            49,
+            40
+        )->print();
 
-        echo $about . $version . $date . PHP_EOL;
-        echo $about2 . $php_version . PHP_EOL . PHP_EOL;
-        echo $about3 . $docs . PHP_EOL;
+        Table::formattedRowData([
+            "PHP Version" => PHP_VERSION,
+            "Documentation" => Command::SITE_DOC
+        ], 20);
+
+        echo PHP_EOL;
     }
 
     /**
@@ -178,17 +179,19 @@ trait DefaultCommandsTrait
     private function history(): never
     {
         $cmd_history_file = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'vinci-console' . DIRECTORY_SEPARATOR . 'vinci-history.log';
-        clearstatcache($cmd_history_file, true);
 
         if (file_exists($cmd_history_file)) {
+            ConsoleOutput::banner("Vinci Console - history commands", ColorsEnum::BG_GREEN)->print();
+
             $commands = file_get_contents($cmd_history_file);
             $commands = explode("\n", $commands);
             $commands = array_slice($commands, 0, 10);
 
             foreach ($commands as $command) {
-                ConsoleOutput::info($command)->print()->break();
+                ConsoleOutput::line($command)->print()->break();
             }
 
+            clearstatcache(true, $cmd_history_file);
             exit;
         }
 
@@ -203,13 +206,13 @@ trait DefaultCommandsTrait
     private function clearHistory(): never
     {
         $cmd_history_file = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'vinci-console' . DIRECTORY_SEPARATOR . 'vinci-history.log';
-        clearstatcache($cmd_history_file, true);
 
         if (file_exists($cmd_history_file)) {
             unlink($cmd_history_file);
             ConsoleOutput::success("History file deleted with successfully!")->print()->exit();
         }
 
+        clearstatcache(true, $cmd_history_file);
         exit;
     }
 
@@ -224,9 +227,7 @@ trait DefaultCommandsTrait
     {
         $cmd_history_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'vinci-console' . DIRECTORY_SEPARATOR;
 
-        if (!is_dir($cmd_history_dir)) {
-            mkdir($cmd_history_dir);
-        }
+        if (!is_dir($cmd_history_dir)) mkdir($cmd_history_dir);
 
         file_put_contents(
             $cmd_history_dir . 'vinci-history.log',

@@ -10,6 +10,13 @@
         displayDetailsOnTestsThatTriggerErrors="true"
         displayDetailsOnTestsThatTriggerNotices="true"
         displayDetailsOnTestsThatTriggerWarnings="true">
+  <!-- <extensions>
+    <bootstrap class="Solital\Core\PHPUnit\PhpUnitExtension">
+      <parameter name="enableByDefault" value="false"/>
+      <parameter name="displayProfiling" value="true"/>
+    </bootstrap>
+  </extensions> -->
+
   <testsuites>
     <testsuite name="Solital Core Tests">
       <directory>tests</directory>

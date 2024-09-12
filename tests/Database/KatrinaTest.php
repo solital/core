@@ -1,18 +1,20 @@
 <?php
 
-require_once 'Model/ModelTest.php';
+namespace Solital\Test\Database;
+
 require_once dirname(__DIR__) . '/bootstrap.php';
 
 use Katrina\Exceptions\ConnectionException;
 use PHPUnit\Framework\TestCase;
 use Solital\Core\Kernel\Application;
+use Solital\Test\Database\Model\User;
 
 class KatrinaTest extends TestCase
 {
     public function testConn()
     {
         Application::connectionDatabase();
-        $res = ModelTest::connection('mysql')::select()->get();
+        $res = User::connection('mysql')::select()->get();
         $this->assertIsArray($res);
     }
 
@@ -21,6 +23,6 @@ class KatrinaTest extends TestCase
         $this->expectException(ConnectionException::class);
         
         Application::connectionDatabase();
-        ModelTest::connection('pgsql')::select()->get();
+        User::connection('pgsql')::select()->get();
     }
 }

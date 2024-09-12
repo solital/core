@@ -3,7 +3,7 @@
 # Set configurations in PHP Security Password component
 password:
   algorithm: default # default - argon2 - argon2d
-  cost: 10
+  cost: 12
   memory_cost: ''
   time_cost: ''
   threads: ''

@@ -19,10 +19,7 @@ class LoggerTest extends TestCase
     public function checkLogsAreEnabled()
     {
         $config = Application::yamlParse('logger.yaml');
-        
-        if ($config['enable_logs'] == false) {
-            throw new \Exception("Logs are disabled");
-        }
+        if ($config['enable_logs'] == false) throw new \Exception("Logs are disabled");
     }
 
     public function testLog()

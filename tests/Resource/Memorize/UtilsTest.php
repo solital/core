@@ -25,7 +25,7 @@ class UtilsTest extends TestCase
             return 1;
         });
 
-        $this->assertEquals('c:' . __FILE__ . '-30-32', $string);
+        $this->assertEquals('c:' . __FILE__ . '-24-26', $string);
     }
 
     public function testStringifyCustomObject()

@@ -1,5 +1,7 @@
 <?php
 
+namespace Solital\Test\Course\Dummy\Managers;
+
 use Solital\Core\Http\Request;
 use Solital\Core\Course\Router;
 use Solital\Core\Course\RouterBootManagerInterface;

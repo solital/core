@@ -41,7 +41,7 @@ abstract class JobStatusConsole
     public static function status(
         string $job_name,
         \Closure|callable $closure,
-        ColorsEnum $job_color = null
+        ?ColorsEnum $job_color = null
     ): static {
         
         (!is_null($job_color)) ?

@@ -150,7 +150,6 @@ class Response implements ResponseInterface
     public function httpCode(int $code): Response
     {
         http_response_code($code);
-
         return $this;
     }
 
@@ -162,9 +161,7 @@ class Response implements ResponseInterface
      */
     public function redirect(string $url, ?int $httpCode = null): void
     {
-        if ($httpCode !== null) {
-            $this->httpCode($httpCode);
-        }
+        if ($httpCode !== null) $this->httpCode($httpCode);
 
         $this->header('location: ' . $url);
         exit(0);
@@ -186,7 +183,6 @@ class Response implements ResponseInterface
     public function header(string $value): self
     {
         header($value);
-
         return $this;
     }
 
@@ -222,25 +218,19 @@ class Response implements ResponseInterface
      */
     public function withStatus(int $code, string $reasonPhrase = ''): ResponseInterface
     {
-        if ($reasonPhrase == "") {
-            $reasonPhrase = $this->statusMessageList[$code];
-        }
+        if ($reasonPhrase == "") $reasonPhrase = $this->statusMessageList[$code];
         $code = $this->sanitizeStatus($code);
 
-        if (!is_string($reasonPhrase)) {
+        if (!is_string($reasonPhrase))
             throw new \InvalidArgumentException("HTTP reason phrase must be a 'string', received '" . (is_object($reasonPhrase) ? get_class($reasonPhrase) : gettype($reasonPhrase)) . "'", 400);
-        }
 
         $clone = clone $this;
         $clone->statusCode = $code;
 
-        if ($reasonPhrase === '' && isset($this->messages[$code])) {
-            $reasonPhrase = $this->messages[$code];
-        }
+        if ($reasonPhrase === '' && isset($this->messages[$code])) $reasonPhrase = $this->messages[$code];
 
-        if ($reasonPhrase === '') {
+        if ($reasonPhrase === '')
             throw new \InvalidArgumentException("The HTTP reason phrase must be supplied for this code", 417);
-        }
 
         $clone->reasonPhrase = $reasonPhrase;
 
@@ -252,13 +242,8 @@ class Response implements ResponseInterface
      */
     public function getReasonPhrase(): string
     {
-        if ($this->reasonPhrase) {
-            return $this->reasonPhrase;
-        }
-
-        if (isset($this->messages[$this->statusCode])) {
-            return $this->messages[$this->statusCode];
-        }
+        if ($this->reasonPhrase) return $this->reasonPhrase;
+        if (isset($this->messages[$this->statusCode])) return $this->messages[$this->statusCode];
     }
 
     /**
@@ -268,9 +253,8 @@ class Response implements ResponseInterface
      */
     private function sanitizeStatus($code): int
     {
-        if (!is_numeric($code) || is_float($code) || $code < 100 || $code > 599) {
+        if (!is_numeric($code) || is_float($code) || $code < 100 || $code > 599)
             throw new \InvalidArgumentException("Invalid HTTP status code. Must be numeric and between 100 and 599", 400);
-        }
 
         return (int) $code;
     }

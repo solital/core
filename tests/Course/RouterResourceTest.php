@@ -5,6 +5,7 @@ require_once 'Dummy/ResourceController.php';
 require_once dirname(__DIR__) . '/bootstrap.php';
 
 use PHPUnit\Framework\TestCase;
+use Solital\Test\TestRouter;
 
 class RouterResourceTest extends TestCase
 {

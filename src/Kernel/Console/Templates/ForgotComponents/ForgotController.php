@@ -20,7 +20,7 @@ class ForgotController extends Controller
     /**
      * @return mixed
      */
-    public function forgot(): mixed
+    public function forgot()
     {
         return view('auth.forgot-form', [
             'title' => 'Forgot Password',
@@ -59,7 +59,7 @@ class ForgotController extends Controller
      * 
      * @return mixed
      */
-    public function change($hash): mixed
+    public function change($hash)
     {
         $res = Hash::decrypt($hash)->isValid();
 

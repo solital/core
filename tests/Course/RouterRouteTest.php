@@ -8,6 +8,7 @@ require_once dirname(__DIR__) . '/bootstrap.php';
 use PHPUnit\Framework\TestCase;
 use Solital\Core\Exceptions\RuntimeException;
 use Solital\Core\Http\Exception\NotFoundHttpException;
+use Solital\Test\TestRouter;
 
 class RouterRouteTest extends TestCase
 {

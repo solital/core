@@ -76,12 +76,13 @@ function decodeJSON($value, bool $toArray = false): mixed
  * @param string $key
  * @param string $message
  * 
- * @return Message
+ * @return mixed
  */
-function message(?string $key = null, ?string $message = null): Message
+function message(?string $key = null, ?string $message = null): mixed
 {
     $msg = new Message();
-    if ($key !== null && $message !== null) $msg->new($key, $message);
+    if (!is_null($key) && !is_null($message)) $msg->new($key, $message);
+    if (!is_null($key) && is_null($message)) return $msg->get($key);
     return $msg;
 }
 
@@ -107,7 +108,7 @@ function session(
         Session::set($key, $value);
         return true;
     }
-    
+
     if ($delete == true) return Session::delete($key);
     if ($take == true) return Session::take($key, $defaultValue);
 

@@ -10,7 +10,7 @@ use Solital\Core\Kernel\Application;
  * @param array|null $args
  * @param bool $escape_special_chars
  */
-function view(string $view, array $args = null, bool $escape_special_chars = true)
+function view(string $view, ?array $args = null, bool $escape_special_chars = true)
 {
     $wolf = Application::provider('solital-wolf');
     $wolf->setArgs($args, $escape_special_chars);
@@ -117,11 +117,10 @@ function conditional(string $needle, bool $value): string
 function csrf_token(int $minutes = 1800): ?string
 {
     $baseVerifier = Course::router()->getCsrfVerifier();
-    if ($baseVerifier !== null) {
-        return "<input type='hidden' name='csrf_token' value='" . $baseVerifier->getTokenProvider()->setToken($minutes) . "'>";
-    }
 
-    return null;
+    return ($baseVerifier !== null) ?
+        "<input type='hidden' name='csrf_token' value='" . $baseVerifier->getTokenProvider()->setToken($minutes) . "'>" :
+        null;
 }
 
 /**

@@ -23,9 +23,9 @@ class MessageTest extends TestCase
     {
         message('msg.test', 'Normal message test');
 
-        $this->assertTrue(message('msg.test')->has('msg.test'));
+        $this->assertTrue(message()->has('msg.test'));
         $this->assertEquals('Normal message test', message()->get('msg.test'));
-        $this->assertFalse(message('msg.test')->has('msg.test'));
+        $this->assertFalse(message()->has('msg.test'));
     }
 
     public function testCustomMessage()

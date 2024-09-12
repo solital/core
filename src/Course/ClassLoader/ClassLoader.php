@@ -16,10 +16,7 @@ class ClassLoader implements ClassLoaderInterface
      */
     public function loadClass(string $class): mixed
     {
-        if (class_exists($class) === false) {
-            throw new RuntimeException("Class '$class' does not exist", 404);
-        }
-
+        if (class_exists($class) === false) throw new RuntimeException("Class '$class' does not exist", 404);
         return new $class();
     }
 
@@ -34,11 +31,7 @@ class ClassLoader implements ClassLoaderInterface
     public function loadClosure(mixed $closure, array $parameters): mixed
     {
         $reflect = new \ReflectionFunction($closure);
-
-        if (!empty($reflect->getParameters())) {
-            return call_user_func_array($closure, $parameters);
-        }
-
+        if (!empty($reflect->getParameters())) return call_user_func_array($closure, $parameters);
         return call_user_func($closure, $parameters);
     }
 }

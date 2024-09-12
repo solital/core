@@ -13,6 +13,7 @@ use Rector\Php80\Rector\FunctionLike\MixedTypeRector;
 use Rector\Php82\Rector\Param\AddSensitiveParameterAttributeRector;
 use Rector\Php83\Rector\ClassConst\AddTypeToConstRector;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
+use Rector\Php84\Rector\Param\ExplicitNullableParamTypeRector;
 use Rector\TypeDeclaration\Rector\Empty_\EmptyOnNullableObjectToInstanceOfRector;
 use Rector\TypeDeclaration\Rector\Property\AddPropertyTypeDeclarationRector;
 
@@ -34,7 +35,7 @@ return RectorConfig::configure()
     ->withSkip([
         __DIR__ . '/src/Console/vendor'
     ])
-    ->withPhpSets(php83: true)
+    ->withPhpSets(php84: true)
     ->withRules([
         AddVoidReturnTypeWhereNoReturnRector::class,
         ArrayKeyExistsTernaryThenValueToCoalescingRector::class,
@@ -53,5 +54,6 @@ return RectorConfig::configure()
         ParamTypeByMethodCallTypeRector::class,
         ParamTypeByParentCallTypeRector::class,
         ReturnNeverTypeRector::class,
-        ReturnUnionTypeRector::class
+        ReturnUnionTypeRector::class,
+        ExplicitNullableParamTypeRector::class
     ]);

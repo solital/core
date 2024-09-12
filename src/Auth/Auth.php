@@ -316,7 +316,7 @@ final class Auth extends Reset
      * @return string
      * @deprecated
      */
-    #[Deprecated(since: "2024-06-25")]
+    #[Deprecated(since: "Core 4.5.0")]
     public static function sodium(#[\SensitiveParameter] string $password, string $key): string
     {
         Hash::checkSodium();
@@ -337,7 +337,7 @@ final class Auth extends Reset
      * @return bool
      * @deprecated
      */
-    #[Deprecated(since: "2024-06-25")]
+    #[Deprecated(since: "Core 4.5.0")]
     public static function sodiumVerify(
         #[\SensitiveParameter] string $hash,
         #[\SensitiveParameter] string $password,

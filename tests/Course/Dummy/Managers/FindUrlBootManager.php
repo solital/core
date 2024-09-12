@@ -1,8 +1,11 @@
 <?php
 
+namespace Solital\Test\Course\Dummy\Managers;
+
 use Solital\Core\Course\Router;
 use Solital\Core\Course\RouterBootManagerInterface;
 use Solital\Core\Http\Request;
+use Solital\Test\TestRouter;
 
 class FindUrlBootManager implements RouterBootManagerInterface
 {

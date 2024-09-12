@@ -1,5 +1,7 @@
 <?php
 
+namespace Solital\Test\Security;
+
 use PHPUnit\Framework\TestCase;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Security\Hash;

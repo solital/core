@@ -90,6 +90,7 @@ class MakeModel extends Command implements CommandInterface
             ->addComment("\n@var bool\n");
 
         $class = (new ClassType($model_name))
+            ->setFinal()
             ->setExtends(Katrina::class)
             ->addMember($table_property)
             ->addMember($id_property)

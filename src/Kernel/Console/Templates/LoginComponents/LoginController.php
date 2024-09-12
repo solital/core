@@ -20,7 +20,7 @@ class LoginController extends Controller
     /**
      * @return mixed
      */
-    public function auth(): mixed
+    public function auth()
     {
         Auth::isRemembering();
 
@@ -55,7 +55,7 @@ class LoginController extends Controller
     /**
      * @return mixed
      */
-    public function dashboard(): mixed
+    public function dashboard()
     {
         Guardian::allowFromTable('auth_users');
 

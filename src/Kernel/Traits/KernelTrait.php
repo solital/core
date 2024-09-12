@@ -12,7 +12,7 @@ trait KernelTrait
     /**
      * That variables must be changed manually
      */
-    const SOLITAL_VERSION   = "4.5.3";
+    const SOLITAL_VERSION   = "4.5.4";
     const SITE_DOC_DOMAIN   = "https://solital.github.io/site/";
 
     /**
@@ -108,10 +108,11 @@ trait KernelTrait
 
             if (array_key_exists('ignore_errors', $yaml_data) && $yaml_data["ignore_errors"] != []) {
                 $errors = [];
+
                 foreach ($yaml_data["ignore_errors"] as $error) {
                     $errors[] = constant($error);
                 }
-
+                //dump_die($errors);
                 $exception->ignoreErrors($errors);
             }
         }

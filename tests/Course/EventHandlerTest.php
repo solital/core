@@ -3,15 +3,16 @@
 require_once 'Dummy/DummyMiddleware.php';
 require_once 'Dummy/DummyController.php';
 require_once 'Dummy/Handler/ExceptionHandler.php';
-require_once 'Dummy/Security/SilentTokenProvider.php';
-require_once 'Dummy/Managers/TestBootManager.php';
 require_once dirname(__DIR__) . '/bootstrap.php';
 
 use PHPUnit\Framework\TestCase;
+use Solital\Test\Course\Dummy\Managers\TestBootManager;
+use Solital\Test\Course\Dummy\Security\SilentTokenProvider;
 use Solital\Core\Course\Event\EventArgument;
 use Solital\Core\Course\Route\LoadableRoute;
 use Solital\Core\Course\Handlers\EventHandler;
 use Solital\Core\Http\Middleware\BaseCsrfVerifier;
+use Solital\Test\TestRouter;
 
 class EventHandlerTest extends TestCase
 {
@@ -43,7 +44,7 @@ class EventHandlerTest extends TestCase
         TestRouter::csrfVerifier($csrfVerifier);
 
         // Add boot-manager
-        TestRouter::addBootManager(new TestBootManager(['/test',], '/'));
+        TestRouter::addBootManager(new TestBootManager(['/test',]));
 
         // Start router
         TestRouter::debug('/');

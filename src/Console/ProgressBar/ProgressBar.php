@@ -13,17 +13,17 @@ class ProgressBar
      * @var mixed
      */
     private mixed $initialmax;
-    
+
     /**
      * @var mixed
      */
     private readonly mixed $starttime;
-    
+
     /**
      * @var mixed
      */
     private mixed $value;
-    
+
     /**
      * @var bool|null|null
      */
@@ -36,18 +36,11 @@ class ProgressBar
      */
     public function __construct(object $ProgressbarStyle, float $initialmax)
     {
-        if ($ProgressbarStyle != NULL) {
-            $this->style = $ProgressbarStyle;
-        } else {
-            throw new ProgressBarException("Variable [" . gettype($ProgressbarStyle)  . " ProgressbarStyle]  was not passed to the constructor!");
-        }
+        if ($initialmax < 0)
+            throw new ProgressBarException("Variable [" . gettype($initialmax)  . " initialmax] it is negative number!");
 
-        if ($initialmax >= 0 and !empty($initialmax)) {
-            $this->initialmax = $initialmax;
-        } else {
-            throw new ProgressBarException("Variable [" . gettype($initialmax)  . " initialmax]  was not passed to the constructor or it is negative number!");
-        }
-
+        $this->style = $ProgressbarStyle;
+        $this->initialmax = $initialmax;
         $this->starttime = time();
         $this->value = 0;
     }
@@ -58,10 +51,7 @@ class ProgressBar
      */
     private function calculateProgress(): float
     {
-        if ($this->initialmax > 0) {
-            return $this->value / $this->initialmax;
-        }
-        
+        if ($this->initialmax > 0) return $this->value / $this->initialmax;
         throw new ProgressBarException("Numeric error, cannot divide a zero!");
     }
 
@@ -81,10 +71,7 @@ class ProgressBar
         $char = [" ", "▌"][floor($remainderwidth * 2)];
 
         //Clears the last space after the progressbar is completed.
-        if (($length - $wholewidth - 1) < 0) {
-            $char = "";
-        }
-
+        if (($length - $wholewidth - 1) < 0) $char = "";
         return $this->style->getName() . " " . number_format($progress * 100, 0) . "% │" . str_repeat("█", $wholewidth) . $char . str_repeat(" ", ($length - $wholewidth)) . "│";
     }
 
@@ -94,11 +81,8 @@ class ProgressBar
      */
     private function constructIterationString(): string
     {
-        if (empty($this->style->datatype)) {
-            return ("{$this->value}/{$this->initialmax}");
-        } else {
-            return ("{$this->value}/{$this->initialmax} {$this->style->getDatatype()}");
-        }
+        return (empty($this->style->datatype)) ?
+            ("{$this->value}/{$this->initialmax}") : ("{$this->value}/{$this->initialmax} {$this->style->getDatatype()}");
     }
 
     /**
@@ -129,9 +113,8 @@ class ProgressBar
             //Show only warning because this is not critical 
             trigger_error("Value cannot be increased over initial max at line " . __LINE__, E_USER_WARNING);
         }
-        if ($autoupdate) {
-            $this->update();
-        }
+
+        if ($autoupdate) $this->update();
     }
 
     /**
@@ -144,19 +127,16 @@ class ProgressBar
      */
     public function stepBy(float $step, bool $autoupdate = true): void
     {
-        if ($step > 0) {
-            if ($step <= abs($this->initialmax - $this->value)) {
-                $this->value += $step;
-            } else {
-                throw new ProgressBarException("Step cannot be greater than the initial max!");
-            }
+        if ($step < 0)
+            throw new ProgressBarException("Step must be positive number and it can't be a zero!");   
+
+        if ($step <= abs($this->initialmax - $this->value)) {
+            $this->value += $step;
         } else {
-            throw new ProgressBarException("Step must be positive number and it can't be a zero!");
+            throw new ProgressBarException("Step cannot be greater than the initial max!");
         }
 
-        if ($autoupdate) {
-            $this->update();
-        }
+        if ($autoupdate) $this->update();
     }
 
     /**
@@ -167,18 +147,15 @@ class ProgressBar
      */
     public function stepTo(float $target, bool $autoupdate = true): void
     {
-        if ($target >= 0) {
-            if ($target <= $this->initialmax) {
-                $this->value = $target;
-            } else {
-                throw new ProgressBarException("Invalid target value given, target cannot be greater than initial max!");
-            }
+        if ($target < 0) throw new ProgressBarException("Target cannot be below zero!");
+
+        if ($target <= $this->initialmax) {
+            $this->value = $target;
         } else {
-            throw new ProgressBarException("Target cannot be below zero!");
+            throw new ProgressBarException("Invalid target value given, target cannot be greater than initial max!");
         }
-        if ($autoupdate) {
-            $this->update();
-        }
+
+        if ($autoupdate) $this->update();
     }
 
     /**

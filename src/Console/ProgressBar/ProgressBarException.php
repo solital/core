@@ -2,7 +2,4 @@
 
 namespace Solital\Core\Console\ProgressBar;
 
-class ProgressBarException extends \Exception
-{
-    
-}
+class ProgressBarException extends \Exception {}

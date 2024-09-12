@@ -1,5 +1,7 @@
 <?php
 
+namespace Solital\Test\Http\Dummy\Security;
+
 use Solital\Core\Http\Middleware\BaseCsrfVerifier;
 use Solital\Core\Http\Request;
 

@@ -1,5 +1,24 @@
 # Released Notes
 
+## v4.5.4 - (2024-09-12)
+
+### Fixed
+
+- Fixed PHP 8.4 implicit nullable
+- Fixed types in `Route` class
+- Fixed `message` helper not get message
+- Fixed session start already exists
+
+### Changed
+
+- Changed `Password` class to use `AlgorithmEnum`
+- Changed controller and model template as final
+- Changed password cost to 12 in `auth.yaml`
+- Changed return types in auth template
+- Changed cost option in `auth.yaml` to 12
+
+--------------------------------------------------------------------------
+
 ## v4.5.3 - (2024-08-22)
 
 ### Fixed

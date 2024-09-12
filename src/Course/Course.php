@@ -51,11 +51,6 @@ class Course
 
     /**
      * Start routing
-     *
-     * @throws NotFoundHttpException
-     * @throws TokenMismatchException
-     * @throws HttpException
-     * @throws \Exception
      */
     public static function start(bool $send_console = false): void
     {
@@ -183,7 +178,7 @@ class Course
      *
      * @return RouteUrl
      */
-    public static function get(string $url, $callback, array $settings = null): RouteInterface
+    public static function get(string $url, $callback, ?array $settings = null): RouteInterface
     {
         return static::match(['get'], $url, $callback, $settings);
     }
@@ -196,7 +191,7 @@ class Course
      * @param array|null $settings
      * @return RouteUrl
      */
-    public static function post(string $url, $callback, array $settings = null): RouteInterface
+    public static function post(string $url, $callback, ?array $settings = null): RouteInterface
     {
         return static::match(['post'], $url, $callback, $settings);
     }
@@ -209,7 +204,7 @@ class Course
      * @param array|null $settings
      * @return RouteUrl
      */
-    public static function put(string $url, $callback, array $settings = null): RouteInterface
+    public static function put(string $url, $callback, ?array $settings = null): RouteInterface
     {
         return static::match(['put'], $url, $callback, $settings);
     }
@@ -222,7 +217,7 @@ class Course
      * @param array|null $settings
      * @return RouteUrl
      */
-    public static function patch(string $url, $callback, array $settings = null): RouteInterface
+    public static function patch(string $url, $callback, ?array $settings = null): RouteInterface
     {
         return static::match(['patch'], $url, $callback, $settings);
     }
@@ -235,7 +230,7 @@ class Course
      * @param array|null $settings
      * @return RouteUrl
      */
-    public static function options(string $url, $callback, array $settings = null): RouteInterface
+    public static function options(string $url, $callback, ?array $settings = null): RouteInterface
     {
         return static::match(['options'], $url, $callback, $settings);
     }
@@ -248,7 +243,7 @@ class Course
      * @param array|null $settings
      * @return RouteUrl
      */
-    public static function delete(string $url, $callback, array $settings = null): RouteInterface
+    public static function delete(string $url, $callback, ?array $settings = null): RouteInterface
     {
         return static::match(['delete'], $url, $callback, $settings);
     }
@@ -314,7 +309,7 @@ class Course
      * @see Course::form
      * @return RouteUrl
      */
-    public static function basic(string $url, $callback, array $settings = null): RouteInterface
+    public static function basic(string $url, $callback, ?array $settings = null): RouteInterface
     {
         return static::match(['get', 'post'], $url, $callback, $settings);
     }
@@ -329,7 +324,7 @@ class Course
      * @see Course::form
      * @return RouteUrl
      */
-    public static function form(string $url, $callback, array $settings = null): RouteInterface
+    public static function form(string $url, $callback, ?array $settings = null): RouteInterface
     {
         return static::match(['get', 'post'], $url, $callback, $settings);
     }
@@ -343,7 +338,7 @@ class Course
      * @param array|null $settings
      * @return RouteUrl|RouteInterface
      */
-    public static function match(array $requestMethods, string $url, $callback, array $settings = null)
+    public static function match(array $requestMethods, string $url, $callback, ?array $settings = null)
     {
         http_response_code(200);
         $route = new RouteUrl(static::$basePath . $url, $callback);
@@ -370,7 +365,7 @@ class Course
      * @param array|null $settings
      * @return RouteUrl|RouteInterface
      */
-    public static function all(string $url, $callback, array $settings = null)
+    public static function all(string $url, $callback, ?array $settings = null)
     {
         http_response_code(200);
         $route = new RouteUrl(static::$basePath . $url, $callback);
@@ -391,7 +386,7 @@ class Course
      * @param array|null $settings
      * @return RouteController|RouteInterface
      */
-    public static function controller(string $url, $controller, array $settings = null)
+    public static function controller(string $url, $controller, ?array $settings = null)
     {
         http_response_code(200);
         $route = new RouteController($url, $controller);
@@ -412,7 +407,7 @@ class Course
      * @param array|null $settings
      * @return RouteResource|RouteInterface
      */
-    public static function resource(string $url, $controller, array $settings = null)
+    public static function resource(string $url, $controller, ?array $settings = null)
     {
         http_response_code(200);
         $route = new RouteResource($url, $controller);
@@ -465,12 +460,9 @@ class Course
             try {
                 return new Uri('/');
             } catch (\Exception $e) {
-                echo $e->getMessage();
+                die($e->getMessage());
             }
         }
-
-        // This will never happen...
-        //return null;
     }
 
     /**
@@ -490,9 +482,8 @@ class Course
      */
     public static function response(): Response
     {
-        if (static::$response === null) {
+        if (static::$response === null)
             static::$response = new Response(static::request(), 'php://memory', 200);
-        }
 
         return static::$response;
     }
@@ -504,10 +495,7 @@ class Course
      */
     public static function router(): Router
     {
-        if (static::$router === null) {
-            static::$router = new Router();
-        }
-
+        if (static::$router === null) static::$router = new Router();
         return static::$router;
     }
 
@@ -520,24 +508,16 @@ class Course
     public static function addDefaultNamespace(RouteInterface $route): RouteInterface
     {
         if (static::$defaultNamespace !== null) {
-
             $callback = $route->getCallback();
 
-            if (empty($callback)) {
-                throw new \Exception("Callback not found", 404);
-            }
+            if (empty($callback)) throw new \Exception("Callback not found", 404);
 
             /* Only add default namespace on relative callbacks */
             if ($callback === null || (\is_string($callback) === true && $callback[0] !== '\\')) {
-
                 $namespace = static::$defaultNamespace;
-
                 $currentNamespace = $route->getNamespace();
 
-                if ($currentNamespace !== null) {
-                    $namespace .= '\\' . $currentNamespace;
-                }
-
+                if ($currentNamespace !== null) $namespace .= '\\' . $currentNamespace;
                 $route->setDefaultNamespace($namespace);
             }
         }

@@ -116,11 +116,9 @@ class Arr
         $results = [];
 
         foreach ($array as $key => $value) {
-            if (is_array($value) && !empty($value)) {
-                $results = array_merge($results, static::dot($value, $prepend . $key . '.'));
-            } else {
+            (is_array($value) && !empty($value)) ?
+                $results = array_merge($results, static::dot($value, $prepend . $key . '.')) :
                 $results[$prepend . $key] = $value;
-            }
         }
 
         return $results;
@@ -164,11 +162,9 @@ class Arr
      */
     public static function exists(mixed $array, mixed $key): bool
     {
-        if ($array instanceof \ArrayAccess) {
-            return $array->offsetExists($key);
-        }
-
-        return array_key_exists($key, $array);
+        return ($array instanceof \ArrayAccess) ?
+            $array->offsetExists($key) :
+            array_key_exists($key, $array);
     }
 
     /**
@@ -180,12 +176,10 @@ class Arr
      * 
      * @return mixed
      */
-    public static function first(array $array, callable $callback = null, mixed $default = null): mixed
+    public static function first(array $array, ?callable $callback = null, mixed $default = null): mixed
     {
         if (is_null($callback)) {
-            if (empty($array)) {
-                return Helpers::value($default);
-            }
+            if (empty($array)) return Helpers::value($default);
 
             foreach ($array as $item) {
                 return $item;
@@ -193,9 +187,7 @@ class Arr
         }
 
         foreach ($array as $key => $value) {
-            if (call_user_func($callback, $value, $key)) {
-                return $value;
-            }
+            if (call_user_func($callback, $value, $key)) return $value;
         }
 
         return Helpers::value($default);
@@ -210,11 +202,10 @@ class Arr
      * 
      * @return mixed
      */
-    public static function last(array $array, callable $callback = null, mixed $default = null): mixed
+    public static function last(array $array, ?callable $callback = null, mixed $default = null): mixed
     {
-        if (is_null($callback)) {
+        if (is_null($callback))
             return empty($array) ? Helpers::value($default) : end($array);
-        }
 
         return static::first(array_reverse($array, true), $callback, $default);
     }
@@ -223,11 +214,11 @@ class Arr
      * Flatten a multi-dimensional array into a single level.
      *
      * @param  array  $array
-     * @param  int  $depth
+     * @param  int|float  $depth
      * 
      * @return array
      */
-    public static function flatten(array $array, $depth = INF): array
+    public static function flatten(array $array, int|float $depth = INF): array
     {
         $result = [];
 
@@ -259,9 +250,8 @@ class Arr
         $original = &$arrays;
         $keys = (array) $keys;
 
-        if (count($keys) === 0) {
-            return;
-        }
+        if (count($keys) === 0) return;
+
         foreach ($arrays as $index => $array) {
             foreach ($keys as $key) {
                 // if the exact key exists in the top-level, remove it
@@ -303,9 +293,7 @@ class Arr
         $original = &$array;
         $keys = (array) $keys;
 
-        if (count($keys) === 0) {
-            return;
-        }
+        if (count($keys) === 0) return;
 
         foreach ($keys as $key) {
             // if the exact key exists in the top-level, remove it
@@ -708,19 +696,13 @@ class Arr
      */
     public static function wrap(mixed $value): array
     {
-        if (is_null($value)) {
-            return [];
-        }
-
+        if (is_null($value)) return [];
         return is_array($value) ? $value : [$value];
     }
 
     private function dataGet($target, $key, $default = null)
     {
-        if (is_null($key)) {
-            return $target;
-        }
-
+        if (is_null($key)) return $target;
         $key = is_array($key) ? $key : explode('.', $key);
 
         while (!is_null($segment = array_shift($key))) {

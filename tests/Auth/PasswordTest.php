@@ -1,5 +1,7 @@
 <?php
 
+namespace Solital\Test\Auth;
+
 require_once dirname(__DIR__) . '/bootstrap.php';
 
 use PHPUnit\Framework\TestCase;
@@ -33,7 +35,7 @@ class PasswordTest extends TestCase
     public function testNoNeedsHash()
     {
         $pass = new Password();
-        $res = $pass->needsRehash('solital', '$2y$10$fV.mcihFuJL3wLuTmXShPO0vrKB6GY9/ykMmUHif.RGJp.sv9SkKC');
+        $res = $pass->needsRehash('solital', '$2y$12$/Ej0/MmVoQ97O1SV/dqq1O/SUkj3sLcx.lI7vHeBVkdunq2YCheTC');
         $this->assertFalse($res);
     }
 

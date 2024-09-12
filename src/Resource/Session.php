@@ -7,9 +7,7 @@ use Deprecated\Deprecated;
 
 final class Session
 {
-	private function __construct()
-	{
-	}
+	private function __construct() {}
 
 	/**
 	 * Starts or resumes a session in a way compatible to PHP's built-in `session_start()` function
@@ -18,14 +16,16 @@ final class Session
 	 * 					  along with cross-site requests (either `null`, `None`, `Lax` or `Strict`)
 	 * @deprecated
 	 */
-	#[Deprecated(since: "4.5")]
+	#[Deprecated(since: "4.5.0")]
 	public static function start(?string $sameSiteRestriction = Cookie::SAME_SITE_RESTRICTION_LAX)
 	{
-		// run PHP's built-in equivalent
-		\session_start();
+		if (session_status() === PHP_SESSION_DISABLED) {
+			// run PHP's built-in equivalent
+			\session_start();
 
-		// intercept the cookie header (if any) and rewrite it
-		self::rewriteCookieHeader($sameSiteRestriction);
+			// intercept the cookie header (if any) and rewrite it
+			self::rewriteCookieHeader($sameSiteRestriction);
+		}
 	}
 
 	/**
@@ -36,11 +36,7 @@ final class Session
 	 */
 	public static function id(?string $newId = null): string
 	{
-		if ($newId === null) {
-			return \session_id();
-		} else {
-			return \session_id($newId);
-		}
+		return ($newId === null) ? session_id() : session_id($newId);
 	}
 
 	/**
@@ -53,7 +49,7 @@ final class Session
 	public static function regenerate(
 		bool $deleteOldSession = false,
 		?string $sameSiteRestriction = Cookie::SAME_SITE_RESTRICTION_LAX
-	) {
+	): void {
 		// run PHP's built-in equivalent
 		\session_regenerate_id($deleteOldSession);
 
@@ -81,11 +77,7 @@ final class Session
 	 */
 	public static function get(string $key, mixed $defaultValue = null): mixed
 	{
-		if (isset($_SESSION[$key])) {
-			return $_SESSION[$key];
-		} else {
-			return $defaultValue;
-		}
+		return (isset($_SESSION[$key])) ? $_SESSION[$key] : $defaultValue;
 	}
 
 	/**
@@ -116,8 +108,10 @@ final class Session
 	 *
 	 * @param string $key the key to set the value for
 	 * @param mixed $value the value to set
+	 * 
+	 * @return void
 	 */
-	public static function set(string $key, mixed $value)
+	public static function set(string $key, mixed $value): void
 	{
 		$_SESSION[$key] = $value;
 	}
@@ -146,8 +140,9 @@ final class Session
 	 * @param string|null $sameSiteRestriction indicates that the cookie should not be sent along 
 	 * 					  with cross-site requests (either `null`, `None`, `Lax` or `Strict`)
 	 */
-	private static function rewriteCookieHeader(?string $sameSiteRestriction = Cookie::SAME_SITE_RESTRICTION_LAX)
-	{
+	private static function rewriteCookieHeader(
+		?string $sameSiteRestriction = Cookie::SAME_SITE_RESTRICTION_LAX
+	): void {
 		// get and remove the original cookie header set by PHP
 		$originalCookieHeader = ResponseHeader::take('Set-Cookie', \session_name() . '=');
 

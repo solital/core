@@ -6,6 +6,7 @@ require_once 'Dummy/ClassLoader/CustomClassLoader.php';
 require_once dirname(__DIR__) . '/bootstrap.php';
 
 use PHPUnit\Framework\TestCase;
+use Solital\Test\TestRouter;
 
 class ClassLoaderTest extends TestCase
 {

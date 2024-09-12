@@ -1,5 +1,7 @@
 <?php
 
+namespace Solital\Test\FileSystem;
+
 use PHPUnit\Framework\TestCase;
 use Solital\Core\FileSystem\HandleFiles;
 

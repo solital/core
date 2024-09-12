@@ -229,31 +229,23 @@ class Guardian
      * 
      * @return string
      */
-    public static function getUrl(string $uri = null)
+    public static function getUrl(?string $uri = null): string
     {
         $http = 'http://';
-
-        if (isset($_SERVER['HTTPS'])) {
-            $http = 'https://';
-        }
-
+        if (isset($_SERVER['HTTPS'])) $http = 'https://';
         $url = $http . $_SERVER['HTTP_HOST'];
-
-        if (isset($uri)) {
-            $url = $http . $_SERVER['HTTP_HOST'] . "/" . $uri;
-        }
-
+        if (isset($uri)) $url = $http . $_SERVER['HTTP_HOST'] . "/" . $uri;
         return $url;
     }
 
     /**
      * Return error
+     * 
+     * @return null|string
      */
-    public function error()
+    public function error(): ?string
     {
-        if (self::$mailer->error()) {
-            return self::$mailer->error();
-        }
+        return self::$mailer->error() ?? null;
     }
 
     /**
@@ -339,7 +331,7 @@ class Guardian
         preg_match_all('@(' . $keys . ')=(?:([\'"])([^\2]+?)\2|([^\s,]+))@', $txt, $matches, PREG_SET_ORDER);
 
         foreach ($matches as $m) {
-            $data[$m[1]] = $m[3] ? $m[3] : $m[4];
+            $data[$m[1]] = $m[3] ?? $m[4];
             unset($needed_parts[$m[1]]);
         }
 

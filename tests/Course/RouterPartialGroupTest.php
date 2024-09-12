@@ -6,6 +6,7 @@ require_once 'Dummy/Handler/ExceptionHandler.php';
 require_once dirname(__DIR__) . '/bootstrap.php';
 
 use PHPUnit\Framework\TestCase;
+use Solital\Test\TestRouter;
 
 class RouterPartialGroupTest extends TestCase
 {

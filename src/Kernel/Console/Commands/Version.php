@@ -72,6 +72,6 @@ class Version extends Command implements CommandInterface
      */
     public function phpVersion(): string
     {
-        return PHP_MAJOR_VERSION . "." . PHP_MINOR_VERSION . "." . PHP_RELEASE_VERSION;
+        return PHP_VERSION;
     }
 }

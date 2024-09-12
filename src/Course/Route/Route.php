@@ -69,16 +69,12 @@ abstract class Route implements RouteInterface
      * @param Router $router
      * 
      * @return string|null
-     * @throws Exception
+     * @throws \Exception|RuntimeException
      */
     public function renderRoute(Request $request, Router $router): ?string
     {
         $callback = $this->getCallback();
-
-        if ($callback === null) {
-            return null;
-        }
-
+        if ($callback === null) return null;
         $parameters = $this->getParameters();
 
         /* Filter parameters with null-value */
@@ -89,7 +85,7 @@ abstract class Route implements RouteInterface
         }
 
         /* Render callback function */
-        if (\is_callable($callback) === true) {
+        if (is_callable($callback) === true) {
             /* When the callback is a function */
             return $router->getClassLoader()->loadClosure($callback, $parameters);
         }
@@ -125,7 +121,7 @@ abstract class Route implements RouteInterface
     /**
      * @param mixed $route
      * @param mixed $url
-     * @param null $parameterRegex
+     * @param mixed $parameterRegex
      * 
      * @return mixed
      */
@@ -276,7 +272,7 @@ abstract class Route implements RouteInterface
     /**
      * Set callback
      *
-     * @param string $callback
+     * @param string|callable $callback
      * @return static
      */
     public function setCallback($callback): RouteInterface
@@ -286,7 +282,7 @@ abstract class Route implements RouteInterface
     }
 
     /**
-     * @return string|callable
+     * @return mixed
      */
     public function getCallback()
     {
@@ -523,26 +519,24 @@ abstract class Route implements RouteInterface
      * Add middleware class-name
      *
      * @deprecated This method is deprecated and will be removed in the near future.
-     * @param MiddlewareInterface|string $middleware
+     * @param mixed $middleware
      * @return static
      */
-    public function setMiddleware($middleware)
+    public function setMiddleware(mixed $middleware)
     {
         $this->middlewares[] = $middleware;
-
         return $this;
     }
 
     /**
      * Add middleware class-name
      *
-     * @param MiddlewareInterface|string $middleware
+     * @param mixed $middleware
      * @return static
      */
-    public function addMiddleware($middleware): RouteInterface
+    public function addMiddleware(mixed $middleware): RouteInterface
     {
         $this->middlewares[] = $middleware;
-
         return $this;
     }
 
@@ -555,7 +549,6 @@ abstract class Route implements RouteInterface
     public function setMiddlewares(array $middlewares): RouteInterface
     {
         $this->middlewares = $middlewares;
-
         return $this;
     }
 
@@ -577,7 +570,6 @@ abstract class Route implements RouteInterface
     public function setDefaultParameterRegex($regex)
     {
         $this->defaultParameterRegex = $regex;
-
         return $this;
     }
 
@@ -606,12 +598,8 @@ abstract class Route implements RouteInterface
      */
     public function setControllerName($controller_name)
     {
-        if ($controller_name instanceof \Closure) {
-            $controller_name = "Closure";
-        }
-
+        if ($controller_name instanceof \Closure) $controller_name = "Closure";
         $this->controller_name = $controller_name;
-
         return $this;
     }
 }

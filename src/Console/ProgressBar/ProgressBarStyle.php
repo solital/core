@@ -16,31 +16,24 @@ class ProgressBarStyle
         private string $datatype,
         private int $length = 16,
     ) {
-        if (!empty(trim($name))) {
-            $this->setName($name);
-        } else {
-            throw new ProgressBarException("Progressbar name cannot be empty!");
-        }
+        (!empty(trim($name))) ? $this->setName($name) : throw new ProgressBarException("Progressbar name cannot be empty!");
 
         $colors = ["1;37" => "white", "0;31" => "red", "1;33" => "yellow", "0;32" => "green", "0;34" => "blue", "0;35" => "magenta"];
 
-        if (in_array(strtolower($color), $colors)) {
-            $this->setColor("\e[" . array_search($color, $colors) . ";40m");
-        } else {
+        (in_array(strtolower($color), $colors)) ?
+            $this->setColor("\e[" . array_search($color, $colors) . ";40m") :
             throw new ProgressBarException("Invalid color specified for style object at line " . __LINE__ . ". Valid colors are " . implode(", ", $colors));
-        }
 
-        if ($length > 0) {
-            $this->setLength($length);
-        } else {
+        ($length > 0) ?
+            $this->setLength($length) :
             throw new ProgressBarException("Progressbar length must be greater than zero!");
-        }
 
         $this->setDatatype($datatype);
     }
 
     /**
      * Get the value of name
+     * 
      * @return string
      */
     public function getName(): string
@@ -50,19 +43,20 @@ class ProgressBarStyle
 
     /**
      * Set the value of name
+     * 
      * @param string $name
      * 
-     * @return ProgrssBarStyle
+     * @return ProgressBarStyle
      */
     public function setName(string $name): ProgressBarStyle
     {
         $this->name = $name;
-
         return $this;
     }
 
     /**
      * Get the value of color
+     * 
      * @return string
      */
     public function getColor(): string
@@ -72,6 +66,7 @@ class ProgressBarStyle
 
     /**
      * Set the value of color
+     * 
      * @param string $color
      * 
      * @return ProgressBarStyle
@@ -79,12 +74,12 @@ class ProgressBarStyle
     public function setColor(string $color): ProgressBarStyle
     {
         $this->color = $color;
-
         return $this;
     }
 
     /**
      * Get the value of datatype
+     * 
      * @return string
      */
     public function getDatatype(): string
@@ -94,6 +89,7 @@ class ProgressBarStyle
 
     /**
      * Set the value of datatype
+     * 
      * @return string $datatype
      * 
      * @return ProgressBarStyle
@@ -101,12 +97,12 @@ class ProgressBarStyle
     public function setDatatype(string $datatype): ProgressBarStyle
     {
         $this->datatype = $datatype;
-
         return $this;
     }
 
     /**
      * Get the value of length
+     * 
      * @return int
      */
     public function getLength(): int
@@ -116,6 +112,7 @@ class ProgressBarStyle
 
     /**
      * Set the value of length
+     * 
      * @param int $length
      * 
      * @return ProgressBarStyle
@@ -123,7 +120,6 @@ class ProgressBarStyle
     public function setLength(int $length): ProgressBarStyle
     {
         $this->length = $length;
-
         return $this;
     }
 }

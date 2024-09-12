@@ -3,10 +3,11 @@
 require_once 'Dummy/DummyMiddleware.php';
 require_once 'Dummy/DummyController.php';
 require_once 'Dummy/Handler/ExceptionHandler.php';
-require_once 'Dummy/Managers/TestBootManager.php';
-require_once 'Dummy/Managers/FindUrlBootManager.php';
 require_once dirname(__DIR__) . '/bootstrap.php';
 
+use Solital\Test\Course\Dummy\Managers\FindUrlBootManager;
+use Solital\Test\Course\Dummy\Managers\TestBootManager;
+use Solital\Test\TestRouter;
 use PHPUnit\Framework\TestCase;
 
 class BootManagerTest extends TestCase

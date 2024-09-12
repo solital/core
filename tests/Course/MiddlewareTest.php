@@ -7,6 +7,7 @@ require_once 'Dummy/Exception/MiddlewareLoadedException.php';
 require_once dirname(__DIR__) . '/bootstrap.php';
 
 use PHPUnit\Framework\TestCase;
+use Solital\Test\TestRouter;
 
 class MiddlewareTest extends TestCase
 {

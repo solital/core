@@ -376,10 +376,6 @@ class Router
      * Start the routing
      *
      * @return string|null
-     * @throws NotFoundHttpException
-     * @throws TokenMismatchException
-     * @throws HttpException
-     * @throws \Exception
      */
     public function start(bool $send_console = false): ?string
     {
@@ -413,7 +409,7 @@ class Router
      * Routes the request
      *
      * @return string|null
-     * @throws HttpException
+     * @throws NotFoundHttpException
      * @throws \Exception
      */
     public function routeRequest(): ?string
@@ -513,16 +509,11 @@ class Router
      * @param string $key
      * @param string $url
      * @return string|null
-     * @throws HttpException
-     * @throws \Exception
      */
     protected function handleRouteRewrite($key, string $url): ?string
     {
         /* If the request has changed */
-        if ($this->request->hasPendingRewrite() === false) {
-            return null;
-        }
-
+        if ($this->request->hasPendingRewrite() === false) return null;
         $route = $this->request->getRewriteRoute();
 
         if ($route !== null) {
@@ -531,9 +522,7 @@ class Router
         }
 
         if ($this->request->getRewriteUrl() !== $url) {
-
             unset($this->processedRoutes[$key]);
-
             $this->request->setHasPendingRewrite(false);
 
             $this->fireEvents(EventHandler::EVENT_REWRITE, [
@@ -549,8 +538,8 @@ class Router
 
     /**
      * @param \Exception $e
-     * @throws HttpException
      * @throws \Exception
+     * 
      * @return string|null
      */
     protected function handleException(\Exception $e): ?string
@@ -928,9 +917,7 @@ class Router
      */
     protected function fireEvents($name, array $arguments = []): void
     {
-        if (\count($this->eventHandlers) === 0) {
-            return;
-        }
+        if (count($this->eventHandlers) === 0) return;
 
         /* @var EventHandlerInterface $eventHandler */
         foreach ($this->eventHandlers as $eventHandler) {

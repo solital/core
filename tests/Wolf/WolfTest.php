@@ -1,5 +1,7 @@
 <?php
 
+namespace Solital\Test\Wolf;
+
 require_once dirname(__DIR__) . '/bootstrap.php';
 
 use PHPUnit\Framework\TestCase;

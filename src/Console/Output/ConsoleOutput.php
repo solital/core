@@ -202,7 +202,7 @@ class ConsoleOutput extends JobStatusConsole
      * @return static
      * @throws OutputException
      */
-    public static function debugMessage(mixed $message, string $title = 'INFO', int|ColorsEnum $color = null): static
+    public static function debugMessage(mixed $message, string $title = 'INFO', mixed $color = null): static
     {
         self::generateColors();
 
@@ -273,13 +273,13 @@ class ConsoleOutput extends JobStatusConsole
     /**
      * Call `exit()` function
      *
-     * @param string|null $message
+     * @param string|int $status
      * 
      * @return never 
      */
-    public function exit(?string $message = null): never
+    public function exit(string|int $status = 0): never
     {
-        exit($message);
+        exit($status);
     }
 
     /**
@@ -383,11 +383,9 @@ class ConsoleOutput extends JobStatusConsole
      */
     private static function are256ColorsSupported(): bool
     {
-        if (DIRECTORY_SEPARATOR === '\\') {
-            return function_exists('sapi_windows_vt100_support') && sapi_windows_vt100_support(STDOUT);
-        } else {
-            return str_starts_with(getenv('TERM'), '256color');
-        }
+        return (DIRECTORY_SEPARATOR === '\\') ?
+            function_exists('sapi_windows_vt100_support') && sapi_windows_vt100_support(STDOUT) :
+            str_starts_with(getenv('TERM'), '256color');
     }
 
     /**

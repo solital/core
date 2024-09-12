@@ -11,7 +11,7 @@ enum ColorsEnum: string
     case CLEAR = "\033[2K\r";
 
         // Attributes
-    case BOLD = "\e[1m";
+    case BOLD = "\033[1m";
     case UN_BOLD = "\e[21m";
     case DIM = "\e[2m";
     case UN_DIM = "\e[22m";

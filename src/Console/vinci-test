@@ -13,13 +13,12 @@ use Solital\Core\Console\Output\ColorsEnum;
 use Solital\Core\Console\Output\ConsoleOutput;
 use Solital\Core\Console\tests\ExtendCommands\{ExtendedCommandsTest, OtherExtendComandTest};
 
-//dd($argv);
-
-/* $cmd = new Command([ExtendedCommandsTest::class, OtherExtendComandTest::class]);
+$classes = [ExtendedCommandsTest::class, OtherExtendComandTest::class];
+$cmd = new Command($classes);
 $res = $cmd->read($argv, $argv);
 
-//print_r($res);
-exit; */
+print_r($res);
+exit;
 
 ## JOB STATUS --------------------------------
 
@@ -93,6 +92,7 @@ for ($i = 0; $i < $progressbar->GetInitialMax(); $i++) {
     //$progressbar->stepTo(2184);
 
     usleep(1000);
-} */
+}
 
 //$progressbar->resetProgressbar();
+$progressbar->terminateProgressbar(); */

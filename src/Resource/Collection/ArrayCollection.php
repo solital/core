@@ -31,9 +31,26 @@ final class ArrayCollection implements
      * @var array
      */
     protected static $proxies = [
-        'average', 'avg', 'contains', 'each', 'every', 'filter', 'first',
-        'flatMap', 'groupBy', 'keyBy', 'map', 'max', 'min', 'partition',
-        'reject', 'some', 'sortBy', 'sortByDesc', 'sum', 'unique',
+        'average',
+        'avg',
+        'contains',
+        'each',
+        'every',
+        'filter',
+        'first',
+        'flatMap',
+        'groupBy',
+        'keyBy',
+        'map',
+        'max',
+        'min',
+        'partition',
+        'reject',
+        'some',
+        'sortBy',
+        'sortByDesc',
+        'sum',
+        'unique',
     ];
 
     /**
@@ -89,16 +106,10 @@ final class ArrayCollection implements
      * @param  callable  $callback
      * @return static
      */
-    public static function times($number, callable $callback = null)
+    public static function times(int $number, ?callable $callback = null)
     {
-        if ($number < 1) {
-            return new static;
-        }
-
-        if (is_null($callback)) {
-            return new static(range(1, $number));
-        }
-
+        if ($number < 1) return new static;
+        if (is_null($callback)) return new static(range(1, $number));
         return (new static(range(1, $number)))->map($callback);
     }
 
@@ -170,7 +181,8 @@ final class ArrayCollection implements
         }
 
         return (new static([
-            $values->get($middle - 1), $values->get($middle),
+            $values->get($middle - 1),
+            $values->get($middle),
         ]))->average();
     }
 
@@ -433,13 +445,14 @@ final class ArrayCollection implements
      * @param  mixed  $keys
      * @return static
      */
-    public function except($keys)
+    public function except(mixed $keys)
     {
         if ($keys instanceof self) {
             $keys = $keys->all();
         } elseif (!is_array($keys)) {
             $keys = func_get_args();
         }
+
         return new static(Arr::except($this->items, $keys));
     }
 
@@ -449,13 +462,11 @@ final class ArrayCollection implements
      * @param  callable|null  $callback
      * @return static
      */
-    public function filter(callable $callback = null)
+    public function filter(?callable $callback = null)
     {
-        if ($callback) {
-            return new static(Arr::where($this->items, $callback));
-        }
-
-        return new static(array_filter($this->items));
+        return ($callback) ?
+            new static(Arr::where($this->items, $callback)) :
+            new static(array_filter($this->items));
     }
 
     /**
@@ -466,7 +477,7 @@ final class ArrayCollection implements
      * @param  callable  $default
      * @return static|mixed
      */
-    public function when($value, callable $callback, callable $default = null)
+    public function when(bool $value, callable $callback, ?callable $default = null)
     {
         if ($value) {
             return $callback($this, $value);
@@ -484,7 +495,7 @@ final class ArrayCollection implements
      * @param  callable  $default
      * @return static|mixed
      */
-    public function whenEmpty(callable $callback, callable $default = null)
+    public function whenEmpty(callable $callback, ?callable $default = null)
     {
         return $this->when($this->isEmpty(), $callback, $default);
     }
@@ -496,7 +507,7 @@ final class ArrayCollection implements
      * @param  callable  $default
      * @return static|mixed
      */
-    public function whenNotEmpty(callable $callback, callable $default = null)
+    public function whenNotEmpty(callable $callback, ?callable $default = null)
     {
         return $this->when($this->isNotEmpty(), $callback, $default);
     }
@@ -509,7 +520,7 @@ final class ArrayCollection implements
      * @param  callable  $default
      * @return static|mixed
      */
-    public function unless($value, callable $callback, callable $default = null)
+    public function unless($value, callable $callback, ?callable $default = null)
     {
         return $this->when(!$value, $callback, $default);
     }
@@ -521,7 +532,7 @@ final class ArrayCollection implements
      * @param  callable  $default
      * @return static|mixed
      */
-    public function unlessEmpty(callable $callback, callable $default = null)
+    public function unlessEmpty(callable $callback, ?callable $default = null)
     {
         return $this->whenNotEmpty($callback, $default);
     }
@@ -533,7 +544,7 @@ final class ArrayCollection implements
      * @param  callable  $default
      * @return static|mixed
      */
-    public function unlessNotEmpty(callable $callback, callable $default = null)
+    public function unlessNotEmpty(callable $callback, ?callable $default = null)
     {
         return $this->whenEmpty($callback, $default);
     }
@@ -724,7 +735,7 @@ final class ArrayCollection implements
      * @param  mixed  $default
      * @return mixed
      */
-    public function first(callable $callback = null, $default = null)
+    public function first(?callable $callback = null, mixed $default = null)
     {
         return Arr::first($this->items, $callback, $default);
     }
@@ -787,11 +798,7 @@ final class ArrayCollection implements
      */
     public function get($key, $default = null)
     {
-        if ($this->offsetExists($key)) {
-            return $this->items[$key];
-        }
-
-        return Helpers::value($default);
+        return ($this->offsetExists($key)) ? $this->items[$key] : Helpers::value($default);
     }
 
     /**
@@ -801,16 +808,14 @@ final class ArrayCollection implements
      * @param  bool  $preserveKeys
      * @return static
      */
-    public function groupBy($groupBy, $preserveKeys = false)
+    public function groupBy(mixed $groupBy, bool $preserveKeys = false)
     {
         if (is_array($groupBy)) {
             $nextGroups = $groupBy;
-
             $groupBy = array_shift($nextGroups);
         }
 
         $groupBy = $this->valueRetriever($groupBy);
-
         $results = [];
 
         foreach ($this->items as $key => $value) {
@@ -846,19 +851,14 @@ final class ArrayCollection implements
      * @param  callable|string  $keyBy
      * @return static
      */
-    public function keyBy($keyBy)
+    public function keyBy(callable|string $keyBy)
     {
         $keyBy = $this->valueRetriever($keyBy);
-
         $results = [];
 
         foreach ($this->items as $key => $item) {
             $resolvedKey = $keyBy($item, $key);
-
-            if (is_object($resolvedKey)) {
-                $resolvedKey = (string) $resolvedKey;
-            }
-
+            if (is_object($resolvedKey)) $resolvedKey = (string) $resolvedKey;
             $results[$resolvedKey] = $item;
         }
 
@@ -871,14 +871,12 @@ final class ArrayCollection implements
      * @param  mixed  $key
      * @return bool
      */
-    public function has($key)
+    public function has(mixed $key)
     {
         $keys = is_array($key) ? $key : func_get_args();
 
         foreach ($keys as $value) {
-            if (!$this->offsetExists($value)) {
-                return false;
-            }
+            if (!$this->offsetExists($value)) return false;
         }
 
         return true;
@@ -891,15 +889,13 @@ final class ArrayCollection implements
      * @param  string  $glue
      * @return string
      */
-    public function implode($value, $glue = null)
+    public function implode(string $value, ?string $glue = null)
     {
         $first = $this->first();
 
-        if (is_array($first) || is_object($first)) {
-            return implode($glue, $this->pluck($value)->all());
-        }
-
-        return implode($value, $this->items);
+        return (is_array($first) || is_object($first)) ?
+            implode($glue, $this->pluck($value)->all()) :
+            implode($value, $this->items);
     }
 
     /**
@@ -908,9 +904,11 @@ final class ArrayCollection implements
      * @param  mixed  $items
      * @return static
      */
-    public function intersect($items)
+    public function intersect(mixed $items)
     {
-        return new static(array_intersect($this->items, $this->getArrayableItems($items)));
+        return new static(
+            array_intersect($this->items, $this->getArrayableItems($items))
+        );
     }
 
     /**
@@ -919,7 +917,7 @@ final class ArrayCollection implements
      * @param  mixed  $items
      * @return static
      */
-    public function intersectByKeys($items)
+    public function intersectByKeys(mixed $items)
     {
         return new static(array_intersect_key(
             $this->items,
@@ -953,7 +951,7 @@ final class ArrayCollection implements
      * @param  mixed  $value
      * @return bool
      */
-    protected function useAsCallable($value)
+    protected function useAsCallable(mixed $value)
     {
         return !is_string($value) && is_callable($value);
     }
@@ -965,24 +963,13 @@ final class ArrayCollection implements
      * @param  string  $finalGlue
      * @return string
      */
-    public function join($glue, $finalGlue = '')
+    public function join(string $glue, string $finalGlue = '')
     {
-        if ($finalGlue === '') {
-            return $this->implode($glue);
-        }
-
+        if ($finalGlue === '') return $this->implode($glue);
         $count = $this->count();
-
-        if ($count === 0) {
-            return '';
-        }
-
-        if ($count === 1) {
-            return $this->last();
-        }
-
+        if ($count === 0) return '';
+        if ($count === 1) return $this->last();
         $collection = new static($this->items);
-
         $finalItem = $collection->pop();
 
         return $collection->implode($glue) . $finalGlue . $finalItem;
@@ -1005,7 +992,7 @@ final class ArrayCollection implements
      * @param  mixed  $default
      * @return mixed
      */
-    public function last(callable $callback = null, $default = null)
+    public function last(?callable $callback = null, mixed $default = null)
     {
         return Arr::last($this->items, $callback, $default);
     }
@@ -1017,7 +1004,7 @@ final class ArrayCollection implements
      * @param  string|null  $key
      * @return static
      */
-    public function pluck($value, $key = null)
+    public function pluck(string|array $value, mixed $key = null)
     {
         return new static(Arr::pluck($this->items, $value, $key));
     }
@@ -1031,9 +1018,7 @@ final class ArrayCollection implements
     public function map(callable $callback)
     {
         $keys = array_keys($this->items);
-
         $items = array_map($callback, $this->items, $keys);
-
         return new static(array_combine($keys, $items));
     }
 
@@ -1047,7 +1032,6 @@ final class ArrayCollection implements
     {
         return $this->map(function ($chunk, $key) use ($callback) {
             $chunk[] = $key;
-
             return $callback(...$chunk);
         });
     }
@@ -1092,7 +1076,6 @@ final class ArrayCollection implements
     public function mapToGroups(callable $callback)
     {
         $groups = $this->mapToDictionary($callback);
-
         return $groups->map([$this, 'make']);
     }
 
@@ -1136,7 +1119,7 @@ final class ArrayCollection implements
      * @param  string  $class
      * @return static
      */
-    public function mapInto($class)
+    public function mapInto(string $class)
     {
         return $this->map(function ($value, $key) use ($class) {
             return new $class($value, $key);
@@ -1149,7 +1132,7 @@ final class ArrayCollection implements
      * @param  callable|string|null  $callback
      * @return mixed
      */
-    public function max($callback = null)
+    public function max(mixed $callback = null)
     {
         $callback = $this->valueRetriever($callback);
 
@@ -1157,7 +1140,6 @@ final class ArrayCollection implements
             return !is_null($value);
         })->reduce(function ($result, $item) use ($callback) {
             $value = $callback($item);
-
             return is_null($result) || $value > $result ? $value : $result;
         });
     }
@@ -1168,7 +1150,7 @@ final class ArrayCollection implements
      * @param  mixed  $items
      * @return static
      */
-    public function merge($items)
+    public function merge(mixed $items)
     {
         return new static(array_merge($this->items, $this->getArrayableItems($items)));
     }
@@ -1179,7 +1161,7 @@ final class ArrayCollection implements
      * @param  mixed  $values
      * @return static
      */
-    public function combine($values)
+    public function combine(mixed $values)
     {
         return new static(array_combine($this->all(), $this->getArrayableItems($values)));
     }
@@ -1190,7 +1172,7 @@ final class ArrayCollection implements
      * @param  mixed  $items
      * @return static
      */
-    public function union($items)
+    public function union(mixed $items)
     {
         return new static($this->items + $this->getArrayableItems($items));
     }
@@ -1201,7 +1183,7 @@ final class ArrayCollection implements
      * @param  callable|string|null  $callback
      * @return mixed
      */
-    public function min($callback = null)
+    public function min(mixed $callback = null)
     {
         $callback = $this->valueRetriever($callback);
 
@@ -1221,17 +1203,13 @@ final class ArrayCollection implements
      * @param  int  $offset
      * @return static
      */
-    public function nth($step, $offset = 0)
+    public function nth(int $step, int $offset = 0)
     {
         $new = [];
-
         $position = 0;
 
         foreach ($this->items as $item) {
-            if ($position % $step === $offset) {
-                $new[] = $item;
-            }
-
+            if ($position % $step === $offset) $new[] = $item;
             $position++;
         }
 
@@ -1244,18 +1222,11 @@ final class ArrayCollection implements
      * @param  mixed  $keys
      * @return static
      */
-    public function only($keys)
+    public function only(mixed $keys)
     {
-        if (is_null($keys)) {
-            return new static($this->items);
-        }
-
-        if ($keys instanceof self) {
-            $keys = $keys->all();
-        }
-
+        if (is_null($keys)) return new static($this->items);
+        if ($keys instanceof self) $keys = $keys->all();
         $keys = is_array($keys) ? $keys : func_get_args();
-
         return new static(Arr::only($this->items, $keys));
     }
 
@@ -1266,10 +1237,9 @@ final class ArrayCollection implements
      * @param  int  $perPage
      * @return static
      */
-    public function forPage($page, $perPage)
+    public function forPage(int $page, int $perPage)
     {
         $offset = max(0, ($page - 1) * $perPage);
-
         return $this->slice($offset, $perPage);
     }
 
@@ -1281,7 +1251,7 @@ final class ArrayCollection implements
      * @param  mixed  $value
      * @return static
      */
-    public function partition($key, $operator = null, $value = null)
+    public function partition(callable|string $key, mixed $operator = null, mixed $value = null)
     {
         $partitions = [new static, new static];
 
@@ -1562,7 +1532,7 @@ final class ArrayCollection implements
      * @param  callable|null  $callback
      * @return static
      */
-    public function sort(callable $callback = null)
+    public function sort(?callable $callback = null)
     {
         $items = $this->items;
 
@@ -1581,10 +1551,9 @@ final class ArrayCollection implements
      * @param  bool  $descending
      * @return static
      */
-    public function sortBy($callback, $options = SORT_REGULAR, $descending = false)
+    public function sortBy(callable|string $callback, int $options = SORT_REGULAR, bool $descending = false)
     {
         $results = [];
-
         $callback = $this->valueRetriever($callback);
 
         // First we will loop through the items and get the comparator from a callback
@@ -1614,7 +1583,7 @@ final class ArrayCollection implements
      * @param  int  $options
      * @return static
      */
-    public function sortByDesc($callback, $options = SORT_REGULAR)
+    public function sortByDesc(callable|string $callback, int $options = SORT_REGULAR)
     {
         return $this->sortBy($callback, $options, true);
     }
@@ -1626,7 +1595,7 @@ final class ArrayCollection implements
      * @param  bool  $descending
      * @return static
      */
-    public function sortKeys($options = SORT_REGULAR, $descending = false)
+    public function sortKeys(int $options = SORT_REGULAR, bool $descending = false)
     {
         $items = $this->items;
 
@@ -1641,7 +1610,7 @@ final class ArrayCollection implements
      * @param  int $options
      * @return static
      */
-    public function sortKeysDesc($options = SORT_REGULAR)
+    public function sortKeysDesc(int $options = SORT_REGULAR)
     {
         return $this->sortKeys($options, true);
     }
@@ -1928,7 +1897,7 @@ final class ArrayCollection implements
     /**
      * Get a base Support collection instance from this collection.
      *
-     * @return Collection
+     * @return ArrayCollection
      */
     public function toBase()
     {

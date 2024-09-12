@@ -6,6 +6,7 @@ require_once dirname(__DIR__) . '/bootstrap.php';
 
 use PHPUnit\Framework\TestCase;
 use Solital\Core\Http\Exception\HttpException;
+use Solital\Test\TestRouter;
 
 class CustomMiddlewareTest extends TestCase
 {

@@ -58,7 +58,7 @@ trait RequestTrait
      * @throws \InvalidArgumentException for any invalid value.
      */
     private function initialize(
-        string $method = null,
+        ?string $method = null,
         mixed $uri = null,
         mixed $body = 'php://memory',
         array $headers = []

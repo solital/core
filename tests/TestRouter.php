@@ -1,5 +1,7 @@
 <?php
 
+namespace Solital\Test;
+
 use Solital\Core\Course\Course;
 use Solital\Core\Http\Uri;
 
@@ -55,7 +57,7 @@ class TestRouter extends Course
 
         // Route request
         ob_start();
-        static::debugNoReset($testUrl, $testMethod, $reset);
+        static::debugNoReset($testUrl, $testMethod);
         $response = ob_get_clean();
 
         // Return response

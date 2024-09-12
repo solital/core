@@ -87,6 +87,7 @@ class MakeController extends Command implements CommandInterface
             ->addComment("Construct");
 
         $class = (new ClassType($controller_name))
+            ->setFinal()
             ->setExtends(Controller::class)
             ->addMember($construct)
             ->addMember($home_method)

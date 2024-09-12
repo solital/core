@@ -1,5 +1,7 @@
 <?php
 
+namespace Solital\Test\Course\Dummy\Security;
+
 use Solital\Core\Resource\Session;
 use Solital\Core\Http\Security\TokenProviderInterface;
 

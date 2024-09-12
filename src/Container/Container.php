@@ -269,7 +269,7 @@ class Container implements ContainerInterface
 	 * @return mixed
 	 */
 	#[\Override]
-	public function extend(string|callable $id, callable $callback = null): mixed
+	public function extend(string|callable $id, ?callable $callback = null): mixed
 	{
 		if ($callback === null) {
 			$callback = $id;

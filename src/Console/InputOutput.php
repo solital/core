@@ -87,7 +87,6 @@ class InputOutput
     {
         if (is_null($this->color)) $this->color = ColorsEnum::WHITE;
         $message = ConsoleOutput::message($message, $this->color)->getMessage();
-
         $this->message_console = $this->readlineWithUnicodeSupport($message);
         return $this;
     }
@@ -190,15 +189,16 @@ class InputOutput
      */
     private function readlineWithUnicodeSupport(?string $prompt = null): string|false
     {
-        if ($prompt !== null && $prompt !== '') {
-            echo $prompt;
-        }
-
+        if ($prompt !== null && $prompt !== '') echo $prompt;
         $line = fgets(STDIN);
 
         // readline() removes the trailing newline, fgets does not,
         // to emulate the real readline(), we also need to remove it
-        if ($line !== false && strlen($line) >= strlen(PHP_EOL) && str_ends_with($line, PHP_EOL)) {
+        if (
+            $line !== false && 
+            strlen($line) >= strlen(PHP_EOL) && 
+            str_ends_with($line, PHP_EOL)
+        ) {
             $line = substr($line, 0, -strlen(PHP_EOL));
         }
 

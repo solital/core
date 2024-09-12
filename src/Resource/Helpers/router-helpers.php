@@ -17,7 +17,7 @@ use Solital\Core\Security\Guardian;
  * 
  * @throws \InvalidArgumentException
  */
-function url(?string $name = null, $parameters = null, ?array $getParams = null): Uri
+function url(?string $name = null, mixed $parameters = null, ?array $getParams = null): Uri
 {
     return Course::getUri($name, $parameters, $getParams);
 }
@@ -29,13 +29,11 @@ function url(?string $name = null, $parameters = null, ?array $getParams = null)
  * @param string|null $defaultValue Default return value
  * @param array ...$methods Default methods
  */
-function input(string $index = null, string $defaultValue = null, ...$methods)
+function input(?string $index = null, ?string $defaultValue = null, ...$methods)
 {
-    if ($index !== null) {
-        return Course::request()->getInputHandler()->value($index, $defaultValue, ...$methods);
-    }
-
-    return Course::request()->getInputHandler();
+    return ($index !== null) ?
+        Course::request()->getInputHandler()->value($index, $defaultValue, ...$methods) :
+        Course::request()->getInputHandler();
 }
 
 /**
@@ -48,10 +46,7 @@ function input(string $index = null, string $defaultValue = null, ...$methods)
  */
 function to_route(string $url, ?int $code = null): void
 {
-    if ($code !== null) {
-        Course::response()->httpCode($code);
-    }
-
+    if ($code !== null) Course::response()->httpCode($code);
     Course::response()->redirect($url);
     exit;
 }
@@ -63,7 +58,7 @@ function to_route(string $url, ?int $code = null): void
  * 
  * @return string
  */
-function get_url(string $uri = null): string
+function get_url(?string $uri = null): string
 {
     return Guardian::getUrl($uri);
 }
@@ -79,9 +74,8 @@ function middleware(string $value): string
 {
     $config = Application::yamlParse('middleware.yaml');
 
-    if (array_key_exists($value, $config['middleware']) == true) {
+    if (array_key_exists($value, $config['middleware']) == true)
         return $config['middleware'][$value];
-    }
 
     throw new RuntimeException("Middleware key '" . $value . "' not exists in middleware.yaml");
 }

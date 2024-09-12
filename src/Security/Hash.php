@@ -124,6 +124,7 @@ final class Hash
     public function value(): mixed
     {
         $json = json_decode(self::$decoded, true);
+        if (is_null($json) || !array_key_exists("value", $json)) return false;
         return $json['value'];
     }
 
@@ -135,7 +136,15 @@ final class Hash
     public function isValid(): bool
     {
         $json = json_decode(self::$decoded, true);
-        if ($json['expire_at'] < date("Y-m-d H:i:s")) return false;
+        
+        if (
+            is_null($json) ||
+            !array_key_exists("expire_at", $json) ||
+            $json['expire_at'] < date("Y-m-d H:i:s")
+        ) {
+            return false;
+        }
+
         return true;
     }
 

@@ -10,6 +10,7 @@ require_once dirname(__DIR__) . '/bootstrap.php';
 
 use PHPUnit\Framework\TestCase;
 use Solital\Core\Course\Route\RouteUrl;
+use Solital\Test\TestRouter;
 
 class RouterRewriteTest extends TestCase
 {

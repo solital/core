@@ -184,7 +184,6 @@ class InputHandler
         $list = [];
 
         foreach ($array as $key => $value) {
-
             // Handle array input
             if (\is_array($value) === false) {
                 $list[$key] = new InputItem($key, $value);
@@ -192,7 +191,6 @@ class InputHandler
             }
 
             $output = $this->parseInputItem($value);
-
             $list[$key] = $output;
         }
 

@@ -1,5 +1,26 @@
 # Released Notes
 
+## v4.5.2 - (2024-09-12)
+
+### Fixed
+
+- Fixed PHP 8.4 implicit nullable
+
+----------------------------------------------------------------------
+
+## v4.5.1 - (2024-09-10)
+
+### Changed
+
+- Changed output in some default commands to banner
+
+### Fixed
+
+- Fixed `toString` method in `CommandException` class
+- Fixed `clearstatecache` in default commands
+
+----------------------------------------------------------------------
+
 ## v4.5.0 - (2024-08-14)
 
 ### Added

@@ -49,7 +49,7 @@ interface ContainerInterface extends PsrContainerInterface, \ArrayAccess
 	 * @param string|callable $id
 	 * @param callable|null $callback
 	 */
-	public function extend(string|callable $id, callable $callback = null);
+	public function extend(string|callable $id, ?callable $callback = null);
 
 	/**
 	 * Get a list of entry names in the container.

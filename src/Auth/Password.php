@@ -2,12 +2,11 @@
 
 namespace Solital\Core\Auth;
 
-use Solital\Core\Kernel\Application;
-use Solital\Core\Exceptions\NotFoundException;
-use SecurePassword\{SecurePassword, HashAlgorithm};
 use SensitiveParameter;
-use Solital\Core\Kernel\Dotenv;
+use Solital\Core\Exceptions\NotFoundException;
 use Solital\Core\Kernel\Exceptions\DotenvException;
+use Solital\Core\Kernel\{Application, Dotenv};
+use SecurePassword\{AlgorithmEnum, SecurePassword};
 
 class Password
 {
@@ -73,6 +72,8 @@ class Password
     }
 
     /**
+     * Creates a password peppered using the entered password and the secret entry.
+     * 
      * @param string $password
      * @param bool $info
      * 
@@ -80,11 +81,14 @@ class Password
      */
     public function create(#[SensitiveParameter] string $password, bool $info = false): mixed
     {
-        if ($info == true) return $this->password->createHash($password)->getHashInfo();
-        return $this->password->createHash($password)->getHash();
+        return ($info == true) ?
+            $this->password->createHash($password)->getHashInfo() :
+            $this->password->createHash($password)->getHash();
     }
 
     /**
+     * Verify if the hash generated with `createHash` is valid
+     * 
      * @param string $password
      * @param string $hash
      * 
@@ -98,6 +102,8 @@ class Password
     }
 
     /**
+     * This function checks to see if the supplied hash implements the algorithm and options provided. If not, it is assumed that the hash needs to be rehashed.
+     * 
      * @param string $password
      * @param string $hash
      * 
@@ -119,9 +125,9 @@ class Password
         $algo = $config['password']['algorithm'];
 
         $this->algo = match ($algo) {
-            'default' => HashAlgorithm::DEFAULT,
-            'argon2' => HashAlgorithm::ARGON2I,
-            'argon2d' => HashAlgorithm::ARGON2ID,
+            'default' => AlgorithmEnum::DEFAULT,
+            'argon2' => AlgorithmEnum::ARGON2I,
+            'argon2d' => AlgorithmEnum::ARGON2ID,
             default => throw new NotFoundException('Password: hash algorithm not found')
         };
 
@@ -130,24 +136,18 @@ class Password
         } elseif (Dotenv::isset('APP_HASH') == true && getenv('APP_HASH') != false) {
             $this->pepper = getenv('APP_HASH');
         } else {
-            if (getenv('APP_HASH') == '' || !Dotenv::isset('APP_HASH')) {
+            if (getenv('APP_HASH') == '' || !Dotenv::isset('APP_HASH'))
                 throw new DotenvException("APP_HASH not found. Execute 'php vinci generate:hash' command");
-            }
         }
 
-        if (isset($config['password']['wait_microseconds'])) {
+        if (isset($config['password']['crypt_type'])) $this->crypt_type = $config['password']['crypt_type'];
+        if (isset($config['password']['wait_microseconds']))
             $this->wait_microseconds = $config['password']['wait_microseconds'];
-        }
-
-        if (isset($config['password']['crypt_type'])) {
-            $this->crypt_type = $config['password']['crypt_type'];
-        }
 
         $this->cost = $config['password']['cost'];
         $this->memory_cost = $config['password']['memory_cost'];
         $this->time_cost = $config['password']['time_cost'];
         $this->threads = $config['password']['threads'];
-
         return $this;
     }
 }

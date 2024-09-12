@@ -7,6 +7,7 @@ require_once dirname(__DIR__) . '/bootstrap.php';
 
 use PHPUnit\Framework\TestCase;
 use Solital\Core\Http\Request;
+use Solital\Test\TestRouter;
 
 class RequestTest extends TestCase
 {

@@ -1,12 +1,15 @@
 <?php
 
-require_once 'Dummy/Security/DummyCsrfVerifier.php';
-require_once dirname(__DIR__) . '/Course/Dummy/Security/SilentTokenProvider.php';
+namespace Solital\Test\Http;
+
 require_once dirname(__DIR__) . '/bootstrap.php';
 
 use PHPUnit\Framework\TestCase;
 use Solital\Core\Http\Exception\TokenMismatchException;
 use Solital\Core\Http\Uri;
+use Solital\Test\Course\Dummy\Security\SilentTokenProvider;
+use Solital\Test\Http\Dummy\Security\DummyCsrfVerifier;
+use Solital\Test\TestRouter;
 
 class CsrfVerifierTest extends TestCase
 {

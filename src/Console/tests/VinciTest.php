@@ -1,5 +1,7 @@
 <?php
 
+namespace Solital\Core\Console\Tests;
+
 use PHPUnit\Framework\TestCase;
 use Solital\Core\Console\{Command, CommandException};
 use Solital\Core\Console\Tests\ExtendCommands\{ExtendedCommandsTest, OtherExtendComandTest};

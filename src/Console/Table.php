@@ -76,7 +76,7 @@ class Table
 
         foreach ($data as $name => $value) {
             $value = self::validateData($value);
-            echo $margin_string . ColorsEnum::GREEN->value . str_pad($name, $space) . ColorsEnum::RESET->value . $value . PHP_EOL;
+            echo $margin_string . ColorsEnum::LIGHT_GREEN->value . str_pad($name, $space) . ColorsEnum::RESET->value . $value . PHP_EOL;
         }
     }
 
@@ -198,23 +198,16 @@ class Table
             $keys = array_keys($row);
 
             foreach ($keys as $key) {
-                if (isset($headerData[$key])) {
-                    continue;
-                }
-
+                if (isset($headerData[$key])) continue;
                 $headerData[$key] = $key;
-                $columnLengths[$key] = $this->verifyStrlen($key);
+                $columnLengths[$key] = mb_strlen($key);
             }
         }
 
         foreach ($this->rows as $row) {
             foreach ($headerData as $column) {
-                $len = max($columnLengths[$column], $this->verifyStrlen($row[$column]));
-
-                if ($len % 2 !== 0) {
-                    ++$len;
-                }
-
+                $len = max($columnLengths[$column], mb_strlen($row[$column]));
+                if ($len % 2 !== 0) ++$len;
                 $columnLengths[$column] = $len;
             }
         }
@@ -229,9 +222,7 @@ class Table
 
         foreach ($this->rows as $row) {
             foreach ($headerData as $column) {
-                if (!isset($row[$column])) {
-                    $row[$column] = '[NULL]';
-                }
+                if (!isset($row[$column])) $row[$column] = '[NULL]';
             }
 
             $res .= $this->getFormattedRowContent($row, $columnLengths, implode(';', $this->cellStyle));
@@ -256,14 +247,18 @@ class Table
     ): string {
         $res = $this->getChar('left') . ' ';
         $rows = [];
-        $rows_formatted = [];
+        //$rows_formatted = [];
 
         foreach ($data as $key => $value) {
             $customFormat = '';
             $value = ' ' . $value;
-            $len = $this->verifyStrlen($value) - $lengths[$key] + 1;
+            $len = mb_strlen($value) - $lengths[$key] + 1;
 
-            if ($isHeader === false && isset($this->columnCellStyle[$key]) && !empty($this->columnCellStyle[$key])) {
+            if (
+                $isHeader === false &&
+                isset($this->columnCellStyle[$key]) &&
+                !empty($this->columnCellStyle[$key])
+            ) {
                 $customFormat = implode("", $this->columnCellStyle[$key]);
             }
 
@@ -273,18 +268,6 @@ class Table
                 . ($format !== '' || $customFormat !== '' ? ColorsEnum::RESET->value : '')
                 . str_repeat(' ', (int)abs($len));
         }
-
-        /* if ($isHeader == true) {
-            foreach ($rows as $row) {
-                if (str_contains($row, "\033") && str_contains($row, "m;")) {
-                    $rows_formatted[] = str_replace("m;", "m", $row);
-                }
-            }
-        } */
-
-        /* if (!empty($rows_formatted)) {
-            $rows = $rows_formatted;
-        } */
 
         $res .= implode($this->getChar('middle'), $rows);
         return $res . $this->getChar('right') . PHP_EOL;
@@ -352,36 +335,15 @@ class Table
      */
     private function getChar(string $char, int $len = 1): string
     {
-        //dd($this->borderStyle);
-        if (!isset($this->chars[$char])) {
-            return '';
-        }
-
-        //$res = (empty($this->borderStyle) ? '' : "\e[" . \implode(";", $this->borderStyle) . "m");
+        if (!isset($this->chars[$char])) return "";
         $res = (empty($this->borderStyle) ? '' : implode(";", $this->borderStyle));
 
-        if ($len === 1) {
-            $res .= $this->chars[$char];;
-        } else {
+        ($len === 1) ?
+            $res .= $this->chars[$char] :
             $res .= str_repeat($this->chars[$char], $len);
-        }
 
         $res .= empty($this->borderStyle) ? '' : ColorsEnum::RESET->value;
         return $res;
-    }
-
-    /**
-     * @param string $str
-     * 
-     * @return int
-     */
-    private function verifyStrlen(string $str): int
-    {
-        if (!function_exists('mb_strlen')) {
-            return strlen($str);
-        }
-
-        return mb_strlen($str);
     }
 
     /**
@@ -392,27 +354,14 @@ class Table
     private static function validateData(mixed $value): mixed
     {
         if (!is_string($value)) {
-            if (is_object($value)) {
-                $value = get_class($value);
-            }
+            if (is_object($value)) $value = get_class($value);
+            if (is_resource($value)) $value = '[RESOURCE]';
+            if (is_callable($value)) $value = '[CALLABLE]';
+            if (is_null($value)) $value = '[NULL]';
 
-            if (is_resource($value)) {
-                $value = '[RESOURCE]';
-            }
-
-            if (is_callable($value)) {
-                $value = '[CALLABLE]';
-            }
-
-            if (is_null($value)) {
-                $value = '[NULL]';
-            }
-
-            if (is_bool($value)) {
-                $value = $value === false ? '[FALSE]' : '[TRUE]';
-            } else {
+            (is_bool($value)) ?
+                $value = $value === false ? '[FALSE]' : '[TRUE]' :
                 $value = (string)$value;
-            }
         }
 
         return $value;
