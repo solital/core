@@ -1,14 +1,24 @@
 <?php
 
-require_once dirname(__DIR__) . '/bootstrap.php';
+require_once dirname(__DIR__, 2) . '/bootstrap.php';
 
 use PHPUnit\Framework\TestCase;
 use Solital\Core\Resource\Session;
-
-Session::start();
+use Solital\Core\Session\SessionConfiguration;
 
 class SessionTest extends TestCase
 {
+    private string $storage = __DIR__ . DIRECTORY_SEPARATOR . "storage";
+
+    public function setUp(): void
+    {
+        if (!is_dir($this->storage)) mkdir($this->storage);
+
+        $session = new SessionConfiguration();
+        $session->setSavePath($this->storage);
+        $session->start();
+    }
+    
     public function testCreateAndReadSession()
     {
         Session::set('name', 'Solital Framework');
@@ -18,10 +28,7 @@ class SessionTest extends TestCase
         session('name', 'Solital Framework');
         $res = session('name');
         $this->assertEquals($res, 'Solital Framework');
-    }
 
-    public function testHasSession()
-    {
         $res = Session::has('name');
         $this->assertTrue($res);
     }
@@ -48,5 +55,13 @@ class SessionTest extends TestCase
         $exists = Session::has('email');
         $this->assertEquals($res, 'solital@email.com');
         $this->assertFalse($exists);
+    }
+
+    public function __destruct()
+    {
+        array_map(
+            'unlink',
+            array_filter((array) array_merge(glob($this->storage . "/*")))
+        );
     }
 }

@@ -184,8 +184,8 @@ trait ClassLoaderTrait
                     $class[] = str_replace('.php', '', basename($file));
                 }
 
-                foreach ($class as $class) {
-                    $boot_manager[] = "\Solital\BootManager\\" . $class;
+                foreach ($class as $class_only) {
+                    $boot_manager[] = "\Solital\BootManager\\" . $class_only;
                 }
             }
         }

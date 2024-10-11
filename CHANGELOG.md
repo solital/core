@@ -1,5 +1,29 @@
 # Released Notes
 
+## v4.6.0 - (2024-10-11)
+
+### Added
+
+- Added session handler support
+- Added `session.yaml` file to configuration
+- Added policy validation trait for Password
+- Added render pure HTML in Wolf
+- Added `cookie` helper
+- Added `setMicrosecond`, `getMicrosecond`, `createFromTimeStamp`, 
+`toi18nFormat`, `getTextualDay`, `getTextualShortDay`, `getTextualMonth`, 
+`getTextualShortMonth`, `getLastDayOfMonth`, `getEasterDate`, 
+`getEasterDateOrthodox`, `isLeapYear` methods to Temporal class
+
+### Fixed
+
+- Fixed `Cookie` class to PHP 8.3 cookie parse
+
+### Deprecated
+
+- Deprecated `getMonthName` and `getMonthShortName` methods in Temporal class
+
+--------------------------------------------------------------------------
+
 ## v4.5.4 - (2024-09-12)
 
 ### Fixed

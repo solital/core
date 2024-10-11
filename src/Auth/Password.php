@@ -4,12 +4,15 @@ namespace Solital\Core\Auth;
 
 use SensitiveParameter;
 use Solital\Core\Exceptions\NotFoundException;
+use Solital\Core\Auth\Trait\PasswordPolicy;
 use Solital\Core\Kernel\Exceptions\DotenvException;
 use Solital\Core\Kernel\{Application, Dotenv};
 use SecurePassword\{AlgorithmEnum, SecurePassword};
 
 class Password
 {
+    use PasswordPolicy;
+
     /**
      * @var null|SecurePassword
      */
@@ -102,7 +105,8 @@ class Password
     }
 
     /**
-     * This function checks to see if the supplied hash implements the algorithm and options provided. If not, it is assumed that the hash needs to be rehashed.
+     * This function checks to see if the supplied hash implements the algorithm and options provided. 
+     * If not, it is assumed that the hash needs to be rehashed.
      * 
      * @param string $password
      * @param string $hash
@@ -137,7 +141,7 @@ class Password
             $this->pepper = getenv('APP_HASH');
         } else {
             if (getenv('APP_HASH') == '' || !Dotenv::isset('APP_HASH'))
-                throw new DotenvException("APP_HASH not found. Execute 'php vinci generate:hash' command");
+                throw new DotenvException("APP_HASH not found. Execute `php vinci generate:hash` command");
         }
 
         if (isset($config['password']['crypt_type'])) $this->crypt_type = $config['password']['crypt_type'];

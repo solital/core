@@ -1,0 +1,30 @@
+# Set the current session name
+name: 
+
+# Sets user-level session storage 
+# (files, sqlite, memcached, encrypt, pdo, apcu, dump)
+save_handler: files
+
+# Set the current session save path for memcached and redis
+save_path: localhost:11211
+
+# Specifies whether the module will use strict session id mode
+strict_mode: false
+
+# Set the current cache limiter
+cache_limiter: public
+
+# Set current cache expire
+cache_expire: 30
+
+# Specifies the number of seconds after which data will be seen as 'garbage' 
+# and potentially cleaned up. Default is 1440
+gc_max_lifetime: 1440
+
+# setGcProbability() in conjunction with session.gc_divisor is used to manage 
+# probability that the gc (garbage collection) routine is started. Defaults to 1
+gc_probability: 1
+
+# session.gc_divisor coupled with session.gc_probability defines the probability 
+# that the gc (garbage collection) process is started on every session initialization.
+gc_divisor: 100

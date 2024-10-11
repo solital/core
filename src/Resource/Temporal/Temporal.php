@@ -39,6 +39,36 @@ class Temporal extends DateTimeHandle
     }
 
     /**
+     * Make it convenient and fast to create `DateTime` or `DateTimeImmutable` instances from a UNIX timestamp
+     *
+     * @param int|float $timestamp
+     * @param string|null $timezone
+     * 
+     * @return static
+     */
+    public static function createFromTimeStamp(int|float $timestamp, ?string $timezone = null): static
+    {
+        if (!is_null($timezone)) self::setTimezone($timezone);
+
+        if (PHP_VERSION_ID >= 80400) {
+            self::$date_time_immutable = DateTimeImmutable::createFromTimeStamp($timestamp);
+        } else {
+            if (is_float($timestamp)) {
+                $format = "U.u";
+            } elseif (is_int($timestamp)) {
+                $format = "U";
+            }
+
+            self::$date_time_immutable = DateTimeImmutable::createFromFormat(
+                $format,
+                (string) $timestamp
+            );
+        }
+
+        return new static;
+    }
+
+    /**
      * Alters the timestamp
      *
      * @param string $modifier
@@ -241,6 +271,46 @@ class Temporal extends DateTimeHandle
         self::$date_time_immutable = self::$date_time->sub($interval);
 
         return new static;
+    }
+
+    /**
+     * Set the microsecond part of the timestamp
+     *
+     * @param int $microseconds
+     * 
+     * @return static
+     */
+    public function setMicrosecond(int $microseconds): static
+    {
+        if (PHP_VERSION_ID >= 80400) {
+            self::$date_time_immutable = self::$date_time->setMicrosecond($microseconds);
+        } else {
+            if ($microseconds < 0 || $microseconds > 999999) {
+                throw new \DateRangeError(
+                    "DateTimeImmutable::setMicrosecond(): Argument #1 (\$microsecond) must be between 0 and 999999, " . $microseconds . " given"
+                );
+            }
+
+            self::$date_time_immutable = self::$date_time->setTime(
+                self::$date_time->format('H'),
+                self::$date_time->format('i'),
+                self::$date_time->format('s'),
+                $microseconds
+            );
+        }
+
+        return new static;
+    }
+
+    /**
+     * Returns the microsecond part of the timestamp as an integer
+     *
+     * @return int
+     */
+    public function getMicrosecond(): int
+    {
+        if (PHP_VERSION_ID >= 80400) return self::$date_time_immutable->getMicrosecond();
+        return (int)self::$date_time_immutable->format("u");
     }
 
     /**

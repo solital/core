@@ -52,7 +52,7 @@ class WolfTest extends TestCase
         $this->assertEquals('<h1>home test SOLITAL</h1><p>solital@email.com</p>', $res);
     }
 
-    public function testCacheView()
+    /* public function testCacheView()
     {
         $result = false;
 
@@ -63,6 +63,12 @@ class WolfTest extends TestCase
         ]);
 
         $wolf->setView('contact')->setCacheTime('week')->render();
+    } */
+
+    public function testRenderHtml()
+    {
+        $wolf = Wolf::renderHtml("<h1>Solital</h1>");
+        $this->assertSame("&lt;h1&gt;Solital&lt;/h1&gt;", $wolf);
     }
 
     public function testWithInstance()

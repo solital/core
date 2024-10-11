@@ -26,32 +26,16 @@ trait WolfMinifyTrait
     {
         if (is_array($type)) {
             if ($type['wolf_minify'] != false) {
-                if ($type['wolf_minify'] == 'style') {
-                    $this->style();
-                }
-
-                if ($type['wolf_minify'] == 'script') {
-                    $this->script();
-                }
-
-                if ($type['wolf_minify'] == 'all') {
-                    $this->all();
-                }
+                if ($type['wolf_minify'] == 'style') $this->style();
+                if ($type['wolf_minify'] == 'script') $this->script();
+                if ($type['wolf_minify'] == 'all') $this->all();
             }
         }
 
         if (is_string($type)) {
-            if ($type == 'style') {
-                $this->style();
-            }
-
-            if ($type == 'script') {
-                $this->script();
-            }
-
-            if ($type == 'all') {
-                $this->all();
-            }
+            if ($type == 'style') $this->style();
+            if ($type == 'script') $this->script();
+            if ($type == 'all') $this->all();
         }
 
         return $this;
@@ -106,7 +90,6 @@ trait WolfMinifyTrait
     {
         $this->style();
         $this->script();
-
         return true;
     }
 
@@ -116,7 +99,6 @@ trait WolfMinifyTrait
     private static function getDirCss(): string
     {
         self::$dir = Application::getRoot("resources/assets/_css/");
-
         return self::$dir;
     }
 
@@ -126,7 +108,6 @@ trait WolfMinifyTrait
     private static function getDirJs(): string
     {
         self::$dir = Application::getRoot("resources/assets/_js/");
-
         return self::$dir;
     }
 
@@ -136,7 +117,6 @@ trait WolfMinifyTrait
     private static function getPublicDirCss(): string
     {
         self::$dir_public = Application::getRoot("public/assets/_css/");
-
         return self::$dir_public;
     }
 
@@ -146,7 +126,6 @@ trait WolfMinifyTrait
     private static function getPublicDirJs(): string
     {
         self::$dir_public = Application::getRoot("public/assets/_js/");
-
         return self::$dir_public;
     }
 }

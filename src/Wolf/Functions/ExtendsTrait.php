@@ -24,8 +24,8 @@ trait ExtendsTrait
     protected function generateTemplate(string $view): mixed
     {
         if (!Application::fileExistsWithoutCache($view)) {
-            Logger::channel('single')->error("Template '" . basename($view) . "' not found");
-            throw new WolfException("Template " . basename($view) . " not found");
+            Logger::channel('single')->error("Template `" . basename($view) . "` not found");
+            throw new WolfException("Template `" . basename($view) . "` not found");
         }
 
         ob_start();
@@ -113,7 +113,7 @@ trait ExtendsTrait
      * 
      * @return string
      */
-    private function convertPhpTags(string $view): string
+    protected function convertPhpTags(string $view): string
     {
         if (!file_exists($view)) throw new \Exception("Template `" . basename($view) . "` not extended because it wasn't found. This file is in another folder?");
         $render = file_get_contents($view);

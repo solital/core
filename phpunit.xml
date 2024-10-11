@@ -11,8 +11,8 @@
         displayDetailsOnTestsThatTriggerNotices="true"
         displayDetailsOnTestsThatTriggerWarnings="true">
   <!-- <extensions>
-    <bootstrap class="Solital\Core\PHPUnit\PhpUnitExtension">
-      <parameter name="enableByDefault" value="false"/>
+    <bootstrap class="Solital\PHPUnit\PhpUnitExtension">
+      <parameter name="enableByDefault" value="true"/>
       <parameter name="displayProfiling" value="true"/>
     </bootstrap>
   </extensions> -->

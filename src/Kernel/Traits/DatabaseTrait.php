@@ -62,19 +62,19 @@ trait DatabaseTrait
      */
     public static function loadDatabaseCache(): void
     {
-        $database_cache = self::yamlParse('cache.yaml');
+        $database_cache = self::yamlParse("cache.yaml");
 
-        if (isset($database_cache['cache_database']) && $database_cache['cache_database'] == true) {
-            if ($database_cache['cache_drive'] == 'file') {
-                throw new \TypeError('The cache drive "file" is not supported by Katrina ORM. Use "memcached", "memcache" or "apcu"');
+        if (isset($database_cache["cache_database"]) && $database_cache["cache_database"] == true) {
+            if ($database_cache["cache_drive"] == "file") {
+                throw new \TypeError("The cache drive `file` is not supported by Katrina ORM. Use `memcached`, `memcache` or `apcu`");
             }
 
-            if (!defined('DB_CACHE')) {
-                define('DB_CACHE', [
-                    'CACHE_TYPE' => $database_cache['cache_drive'],
-                    'CACHE_HOST' => $database_cache['cache_host'],
-                    'CACHE_PORT' => $database_cache['cache_port'],
-                    'CACHE_TTL' => $database_cache['cache_ttl']
+            if (!defined("DB_CACHE")) {
+                define("DB_CACHE", [
+                    "CACHE_TYPE" => $database_cache["cache_drive"],
+                    "CACHE_HOST" => $database_cache["cache_host"],
+                    "CACHE_PORT" => $database_cache["cache_port"],
+                    "CACHE_TTL" => $database_cache["cache_ttl"]
                 ]);
             }
         }

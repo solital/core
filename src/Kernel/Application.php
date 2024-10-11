@@ -3,18 +3,17 @@
 namespace Solital\Core\Kernel;
 
 use Solital\Core\Course\Course;
-use Solital\Core\Resource\Session;
 use Solital\Core\Security\Guardian;
 use Solital\Core\FileSystem\HandleFiles;
 use Solital\Core\Kernel\Ini\IniCore;
 use Solital\Core\Kernel\Exceptions\ApplicationException;
 use Solital\Core\Container\Interface\ContainerInterface;
 use Solital\Core\Container\{Container, DefaultServiceContainer};
-use Solital\Core\Kernel\Traits\{KernelTrait, ClassLoaderTrait, DatabaseTrait, YamlTrait};
+use Solital\Core\Kernel\Traits\{KernelTrait, ClassLoaderTrait, DatabaseTrait, SessionTrait, YamlTrait};
 
 abstract class Application
 {
-    use KernelTrait, ClassLoaderTrait, DatabaseTrait, YamlTrait;
+    use KernelTrait, ClassLoaderTrait, DatabaseTrait, SessionTrait, YamlTrait;
 
     /**
      * @var string
@@ -25,11 +24,6 @@ abstract class Application
      * @var int
      */
     private static int $error_code;
-
-    /**
-     * @var string
-     */
-    //private static string $default_timezone = "America/Fortaleza";
 
     /**
      * @var HandleFiles
@@ -56,7 +50,6 @@ abstract class Application
 
         /* LOAD YAML CONFIG */
         $exception_config = self::yamlParse('exceptions.yaml', true);
-        $bootstrap_config = self::yamlParse('bootstrap.yaml');
 
         /* LOAD SERVICE PROVIDER */
         self::$container = new Container();
@@ -81,10 +74,8 @@ abstract class Application
     public static function init(): void
     {
         self::getInstance();
-        self::connectionDatabase();
         self::loadBootManager();
         Guardian::validateDomain();
-
         Course::start();
     }
 
@@ -110,7 +101,7 @@ abstract class Application
         $db_config = self::$db;
         $database_connection = self::yamlParse('database.yaml', throws: true);
         $db_config = self::setDatabaseConnection($database_connection);
-
+        
         // Set variables fo main database
         if (!defined('DB_CONFIG')) {
             define('DB_CONFIG', [
@@ -258,12 +249,10 @@ abstract class Application
     public static function sessionInit(): void
     {
         $session_dir = self::getRootApp('Storage/session');
+        $yaml_config = self::yamlParse("session.yaml");
 
-        if (!session_id()) {
-            if (!is_dir($session_dir)) self::$handle->create($session_dir);
-            session_save_path($session_dir);
-            Session::start();
-        }
+        if (!is_dir($session_dir)) self::$handle->create($session_dir);
+        self::loadSession($session_dir, $yaml_config);
     }
 
     /**

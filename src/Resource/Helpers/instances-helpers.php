@@ -2,6 +2,7 @@
 
 use Solital\Core\Cache\SimpleCache;
 use Solital\Core\Resource\{Collection\ArrayCollection, JSON, Message, Session, Str\Str};
+use Solital\Core\Resource\Cookie;
 use Solital\Core\Resource\Memorize\{Memorizator, Storage, Utils};
 use Solital\Core\Security\Hash;
 
@@ -189,4 +190,16 @@ function encrypt(string $value, string $time = '+1 hour'): string
 function decrypt(string $key): Hash
 {
     return Hash::decrypt($key);
+}
+
+/**
+ * Prepares a new cookie
+ *
+ * @param string $name
+ * 
+ * @return Cookie
+ */
+function cookie(string $name): Cookie
+{
+    return new Cookie($name);    
 }

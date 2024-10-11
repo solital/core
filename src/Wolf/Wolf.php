@@ -176,6 +176,21 @@ class Wolf
     }
 
     /**
+     * Render HTML
+     *
+     * @param string $html
+     * 
+     * @return string
+     * 
+     */
+    public static function renderHtml(string $html): string
+    {
+        ob_start();
+        echo htmlspecialchars($html);
+        return ob_get_clean();
+    }
+
+    /**
      * Escape HTML tags
      * 
      * @param mixed $args

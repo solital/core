@@ -2,7 +2,6 @@
 
 namespace Solital\Core\Wolf;
 
-use Solital\Core\FileSystem\HandleFiles;
 use Solital\Core\Kernel\Application;
 use Solital\Core\Wolf\Functions\ExtendsTrait;
 
@@ -46,7 +45,7 @@ trait WolfCacheTrait
 
             return $this;
         }
-        
+
         if (is_string($time)) {
             match ($time) {
                 'minute' => $this->forOneMinute(),
@@ -110,11 +109,9 @@ trait WolfCacheTrait
      */
     protected function getFolderCache(): string
     {
-        if (Application::isCli() == true) {
-            $this->cache_dir = Application::getRootApp('view/cache/');
-        } else {
+        (Application::isCli() == true) ?
+            $this->cache_dir = Application::getRootApp('view/cache/') :
             $this->cache_dir = Application::getRootApp("Storage/cache/wolf/");
-        }
 
         if (!is_dir($this->cache_dir)) Application::provider('handler-file')->create($this->cache_dir);
         return $this->cache_dir;

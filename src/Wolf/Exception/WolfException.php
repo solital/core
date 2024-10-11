@@ -2,7 +2,4 @@
 
 namespace Solital\Core\Wolf\Exception;
 
-class WolfException extends \Exception
-{
-    
-}
+class WolfException extends \Exception {}

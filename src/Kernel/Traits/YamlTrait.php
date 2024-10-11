@@ -32,7 +32,7 @@ trait YamlTrait
         $full_yaml_file = $yaml_dir_file  . $yaml_file;
 
         if (!self::fileExistsWithoutCache($full_yaml_file)) {
-            if ($throws == true) throw new YamlException('YAML file "' . $yaml_file . '" not found');
+            if ($throws == true) throw new YamlException("YAML file `" . $yaml_file . "` not found");
             return false;
         }
 
