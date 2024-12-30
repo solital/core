@@ -2,6 +2,8 @@
 
 namespace Solital\Core\Security\Scanner\Traits;
 
+use Solital\Core\Console\Output\ConsoleOutput;
+
 trait PrintTrait
 {
     /**
@@ -176,29 +178,29 @@ trait PrintTrait
     {
         $end = time();
         
-        $this->info('End time: ')->print();
-        $this->line((string)date('Y-m-d H:i:s', $end))->print()->break(true);
+        ConsoleOutput::info('End time: ')->print();
+        ConsoleOutput::line((string)date('Y-m-d H:i:s', $end))->print()->break(true);
 
-        $this->info('Total execution time: ')->print();
-        $this->line(($end - $start))->print()->break();
+        ConsoleOutput::info('Total execution time: ')->print();
+        ConsoleOutput::line(($end - $start))->print()->break();
 
-        $this->info('Base directory: ')->print();
-        $this->line($dir)->print()->break(true);
+        ConsoleOutput::info('Base directory: ')->print();
+        ConsoleOutput::line($dir)->print()->break(true);
 
-        $this->info('Total directories scanned: ')->print();
-        $this->line($this->stat['directories'])->print()->break();
+        ConsoleOutput::info('Total directories scanned: ')->print();
+        ConsoleOutput::line($this->stat['directories'])->print()->break();
 
-        $this->info('Total files scanned: ')->print();
-        $this->line($this->stat['files_scanned'])->print()->break(true);
+        ConsoleOutput::info('Total files scanned: ')->print();
+        ConsoleOutput::line($this->stat['files_scanned'])->print()->break(true);
 
         if ($this->stat['files_infected'] == 0) {
-            $this->success('No malware was found')->print();
+            ConsoleOutput::success('No malware was found')->print();
         } else {
-            $this->error('Total malware identified:')->print();
-            $this->line(' ' . $this->stat['files_infected'])->print()->break(true);
+            ConsoleOutput::error('Total malware identified:')->print();
+            ConsoleOutput::line(' ' . $this->stat['files_infected'])->print()->break(true);
 
             foreach ($this->found_malwawre as $found) {
-                $this->line($found)->print()->break();
+                ConsoleOutput::line($found)->print()->break();
             }
         }
     }

@@ -6,8 +6,9 @@ use Solital\Core\Console\Command;
 use Solital\Core\Console\Interface\CommandInterface;
 use Solital\Core\Kernel\Console\HelpersTrait;
 use Solital\Core\Console\Output\ConsoleOutput;
+use Solital\Core\Schedule\Attribute\EveryMinute;
 use Solital\Core\Kernel\{Application, DebugCore};
-use Solital\Core\Schedule\{Schedule, ScheduleInterface, TaskSchedule};
+use Solital\Core\Schedule\{ScheduleInterface, TaskSchedule};
 use Nette\PhpGenerator\{ClassType, Method, PhpNamespace};
 
 class MakeSchedule extends Command implements CommandInterface
@@ -79,12 +80,14 @@ class MakeSchedule extends Command implements CommandInterface
             ->addImplement(ScheduleInterface::class)
             ->addMember($constructor)
             ->addMember($handle_method)
+            ->addAttribute(EveryMinute::class)
             ->addComment("@generated class generated using Vinci Console");
 
         $data = (new PhpNamespace("Solital\Schedule"))
             ->add($class)
             ->addUse(ScheduleInterface::class)
-            ->addUse(TaskSchedule::class);
+            ->addUse(TaskSchedule::class)
+            ->addUse(EveryMinute::class);
 
         return $data;
     }

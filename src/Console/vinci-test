@@ -4,16 +4,13 @@
 require_once 'vendor/autoload.php';
 
 use SebastianBergmann\Environment\Console;
-use Solital\Core\Console\Command;
-use Solital\Core\Console\TableBuilder;
-use Solital\Core\Console\ProgressBar\ProgressBar;
-use Solital\Core\Console\ProgressBar\ProgressBarStyle;
 use Solital\Core\Console\InputOutput;
-use Solital\Core\Console\Output\ColorsEnum;
-use Solital\Core\Console\Output\ConsoleOutput;
-use Solital\Core\Console\tests\ExtendCommands\{ExtendedCommandsTest, OtherExtendComandTest};
+use Solital\Core\Console\{Command, TableBuilder};
+use Solital\Core\Console\ProgressBar\{ProgressBar, ProgressBarStyle};
+use Solital\Core\Console\Output\{ColorsEnum, ConsoleOutput};
+use Solital\Core\Console\tests\ExtendCommands\{ExtendedCommands, OtherExtendComand};
 
-$classes = [ExtendedCommandsTest::class, OtherExtendComandTest::class];
+$classes = [ExtendedCommands::class, OtherExtendComand::class];
 $cmd = new Command($classes);
 $res = $cmd->read($argv, $argv);
 

@@ -5,7 +5,7 @@ namespace Solital\Core\Console\Tests\Commands;
 use Solital\Core\Console\Command;
 use Solital\Core\Console\Interface\CommandInterface;
 
-class CustomCommandsTest extends Command implements CommandInterface
+class CustomCommands extends Command implements CommandInterface
 {
     protected string $command = "create:test";
     //protected array $arguments = ["argument-custom-second"];
@@ -22,5 +22,7 @@ class CustomCommandsTest extends Command implements CommandInterface
         if (isset($options->witharg)) {
             return $options->witharg;
         }
+
+        return null;
     }
 }

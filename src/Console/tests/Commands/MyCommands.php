@@ -5,7 +5,7 @@ namespace Solital\Core\Console\Tests\Commands;
 use Solital\Core\Console\Command;
 use Solital\Core\Console\Interface\CommandInterface;
 
-class MyCommandsTest extends Command implements CommandInterface
+class MyCommands extends Command implements CommandInterface
 {
     protected string $command = "user:test";
     //protected array $arguments = ["argument_test"];

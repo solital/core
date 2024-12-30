@@ -7,6 +7,7 @@
         "php": "^8.3",
         "ext-json": "*",
         "ext-pdo": "*",
+        "ext-intl": "*",
         "brenno-duarte/apcu-oop": "^1.0",
         "brenno-duarte/modern-php-exception": "^3.3",
         "brenno-duarte/php-secure-password": "^3.1",
@@ -39,8 +40,7 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^11",
-        "phpstan/phpstan": "^1.9",
-        "rector/rector": "^1.2"
+        "phpstan/phpstan": "^1.9"
     },
     "autoload": {
         "exclude-from-classmap": [

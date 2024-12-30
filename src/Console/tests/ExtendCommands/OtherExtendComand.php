@@ -3,13 +3,16 @@
 namespace Solital\Core\Console\Tests\ExtendCommands;
 
 use Solital\Core\Console\Interface\ExtendCommandsInterface;
-use Solital\Core\Console\Tests\Commands\{CustomCommandsTest, CustomTest};
+use Solital\Core\Console\Tests\Commands\{CallSameCommand, MyCommands};
 
-class ExtendedCommandsTest implements ExtendCommandsInterface
+class OtherExtendComand implements ExtendCommandsInterface
 {
+    /**
+     * @var array
+     */
     protected array $command_class = [
-        CustomCommandsTest::class,
-        CustomTest::class
+        MyCommands::class,
+        CallSameCommand::class
     ];
 
     #[\Override]
@@ -21,6 +24,6 @@ class ExtendedCommandsTest implements ExtendCommandsInterface
     #[\Override]
     public function getTypeCommands(): string
     {
-        return "Extended Commands Test";
+        return "Other Extend Commands Test";
     }
 }

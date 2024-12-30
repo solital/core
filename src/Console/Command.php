@@ -10,8 +10,8 @@ class Command
 {
     use DefaultCommandsTrait;
 
-    public const VERSION = "4.5.2";
-    public const DATE_VERSION = "Sep 12 2024";
+    public const VERSION = "4.5.3";
+    public const DATE_VERSION = "Dec 30 2024";
     public const SITE_DOC = "https://solital.github.io/site/docs/4.x/vinci-console/";
 
     /**

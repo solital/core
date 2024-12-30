@@ -8,6 +8,7 @@ require_once dirname(__DIR__) . '/bootstrap.php';
 use PHPUnit\Framework\TestCase;
 use Solital\Core\Http\Input\InputItem;
 use Solital\Test\TestRouter;
+use Solital\Core\Http\RequestValidatorInterface;
 
 class InputHandlerTest extends TestCase
 {
@@ -113,6 +114,90 @@ class InputHandlerTest extends TestCase
         }
 
         $_GET = [];
+    }
+
+    public function testValidation()
+    {
+        global $_POST;
+
+        $_POST = [
+            'username' => 'Solital123',
+            'password' => 'password2024'
+        ];
+
+        $data_rules = [
+            'username' => 'required|alpha_numeric|max_len,100|min_len,6',
+            'password' => 'required|max_len,100|min_len,6',
+            'email'    => 'required|valid_email'
+        ];
+
+        $router = TestRouter::router();
+        $router->reset();
+        $router->getRequest()->setMethod('post');
+
+        $handler = TestRouter::request()->getInputHandler();
+        
+        $result = $handler->validate($data_rules);
+        $this->assertArrayHasKey('validation_errors', $result);
+
+        $_POST = [
+            'username' => 'Solital123',
+            'password' => ' password2024 ',
+            'email' => 'solital@email.com',
+        ];
+
+        $data_filter = [
+            'username' => 'upper_case|sanitize_string',
+            'password' => 'trim',
+            'email'    => 'trim|sanitize_email'
+        ];
+
+        $result = $handler->validate($data_rules, $data_filter);
+        $this->assertArrayIsEqualToArrayOnlyConsideringListOfKeys([
+            'username' => 'SOLITAL123',
+            'password' => 'password2024',
+            'email' => 'solital@email.com',
+        ], $result, ['username', 'password', 'email']);
+
+
+        $validator_class = new class implements RequestValidatorInterface
+        {
+            public function rules(): array
+            {
+                return [
+                    'username' => 'required|alpha_numeric|max_len,100|min_len,6',
+                    'password' => 'required|max_len,100|min_len,6',
+                    'email'    => 'required|valid_email'
+                ];
+            }
+
+            public function filters(): array
+            {
+                return [
+                    'username' => 'upper_case|sanitize_string',
+                    'password' => 'trim',
+                    'email'    => 'trim|sanitize_email'
+                ];
+            }
+
+            public function messages(): array
+            {
+                return [
+                    'username' => ['required' => 'Fill the Username field please, its required.'],
+                    'password' => ['required' => 'Please enter a password. This field is empty.'],
+                    'email'    => ['valid_email' => 'Please enter a valid e-mail.']
+                ];
+            }
+        };
+
+        $result = $handler->validate($validator_class::class, $data_filter);
+        $this->assertArrayIsEqualToArrayOnlyConsideringListOfKeys([
+            'username' => 'SOLITAL123',
+            'password' => 'password2024',
+            'email' => 'solital@email.com',
+        ], $result, ['username', 'password', 'email']);
+
+        $_POST = [];
     }
 
     public function testFile()

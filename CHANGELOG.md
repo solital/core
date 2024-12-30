@@ -1,5 +1,15 @@
 # Released Notes
 
+## v4.6.1 - (2024-12-30)
+
+### Fixed
+
+- Fixed attribute in make schedule
+- Fixed print in scan component
+- Fixed explicit nullable in `CommandException`
+
+--------------------------------------------------------------------------
+
 ## v4.6.0 - (2024-10-11)
 
 ### Added

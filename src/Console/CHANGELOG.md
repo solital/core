@@ -1,5 +1,13 @@
 # Released Notes
 
+## v4.5.3 - (2024-12-30)
+
+### Fixed
+
+- Fixed implicit nullable in `CommandException`
+
+----------------------------------------------------------------------
+
 ## v4.5.2 - (2024-09-12)
 
 ### Fixed
