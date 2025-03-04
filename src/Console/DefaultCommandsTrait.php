@@ -142,9 +142,9 @@ trait DefaultCommandsTrait
 
         for ($i = 0; $i < count($all['cmd']); $i++) {
             echo PHP_EOL;
-            ConsoleOutput::warning(ColorsEnum::ITALIC->value . $all['type'][$i])->print()->break();
 
             if (isset($all_commands[$i])) {
+                ConsoleOutput::warning(ColorsEnum::ITALIC->value . $all['type'][$i])->print()->break();
                 Table::formattedRowData($all_commands[$i], margin: true);
             }
         }

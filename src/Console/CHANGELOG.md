@@ -1,5 +1,13 @@
 # Released Notes
 
+## v4.5.4 - (2025-03-04)
+
+### Changed
+
+- Changed message when not exists commands
+
+----------------------------------------------------------------------
+
 ## v4.5.3 - (2024-12-30)
 
 ### Fixed

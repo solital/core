@@ -148,45 +148,39 @@ class GenerateConfigFiles extends Command implements CommandInterface
     {
         $dir_cmd = Application::getRootApp('Console/', DebugCore::isCoreDebugEnabled());
 
-        $command_class = (new Property('command_class'))
-            ->setType('array')
+        $command_class = (new Property("command_class"))
+            ->setType("array")
             ->setValue([])
             ->setProtected()
             ->addComment("\n@var array\n");
 
-        $type_commands = (new Property('type_commands'))
-            ->setType('string')
-            ->setValue("")
-            ->setProtected()
-            ->addComment("\n@var string\n");
-
-        $get_command_class = (new Method('getCommandClass'))
+        $get_command_class = (new Method("getCommandClass"))
             ->setPublic()
-            ->setBody('return $this->command_class;')
-            ->setReturnType('array')
+            ->setBody("\$this->command_class = Application::getUserCommands();\nreturn \$this->command_class;")
+            ->setReturnType("array")
             ->addComment("@return array");
 
-        $get_type_command = (new Method('getTypeCommands'))
+        $get_type_command = (new Method("getTypeCommands"))
             ->setPublic()
-            ->setBody('return $this->type_commands;')
-            ->setReturnType('string')
+            ->setBody("return \"User Command\";")
+            ->setReturnType("string")
             ->addComment("@return string");
 
-        $class = (new ClassType('Config'))
+        $class = (new ClassType("Config"))
             ->addImplement(ExtendCommandsInterface::class)
             ->addMember($get_command_class)
             ->addMember($get_type_command)
             ->addMember($command_class)
-            ->addMember($type_commands)
             ->addComment("@generated class generated using Vinci Console");
 
         $data = (new PhpNamespace("Solital\Console"))
             ->add($class)
-            ->addUse(ExtendCommandsInterface::class);
+            ->addUse(ExtendCommandsInterface::class)
+            ->addUse(Application::class);
 
         $this->createComponent($data, [
-            'component_name' => 'Config',
-            'directory' => $dir_cmd
+            "component_name" => "Config",
+            "directory" => $dir_cmd
         ]);
 
         return $this;
