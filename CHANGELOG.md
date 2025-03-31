@@ -1,5 +1,19 @@
 # Released Notes
 
+## v4.7.0 - (2025-03-31)
+
+### Added
+
+- Added  `Str::doesntContain()`, `Str::between()` and `Str::uuid()` methods
+- Added `disableCoreDebug` method in `init` method
+
+### Deprecated
+
+- Deprecated `getMonthInt` method in `Temporal` component
+- Deprecated `time` property in `TaskSchedule` class
+
+--------------------------------------------------------------------------
+
 ## v4.6.2 - (2025-03-04)
 
 ### Changed

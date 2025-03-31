@@ -73,6 +73,7 @@ abstract class Application
      */
     public static function init(): void
     {
+        DebugCore::disableCoreDebug();
         self::getInstance();
         self::loadBootManager();
         Guardian::validateDomain();

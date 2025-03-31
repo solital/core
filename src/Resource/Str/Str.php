@@ -845,9 +845,9 @@ final class Str extends StrMask
         $ellipsis = '';
         $max_length = max($max_length, 0);
 
-        if (mb_strlen($this->value()) <= $max_length) {
+        /* if (mb_strlen($this->value()) <= $max_length) {
             return $this->value();
-        }
+        } */
 
         if ($add_ellipsis === true) {
             $ellipsis = mb_substr('...', 0, $max_length);

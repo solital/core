@@ -2,6 +2,7 @@
 
 namespace Solital\Core\Schedule;
 
+use Deprecated\Deprecated;
 use GO\{Scheduler, Traits\Interval};
 use Solital\Core\Console\Output\ConsoleOutput;
 use Solital\Core\Schedule\Exception\ScheduleException;
@@ -17,7 +18,9 @@ class TaskSchedule extends Scheduler
 
     /**
      * @var string
+     * @deprecated Use the attributes instead of this property
      */
+    #[Deprecated("Use the attributes instead of this property", "Solital 4.7")]
     protected string $time = "everyMinute()";
 
     /**

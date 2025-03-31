@@ -2,6 +2,7 @@
 
 namespace Solital\Core\Kernel\Console\Commands;
 
+use Solital\Core\FileSystem\HandleFiles;
 use Solital\Core\Console\Command;
 use Solital\Core\Console\Interface\CommandInterface;
 use Solital\Core\Kernel\Console\HelpersTrait;
@@ -49,7 +50,7 @@ class MakeSchedule extends Command implements CommandInterface
     #[\Override]
     public function handle(object $arguments, object $options): mixed
     {
-        $this->handle = Application::provider('handler-file');
+        $this->handle = new HandleFiles();
         $this->schedule_dir = Application::getRootApp('Schedule/', DebugCore::isCoreDebugEnabled());
 
         if (isset($options->remove)) $this->removeComponent($this->schedule_dir, $arguments->schedule_name . ".php");

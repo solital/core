@@ -278,9 +278,23 @@ abstract class DateTimeHandle
         return (int)self::$date_time_immutable->format('Y');
     }
 
-    public function getMonthInt(): int
+    /**
+     * Return numeric representation of a month
+     *
+     * @return int
+     */
+    public function getMonth(): int
     {
         return (int)self::$date_time_immutable->format('m');
+    }
+
+    /**
+     * @deprecated Use `getMonth` instead
+     */
+    #[Deprecated("Use `getMonth` instead", "4.6")]
+    public function getMonthInt(): int
+    {
+        return $this->getMonth();
     }
 
     public function getTextualMonth(): string

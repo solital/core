@@ -30,6 +30,16 @@ abstract class DebugCore
     }
 
     /**
+     * Disable debug in Core
+     *
+     * @return void
+     */
+    public static function disableCoreDebug(): void
+    {
+        self::$debug = false;
+    }
+
+    /**
      * Get debug status
      *
      * @return bool

@@ -2,10 +2,31 @@
 
 namespace Solital\Core\Resource\Str\Trait;
 
+use Symfony\Component\Uid\Uuid;
 use Solital\Core\Resource\Str\Exceptions\InvalidStringArgumentException;
 
 trait StrStaticTrait
 {
+    /**
+     * Returns everything in a source string that exists between the first occurance of each of the two key substrings
+     * [!!] Not chainable
+     *
+     * @param string $string
+     * @param string $start
+     * @param string $end
+     * 
+     * @return string
+     */
+    public static function between(string $string, string $start, string $end): string
+    {
+        $string = ' ' . $string;
+        $ini = mb_strpos($string, $start, 0, 'UTF-8');
+        if ($ini == 0) return '';
+        $ini += mb_strlen($start, 'UTF-8');
+        $len = mb_strpos($string, $end, $ini, 'UTF-8') - $ini;
+        return mb_substr($string, $ini, $len, 'UTF-8');
+    }
+
     /**
      * Does current string contain a subtring?
      * [!!] Not chainable
@@ -87,6 +108,20 @@ trait StrStaticTrait
     {
         if (null === $encoding) $encoding = mb_internal_encoding();
         return strcasecmp(mb_strtoupper($string1, $encoding), mb_strtoupper($string2, $encoding));
+    }
+
+    /**
+     * Does current string not contain a subtring?
+     * [!!] Not chainable
+     *
+     * @param string $haystack
+     * @param string $needle
+     * 
+     * @return bool
+     */
+    public static function doesntContain(string $haystack, string $needle): bool
+    {
+        return !self::contains($haystack, $needle);
     }
 
     /**
@@ -179,6 +214,16 @@ trait StrStaticTrait
     {
         if (self::isBinary($string)) return mb_count_chars($string, 3);
         return count_chars($string, 3);
+    }
+
+    /**
+     * Returns the identifier as a raw binary string
+     *
+     * @return string
+     */
+    public static function uuid(): string
+    {
+        return Uuid::v4()->toBinary();
     }
 
     /**

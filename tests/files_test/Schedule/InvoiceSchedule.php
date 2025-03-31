@@ -2,13 +2,15 @@
 
 namespace Solital\Schedule;
 
-use Solital\Core\Schedule\Schedule;
+use Solital\Core\Schedule\Attribute\EveryMinute;
 use Solital\Core\Schedule\ScheduleInterface;
+use Solital\Core\Schedule\TaskSchedule;
 
 /**
  * @generated class generated using Vinci Console
  */
-class InvoiceSchedule extends Schedule implements ScheduleInterface
+#[EveryMinute]
+class InvoiceSchedule extends TaskSchedule implements ScheduleInterface
 {
 	/**
 	 * Construct with schedule time
@@ -24,6 +26,6 @@ class InvoiceSchedule extends Schedule implements ScheduleInterface
 	 */
 	public function handle(): mixed
 	{
-		return true;
+		return $this;
 	}
 }
