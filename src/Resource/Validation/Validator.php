@@ -1,24 +1,24 @@
 <?php
 
-namespace Solital\Core\Resource;
+namespace Solital\Core\Resource\Validation;
 
-use GUMP;
+use Solital\Core\Resource\Validation\DataValidator;
 
-class Validation
+class Validator
 {
     /**
-     * @var GUMP
+     * @var DataValidator
      */
-    private GUMP $gump;
+    private DataValidator $validator;
 
     /**
      * @var array
      */
     private array $data;
 
-    public function __construct()
+    public function __construct(string $language = "en")
     {
-        $this->gump = new GUMP();
+        $this->validator = new DataValidator($language);
     }
 
     /**
@@ -30,7 +30,7 @@ class Validation
      */
     public function verifyRequestInput(array $rules, ?array $input = null): self
     {
-        $this->gump->validation_rules($rules);
+        $this->validator->validation_rules($rules);
 
         if (!is_null($input)) {
             // Código para pegar valores usando o Input Handler
@@ -52,7 +52,7 @@ class Validation
      */
     public function verify(array $data, array $rules): self
     {
-        $this->gump->validation_rules($rules);
+        $this->validator->validation_rules($rules);
         $this->data = $data;
         return $this;
     }
@@ -66,7 +66,7 @@ class Validation
      */
     public function setFieldsErrorMessages(array $messages): self
     {
-        $this->gump->set_fields_error_messages($messages);
+        $this->validator->set_fields_error_messages($messages);
         return $this;
     }
 
@@ -79,7 +79,7 @@ class Validation
      */
     public function filter(array $rules): self
     {
-        $this->gump->filter_rules($rules);
+        $this->validator->filter_rules($rules);
         return $this;
     }
 
@@ -90,12 +90,10 @@ class Validation
      */
     public function getResult(): array
     {
-        $validated = $this->gump->run($this->data);
+        $validated = $this->validator->run($this->data);
 
-        if ($this->gump->errors()) {
-            return ['validation_errors' => $this->gump->get_errors_array()];
-        } else {
-            return $validated;
-        }
+        return ($this->validator->errors()) ? 
+            ['validation_errors' => $this->validator->get_errors_array()] : 
+            $validated;
     }
 }

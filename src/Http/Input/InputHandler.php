@@ -3,7 +3,8 @@
 namespace Solital\Core\Http\Input;
 
 use Solital\Core\Http\{Request, RequestValidatorInterface};
-use Solital\Core\Resource\{JSON, Validation};
+use Solital\Core\Resource\JSON;
+use Solital\Core\Resource\Validation\Validator;
 
 class InputHandler
 {
@@ -372,7 +373,7 @@ class InputHandler
             $data_filter = $request_validation->filters();
         }
 
-        $valid = new Validation();
+        $valid = new Validator();
         $valid->verifyRequestInput($validate);
 
         if (!empty($data_messages)) {

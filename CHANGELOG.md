@@ -1,5 +1,17 @@
 # Released Notes
 
+## v4.7.1 - (2025-04-05)
+
+### Fixed
+
+- Fixed and added new validation package
+
+### Removed
+
+- Removed `wixel/gump` package
+
+--------------------------------------------------------------------------
+
 ## v4.7.0 - (2025-03-31)
 
 ### Added
