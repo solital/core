@@ -51,7 +51,5 @@ class MakeMigrations extends Command implements CommandInterface
             ConsoleOutput::error("Error: " . $e->getMessage())->print()->break();
             return false;
         }
-
-        return $this;
     }
 }

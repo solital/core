@@ -1,5 +1,15 @@
 # Released Notes
 
+## v4.8.0 - (2025-06-18)
+
+### Added
+
+- Added `Number::toRoman` method
+- Added support to ignore migration
+- Added `--refresh` an `--reset` options to migrations
+
+--------------------------------------------------------------------------
+
 ## v4.7.1 - (2025-04-05)
 
 ### Fixed

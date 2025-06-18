@@ -37,10 +37,21 @@ trait HandleMigrationTrait
 
         if (isset($options->rollback)) {
             $this->runRollback($migrations_db, $options);
+            exit;
         }
 
-        foreach ($migrations_db as $migrations_db) {
-            $migrations_db_array = (array)$migrations_db;
+        if (isset($options->refresh)) {
+            $this->runRollback($migrations_db, count($migrations_db));
+            $migrations_db = [];
+        }
+
+        if (isset($options->reset)) {
+            $this->runRollback($migrations_db, count($migrations_db));
+            exit;
+        }
+
+        foreach ($migrations_db as $migration_db) {
+            $migrations_db_array = (array)$migration_db;
             $to_array[] = $migrations_db_array['name'] . ".php";
         }
 
@@ -79,8 +90,8 @@ trait HandleMigrationTrait
      */
     private function convertMigrationsObject(mixed $migrations, object $options): mixed
     {
-        foreach ($migrations as $migrations) {
-            $migrations_array[] = (array)$migrations;
+        foreach ($migrations as $migration) {
+            $migrations_array[] = (array)$migration;
         }
 
         $reverse = array_reverse($migrations_array);

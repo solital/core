@@ -7,7 +7,8 @@ use NumberFormatter;
 class Number
 {
     /**
-     * Reduce a large number
+     * Simplifies large numbers by converting them into more readable values using 
+     * thousands (K), millions (M), and billions (B)
      *
      * @param float $number
      * @param int|null $decimals
@@ -16,15 +17,14 @@ class Number
      */
     public static function reduce(float $number, ?int $decimals = null): float
     {
-        if (!is_null($decimals) && $decimals > 0) {
-            return self::numberFormat($number, $decimals);
-        }
-
-        return self::numberFormat($number, 2);
+        return (!is_null($decimals) && $decimals > 0) ?
+            self::numberFormat($number, $decimals) :
+            self::numberFormat($number, 2);
     }
 
     /**
-     * Get currency format
+     * Formats a numerical value into a specific currency format, supporting different locales and 
+     * currency symbols (USD, EUR, BRL, and others)
      *
      * @param int|float $value
      * @param string $currency_code
@@ -43,7 +43,7 @@ class Number
     }
 
     /**
-     * Get percent format
+     * Converts a numerical value into its percentage representation
      *
      * @param int|float $value
      * @param int $precision
@@ -57,7 +57,7 @@ class Number
     }
 
     /**
-     * Spellout rule-based format
+     * Transforms numeric values into their text equivalent
      *
      * @param int|float $value
      * @param string $locale
@@ -84,12 +84,12 @@ class Number
         } elseif ($number < $min) {
             return $min;
         }
-        
+
         return $number;
     }
 
     /**
-     * Format a value
+     * Formats numbers with thousand separators, decimal precision, and currency symbols
      *
      * @param int|float $value
      * @param string $locale
@@ -111,6 +111,20 @@ class Number
     }
 
     /**
+     * Transforms an integer into its Roman numeral equivalent. 
+     * This is useful for formatting dates, numbering lists, or historical references
+     *
+     * @param int $value
+     * 
+     * @return string
+     */
+    public static function toRoman(int $value): string
+    {
+        $nf = new \MessageFormatter('@numbers=roman', '{0, number}');
+        return $nf->format([$value]);
+    }
+
+    /**
      * Reduce a large number 
      */
     private static function numberFormat(
@@ -119,7 +133,12 @@ class Number
         string $dec_point = ".",
         string $thousands_sep = ""
     ): float {
-        return (float) number_format($number, $decimals, $dec_point, $thousands_sep);
+        return (float) number_format(
+            $number,
+            $decimals,
+            $dec_point,
+            $thousands_sep
+        );
     }
 
     /**
@@ -137,9 +156,8 @@ class Number
         $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
         $formatter->setAttribute(NumberFormatter::GROUPING_USED, $groupingUsed);
 
-        if ($style == NumberFormatter::CURRENCY) {
+        if ($style == NumberFormatter::CURRENCY)
             $formatter->setTextAttribute(NumberFormatter::CURRENCY_CODE, $currencyCode);
-        }
 
         return $formatter->format($value);
     }

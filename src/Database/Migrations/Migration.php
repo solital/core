@@ -36,6 +36,13 @@ class Migration
     protected HandleFiles $handle;
 
     /**
+     * Migration shoud be ignored?
+     * 
+     * @var bool
+     */
+    protected bool $ignore_migration = false;
+
+    /**
      * Create a migrator instance.
      */
     public function __construct()
@@ -241,15 +248,15 @@ class Migration
 
     /**
      * @param mixed $migrations_db
-     * @param object $options
+     * @param object|int $options
      * 
      * @return void
      */
-    private function runRollback(mixed $migrations_db, object $options): void
+    private function runRollback(mixed $migrations_db, object|int $options): void
     {
         $start_time = microtime(true);
 
-        if (!is_bool($options->rollback)) {
+        if (isset($options->rollback) && !is_bool($options->rollback)) {
             $migrations_db = $this->convertMigrationsObject($migrations_db, $options);
         }
 
@@ -278,7 +285,7 @@ class Migration
         $execution_time = ($end_time - $start_time);
 
         echo PHP_EOL;
-        ConsoleOutput::success("Migrations performed on: " . $execution_time . " sec")->print()->break()->exit();
+        ConsoleOutput::success("Migrations performed on: " . $execution_time . " sec")->print()->break();
     }
 
     /**
@@ -307,9 +314,8 @@ class Migration
             ConsoleOutput::status(basename($migration_file), function () use ($migration_file, $options) {
                 $instance = $this->instantiateMigration(basename($migration_file));
 
-                if ($instance === null) {
-                    return false;
-                }
+                if ($instance === null) return false;
+                if ($instance->isIgnored() == true) return false;
 
                 if (isset($options->rollback)) {
                     $this->provider->delete("name", basename($migration_file));
@@ -365,5 +371,15 @@ class Migration
         }
 
         return null;
+    }
+
+    /**
+     * Migration shoud be ignored?
+     *
+     * @return bool
+     */
+    private function isIgnored(): bool
+    {
+        return $this->ignore_migration;
     }
 }
