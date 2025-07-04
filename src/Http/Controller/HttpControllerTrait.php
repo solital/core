@@ -16,7 +16,7 @@ trait HttpControllerTrait
      * 
      * @return mixed
      */
-    public function getRequestParams(string $index = null, string $defaultValue = null, ...$methods): mixed
+    public function getRequestParams(?string $index = null, ?string $defaultValue = null, ...$methods): mixed
     {
         $reflection = new \ReflectionFunction('input');
         return $reflection->invoke($index, $defaultValue, $methods);

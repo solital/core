@@ -1,5 +1,13 @@
 # Released Notes
 
+## v4.8.1 - (2025-07-04)
+
+### Fixed
+
+- Fixed implicit nullable in `HttpControllerTrait` trait
+
+--------------------------------------------------------------------------
+
 ## v4.8.0 - (2025-06-18)
 
 ### Added
