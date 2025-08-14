@@ -48,7 +48,9 @@ final class Hash
         #[SensitiveParameter] string $crypt_key
     ): Encryption {
         if (getenv('APP_HASH') == '' || !Dotenv::isset('APP_HASH')) {
-            throw new DotenvException("APP_HASH not found. Execute 'php vinci generate:hash' command");
+            throw new DotenvException(
+                "APP_HASH not found. Execute 'php vinci generate:hash' command"
+            );
         }
 
         $adapter = match ($adapter_name) {
@@ -86,7 +88,7 @@ final class Hash
                 self::getCryptConfig('openssl'),
                 getenv('APP_HASH')
             )->encrypt(json_encode($data));
-            $key = str_replace("==", "EQUALS", $key);
+            $key = str_replace(['==', '='], ['EQUALSTWO', 'EQUALSONE'], $key);
         }
 
         return (string)$key;
@@ -108,8 +110,11 @@ final class Hash
         ) {
             $decode = self::legacyOpenSSLEncryption('decrypt', key: $key);
         } else {
-            $key = str_replace("EQUALS", "==", $key);
-            $decode = self::encryption(self::getCryptConfig('openssl'), getenv('APP_HASH'))->decrypt($key);
+            $key = str_replace(['EQUALSTWO', 'EQUALSONE'], ['==', '='], $key);
+            $decode = self::encryption(
+                self::getCryptConfig('openssl'), 
+                getenv('APP_HASH')
+            )->decrypt($key);
         }
 
         self::$decoded = $decode;
